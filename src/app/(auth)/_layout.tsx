@@ -46,7 +46,7 @@ export default function TabLayout() {
           title: 'Register',
           tabBarIcon: ({ color }) => <TabBarIcon name="credit-card" color={color} />,
           headerRight: () => (
-            <Link href="/modals/tool-tip-modal" asChild>
+            <Link href="/modals/tool-tip-register-modal" asChild>
               <Pressable>
                 {({ pressed }) => (
                   <FontAwesome
