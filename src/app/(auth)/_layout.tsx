@@ -33,15 +33,14 @@ export default function TabLayout() {
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
       }}>
-      <Tabs.Screen
-        name="index"
+      <Tabs.Screen name="index" options={{ href: null }} />
+      <Tabs.Screen name="login"
         options={{
           title: 'Login',
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />
         }}
       />
-      <Tabs.Screen
-        name="register"
+      <Tabs.Screen name="register"
         options={{
           title: 'Register',
           tabBarIcon: ({ color }) => <TabBarIcon name="credit-card" color={color} />,

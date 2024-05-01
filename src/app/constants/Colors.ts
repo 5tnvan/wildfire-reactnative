@@ -16,4 +16,7 @@ export default {
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorDark,
   },
+  gradient: {
+    warm: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500',
+  }
 };

@@ -7,7 +7,7 @@ import React from 'react';
  * **/
 const IndexPage = () => {
     return (
-        <Redirect href={"/(auth)"} />
+        <Redirect href={"/(tabs)"} />
     );
 }
 
