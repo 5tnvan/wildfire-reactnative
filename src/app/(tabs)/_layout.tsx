@@ -3,8 +3,9 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { MaterialIcons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
-import { Link, Tabs } from 'expo-router';
+import { Link, Tabs, useSegments } from 'expo-router';
 import { Pressable } from 'react-native';
+import { BlurView } from 'expo-blur';
 
 import Colors from '@/src/app/constants/Colors';
 import { useColorScheme } from '@/src/app/components/useColorScheme';
@@ -27,6 +28,7 @@ function TabBarIcon(props: {
  * **/
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const segment = useSegments();
 
   return (
     <Tabs
@@ -56,6 +58,7 @@ export default function TabLayout() {
         options={{
           title: 'Skort',
           tabBarIcon: ({ color }) => <MaterialIcons name="app-shortcut" size={24} color={color} />,
+          tabBarStyle: { display: segment[1] === "skort" ? 'none' : 'flex'}
         }}
       />
       <Tabs.Screen

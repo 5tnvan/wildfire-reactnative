@@ -1,5 +1,5 @@
 import { View, Text, Image, ImageBackground, StyleSheet } from 'react-native';
-import AuthRegister from '../components/AuthRegister';
+import AuthRegister from '../components/auth/AuthRegister';
 
 export default function RegisterScreen() {
   return (
