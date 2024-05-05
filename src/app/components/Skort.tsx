@@ -15,6 +15,59 @@ const videos = [
   "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
 ];
 
+const videos2 = [
+  {
+    uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+    title: "This is for bigger fun!",
+    likes: 100,
+    comments: 50,
+    shares: 20,
+    username: "big_bunny",
+    avatar_url: "https://media1.tenor.com/m/hOFCCrNX1-4AAAAC/deadpixels-dpgc.gif",
+    followers: 500,
+  },
+  {
+    uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    title: "Bigger Blazes :)",
+    likes: 200,
+    comments: 70,
+    shares: 30,
+    username: "small_pie",
+    avatar_url: "https://media.tenor.com/xahLJFsO-cEAAAAi/thank-you.gif",
+    followers: 1000,
+  },
+  {
+    uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    title: "Big buck big",
+    likes: 100,
+    comments: 50,
+    shares: 20,
+    username: "big_bunny",
+    avatar_url: "https://media1.tenor.com/m/hOFCCrNX1-4AAAAC/deadpixels-dpgc.gif",
+    followers: 500,
+  },
+  {
+    uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    title: "Elephant do not forget",
+    likes: 200,
+    comments: 70,
+    shares: 30,
+    username: "small_pie",
+    avatar_url: "https://media.tenor.com/xahLJFsO-cEAAAAi/thank-you.gif",
+    followers: 1000,
+  },
+  {
+    uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    title: "Big escapes",
+    likes: 200,
+    comments: 70,
+    shares: 30,
+    username: "chewbaka",
+    avatar_url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    followers: 2374,
+  },
+];
+
 export function LogoWildfireLit() {
   return (
     <Image
@@ -74,7 +127,7 @@ export function PressableBuy() {
         source={require('@/assets/images/dollar-coin.png')}
         className='w-5 h-5'
       />
-      <Text className='font-semibold ml-1'>Buy $TRAN</Text>
+      <Text className='font-semibold ml-1'>Buy $BUNNEH</Text>
     </Pressable>
   );
 }
@@ -88,7 +141,7 @@ export function PressableAvatarWithUsername() {
       }}
     >
       <Avatar width={45} height={45} border={2} />
-      <Text className='font-semibold text-lg text-white ml-1'>@username</Text>
+      <Text className='font-semibold text-lg text-white ml-1'>@bunneh</Text>
     </Pressable>
   );
 }
@@ -164,7 +217,7 @@ export default function SkortScreen() {
         <View className="flex-row items-center justify-between w-full px-3">
           <View className='flex-row items-center'>
             <LogoWildfireLit />
-            <Text className='text-lg text-white font-semibold ml-2'>Video title</Text>
+            <Text className='text-lg text-white font-semibold ml-2'>Is there extraterrestrial life?</Text>
           </View>
           <View><PressableSkort /></View>
         </View>
