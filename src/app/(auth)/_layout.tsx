@@ -22,7 +22,7 @@ function TabBarIcon(props: {
  * TAB LAYOUT
  * Entry Point to the app
  * **/
-export default function TabLayout() {
+export default function AuthLayout() {
   const colorScheme = useColorScheme();
 
   return (
@@ -37,7 +37,21 @@ export default function TabLayout() {
       <Tabs.Screen name="login"
         options={{
           title: 'Login',
-          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />
+          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+          headerRight: () => (
+            <Link href="/modals/tool-tip-login-modal" asChild>
+              <Pressable>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="info-circle"
+                    size={25}
+                    color={Colors[colorScheme ?? 'light'].text}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+            </Link>
+          ),
         }}
       />
       <Tabs.Screen name="register"

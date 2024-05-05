@@ -1,5 +1,7 @@
 import { Redirect } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
+import { Session } from '@supabase/supabase-js';
 
 /** 
  * ROOT INDEX
@@ -7,8 +9,7 @@ import React from 'react';
  * **/
 const IndexPage = () => {
     return (
-        <Redirect href={"/(tabs)"} />
-    );
+        <Redirect href={"/(auth)"} />
+    ); 
 }
-
 export default IndexPage;

@@ -1,6 +1,6 @@
 import { supabase } from '@/src/lib/supabase'
 import React, { useState } from 'react'
-import { Alert, StyleSheet, View, AppState } from 'react-native'
+import { Alert, StyleSheet, View, AppState, Pressable, Text } from 'react-native'
 import { Button, Input } from 'react-native-elements'
 
 // Tells Supabase Auth to continuously refresh the session automatically if
@@ -37,6 +37,7 @@ export default function AuthRegister() {
 
   return (
     <View className='w-full'>
+      
       <View>
         <Input
           label="Email"
@@ -59,7 +60,10 @@ export default function AuthRegister() {
         />
       </View>
       <View>
-        <Button title="Register" disabled={loading} onPress={() => signUpWithEmail()} />
+        {/* <Button title="Register" disabled={loading} onPress={() => signUpWithEmail()} /> */}
+        <Pressable className='items-center justify-center p-3 rounded-full bg-accent' onPress={() => console.log("ya")}>
+            <Text className='text-lg text-black font-semibold'>Register</Text>
+          </Pressable>
       </View>
     </View>
   )

@@ -3,8 +3,6 @@ import { Platform, StyleSheet, useColorScheme } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Image } from 'react-native';
 import { Text, View } from "@/src/app/components/Themed";
-import Colors from "@/src/app/constants/Colors";
-import { Stack } from "expo-router";
 
 type Props = {
   iconName: any,
@@ -28,19 +26,18 @@ export default function ModalScreen() {
     <View className="flex grow items-center justify-start pt-20 pl-5 pr-5">
       {/* Create a wildpay account */}
       <View className='flex flex-row items-center justify-center mb-5'>
-        <Text className="text-lg mr-2 font-bold">Create a</Text>
+        <Text className="text-lg mr-2 font-bold">Log in with </Text>
         <Image
           source={require('@/assets/images/wildpay-logo.png')}
           className='w-5 h-5 mr-1'
         />
-        <Text className='text-indigo-700 text-lg font-bold mr-2'>wildpay</Text>
-        <Text className="text-lg font-bold">account</Text>
+        <Text className='text-indigo-800 text-lg font-bold mr-2'>wildpay</Text>
       </View>
       {/* Tooltips */}
       <View className="flex flex-col w-full">
-        <ToolTip iconName="user" iconSize={16} text="Wildpay keeps your payments in-check" />
-        <ToolTip iconName="key" iconSize={16} text="Sync your Wildpay followers to Wildfire" />
-        <ToolTip iconName="bitcoin" iconSize={16} text="Withdraw your coins from Wildpay, instantly" />
+        <ToolTip iconName="key" iconSize={16} text="Login with the same credentials" />
+        <ToolTip iconName="bitcoin" iconSize={16} text="Reset password if you don't remember" />
+        <ToolTip iconName="bitcoin" iconSize={16} text="Register a new account if you have one" />
       </View>
       
       {/* Use a light status bar on iOS to account for the black space above the modal */}
