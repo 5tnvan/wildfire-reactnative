@@ -3,13 +3,14 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { MaterialIcons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
-import { Link, Tabs, useSegments } from 'expo-router';
+import { Link, Redirect, Tabs, useSegments } from 'expo-router';
 import { Pressable } from 'react-native';
 import { BlurView } from 'expo-blur';
 
 import Colors from '@/src/app/constants/Colors';
 import { useColorScheme } from '@/src/app/components/useColorScheme';
 import { useClientOnlyValue } from '@/src/app/components/useClientOnlyValue';
+import { useAuth } from '../providers/AuthProvider';
 
 /** 
  * TAB LAYOUT
@@ -29,6 +30,14 @@ function TabBarIcon(props: {
 export default function ProtectedLayout() {
   const colorScheme = useColorScheme();
   const segment = useSegments();
+
+  const { isAuthenticated, user, session } = useAuth();
+
+  console.log("userId", user?.id);
+
+  if (!isAuthenticated) {
+    return <Redirect href="/(auth)" />;
+  }
 
   return (
     <Tabs
@@ -58,7 +67,7 @@ export default function ProtectedLayout() {
         options={{
           title: 'Skort',
           tabBarIcon: ({ color }) => <MaterialIcons name="app-shortcut" size={24} color={color} />,
-          tabBarStyle: { display: segment[1] === "skort" ? 'none' : 'flex'}
+          tabBarStyle: { display: segment[1] === "skort" ? 'none' : 'flex'} //hide tab bar for this screen
         }}
       />
       <Tabs.Screen
