@@ -4,23 +4,23 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Video, ResizeMode } from 'expo-av';
-import { LogoWildfireLit } from '../logos/LogoFireLit';
-import { ViewCount } from '../counts/ViewCount';
-import { PressableShare } from '../pressables/PressableShare';
-import { PressableComment } from '../pressables/PressableComment';
-import { PressableFire } from '../pressables/PressableFire';
-import { PressableAvatarWithUsername } from '../pressables/PressableAvatarWithUsername';
-import { PressableTip } from '../pressables/PressableTip';
-import { PressableGift } from '../pressables/PressableGift';
-import { PressableBuy } from '../pressables/PressableBuy';
-import FormatNumber from '../FormatNumber';
+import { LogoWildfireLit } from './logos/LogoFireLit';
+import { ViewCount } from './counts/ViewCount';
+import { PressableShare } from './pressables/PressableShare';
+import { PressableComment } from './pressables/PressableComment';
+import { PressableFire } from './pressables/PressableFire';
+import { PressableAvatarWithUsername } from './pressables/PressableAvatarWithUsername';
+import { PressableTip } from './pressables/PressableTip';
+import { PressableGift } from './pressables/PressableGift';
+import { PressableBuy } from './pressables/PressableBuy';
+import FormatNumber from './FormatNumber';
 import { LinearGradient } from 'expo-linear-gradient';
-import { PressableNFT } from '../pressables/PressableNFT';
+import { PressableNFT } from './pressables/PressableNFT';
 
 const videos2 = [
   {
     uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-    title: "This is for bigger fun! This is for bigger fun! This is for bigger fun! This is for bigger fun!",
+    title: "This is for bigger fun!",
     fires: 1456,
     comments: 50,
     shares: 203,
@@ -101,7 +101,7 @@ const videos2 = [
  * SKORT SCREEN
  * Skort is a short with a reveal
  * **/
-export default function SkortScreen() {
+export default function SkortComponent() {
   const router = useRouter();
   const [currentViewableItemIndex, setCurrentViewableItemIndex] = useState(0);
   const viewabilityConfig = { viewAreaCoveragePercentThreshold: 50 };

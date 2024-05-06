@@ -8,7 +8,7 @@ import { useColorScheme } from '@/src/app/components/useColorScheme';
 import { useClientOnlyValue } from '@/src/app/components/useClientOnlyValue';
 
 /** 
- * TAB LAYOUT
+ * TAB BAR ICON
  * Icons: https://icons.expo.fyi/
  * **/
 function TabBarIcon(props: {
@@ -19,8 +19,8 @@ function TabBarIcon(props: {
 }
 
 /** 
- * TAB LAYOUT
- * Entry Point to the app
+ * AUTH LAYOUT
+ * _layout for /(auth)
  * **/
 export default function AuthLayout() {
   const colorScheme = useColorScheme();
@@ -33,7 +33,11 @@ export default function AuthLayout() {
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true)
       }}>
+
+      {/* (auth)/index */}
       <Tabs.Screen name="index" options={{ href: null }} />
+
+      {/* (auth)/login */}
       <Tabs.Screen name="login"
         options={{
           title: 'Login',
@@ -54,6 +58,8 @@ export default function AuthLayout() {
           ),
         }}
       />
+      
+      {/* (auth)/register */}
       <Tabs.Screen name="register"
         options={{
           title: 'Register',

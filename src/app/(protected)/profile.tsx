@@ -4,7 +4,7 @@ import { Button, Input } from 'react-native-elements'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from '@/src/lib/supabase'
 
-export default function ProfilePage({ session }: { session: Session }) {
+export default function ProfileScreen({ session }: { session: Session }) {
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState('')
   const [website, setWebsite] = useState('')

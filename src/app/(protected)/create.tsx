@@ -1,7 +1,7 @@
 import { View, Text, Image } from 'react-native';
 import AuthLogin from '../components/auth/AuthLogin';
 
-export default function CreatePage() {
+export default function CreateScreen() {
   return (
     <View className="flex flex-col justify-center items-end px-4 grow">
       <Image source={{ uri: "https://media.tenor.com/ZZu2QC-efdUAAAAi/cute-cat-white.gif" }} width={80} height={80}/>

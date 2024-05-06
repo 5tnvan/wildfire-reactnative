@@ -23,10 +23,10 @@ function TabBarIcon(props: {
 }
 
 /** 
- * TAB LAYOUT
- * Entry Point to the app
+ * PROTECTED LAYOUT
+ * _layout for (protected)
  * **/
-export default function TabLayout() {
+export default function ProtectedLayout() {
   const colorScheme = useColorScheme();
   const segment = useSegments();
 

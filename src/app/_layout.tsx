@@ -3,13 +3,29 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-
+import { useEffect, useState } from 'react';
 import { useColorScheme } from '@/src/app/components/useColorScheme';
-
 export { ErrorBoundary, } from 'expo-router'; // Catch any errors thrown by the Layout component.
-export const unstable_settings = { initialRouteName: '(tabs)', }; // Ensure that reloading on `/modal` keeps a back button present.
+export const unstable_settings = { initialRouteName: '(auth)', }; // Ensure that reloading on `/modal` keeps a back button present.
 SplashScreen.preventAutoHideAsync(); // Prevent the splash screen from auto-hiding before asset loading is complete.
+
+/** 
+ * ROOT LAYOUT NAV
+ * **/
+function RootLayoutNav() {
+  const colorScheme = useColorScheme();
+
+  return (
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <Stack>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(protected)" options={{ headerShown: false }} />
+        <Stack.Screen name="modals/tool-tip-register-modal" options={{ title: 'Tooltip', presentation: 'card', headerBackTitle: 'Back' }} />
+        <Stack.Screen name="modals/tool-tip-login-modal" options={{ title: 'Tooltip', presentation: 'card', headerBackTitle: 'Back' }} />
+      </Stack>
+    </ThemeProvider>
+  );
+}
 
 /** 
  * ROOT LAYOUT
@@ -17,7 +33,7 @@ SplashScreen.preventAutoHideAsync(); // Prevent the splash screen from auto-hidi
  * **/
 export default function RootLayout() {
 
-  //LOADING FONTS
+  //Loading fonts
   const [loaded, error] = useFonts({
     SpaceMono: require('../../assets/fonts/NeueHaasDisplayRoman.ttf'),
     ...FontAwesome.font,
@@ -38,23 +54,6 @@ export default function RootLayout() {
     return null;
   }
 
+
   return <RootLayoutNav />;
-}
-
-/** 
- * ROOT LAYOUT NAV
- * 
- * **/
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modals/tool-tip-register-modal" options={{ presentation: 'card' }} />
-      </Stack>
-    </ThemeProvider>
-  );
 }
