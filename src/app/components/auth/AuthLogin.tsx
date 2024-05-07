@@ -43,10 +43,9 @@ export default function AuthLogin() {
         />
       </View>
       <View>
-        <Button title="Log In" disabled={loading} onPress={() => signInWithEmail()} />
-          {/* <Pressable className='items-center justify-center p-3 rounded-full bg-accent' onPress={() => console.log("ya")}>
+          <Pressable className='items-center justify-center p-3 rounded-full bg-accent' onPress={() => signInWithEmail()}>
             <Text className='text-lg text-black font-semibold'>Log In</Text>
-          </Pressable> */}
+          </Pressable>
       </View>
 
     </View>

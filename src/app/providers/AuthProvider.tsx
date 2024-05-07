@@ -32,7 +32,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
             value={{
                 session,
                 user: session?.user || null,
-                isAuthenticated: !!session?.user && !session.user.is_anonymous,
+                isAuthenticated: !!session?.user,
             }}
         >
             {children}
