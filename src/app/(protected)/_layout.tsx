@@ -3,17 +3,15 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { MaterialIcons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
-import { Link, Redirect, Tabs, useSegments } from 'expo-router';
-import { Pressable } from 'react-native';
-import { BlurView } from 'expo-blur';
-
+import { Redirect, Tabs, useSegments } from 'expo-router';
 import Colors from '@/src/app/constants/Colors';
 import { useColorScheme } from '@/src/app/components/useColorScheme';
 import { useClientOnlyValue } from '@/src/app/components/useClientOnlyValue';
 import { useAuth } from '../providers/AuthProvider';
+import AuthUserProvider, { useAuthUser } from '../providers/AuthUserProvider';
 
 /** 
- * TAB LAYOUT
+ * TAB BAR ICON
  * Icons: https://icons.expo.fyi/
  * **/
 function TabBarIcon(props: {
@@ -24,20 +22,11 @@ function TabBarIcon(props: {
 }
 
 /** 
- * PROTECTED LAYOUT
- * _layout for (protected)
+ * PROTECTED LAYOUT NAVIGATION
  * **/
-export default function ProtectedLayout() {
-  const colorScheme = useColorScheme();
+function ProtectedLayoutNav() {
   const segment = useSegments();
-
-  const { isAuthenticated, user, session } = useAuth();
-
-  console.log("userId", user?.id);
-
-  if (!isAuthenticated) {
-    return <Redirect href="/(auth)" />;
-  }
+  const colorScheme = useColorScheme();
 
   return (
     <Tabs
@@ -84,6 +73,27 @@ export default function ProtectedLayout() {
           tabBarIcon: ({ color }) => <MaterialCommunityIcons name="face-woman-profile" size={24} color={color} />,
         }}
       />
+      {/* <Tabs.Screen name="modals/follows-modal" options={{ href: null }} /> */}
     </Tabs>
+  );
+}
+
+/** 
+ * PROTECTED LAYOUT
+ * _layout for /(protected)
+ * **/
+export default function ProtectedLayout() {
+  
+  const { isAuthenticated, user } = useAuth();
+  console.log("userId", user?.id);
+
+  if (!isAuthenticated) {
+    return <Redirect href="/(auth)" />;
+  }
+
+  return (
+    <AuthUserProvider>
+      <ProtectedLayoutNav />
+    </AuthUserProvider>
   );
 }

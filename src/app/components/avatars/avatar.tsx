@@ -14,17 +14,17 @@ type Props = {
     let halo = 0;
 
     if (size == "md") {
-      width = 10;
-      height = 10;
+      width = 12;
+      height = 12;
     }
 
     if (size == "md" && ring) {
       border = 2;
-      halo = 11;
+      halo = 14;
     }
 
     return (
-      <View className={`w-${halo} h-${halo} flex-row justify-center items-center rounded-full overflow-hidden bg-lime-400`}>
+      <View className={`w-${halo} h-${halo} flex-row justify-center items-center rounded-full overflow-hidden bg-accent`}>
         <View className={`border-${border} w-${width} h-${height} border-white rounded-full`}>
         <Image
           source={{ uri: avatar_url }}
@@ -37,10 +37,6 @@ type Props = {
   }
 
   const styles = StyleSheet.create({
-    imageContainer: {
-      width: '100%',
-      height: '100%',
-    },
     image: {
       width: '100%',
       height: '100%',
