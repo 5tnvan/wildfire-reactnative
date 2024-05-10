@@ -3,7 +3,7 @@ import AuthRegister from "../components/auth/AuthRegister";
 
 export default function RegisterScreen() {
   return (
-    <ScrollView className="flex flex-col justify-content px-4 grow">
+    <View className="flex flex-col justify-content px-4 grow">
       {/* Create a wildpay account */}
       <View className="flex flex-row items-center justify-center my-5">
         <Text className="text-lg text-black dark:text-white mr-2 font-bold">
@@ -21,6 +21,6 @@ export default function RegisterScreen() {
 
       {/* Card */}
       <AuthRegister />
-    </ScrollView>
+    </View>
   );
 }

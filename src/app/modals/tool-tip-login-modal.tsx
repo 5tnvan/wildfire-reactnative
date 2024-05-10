@@ -37,7 +37,7 @@ export default function ModalScreen() {
       <View className="flex flex-col w-full">
         <ToolTip iconName="key" iconSize={16} text="Login with the same credentials" />
         <ToolTip iconName="bitcoin" iconSize={16} text="Reset password if you don't remember" />
-        <ToolTip iconName="bitcoin" iconSize={16} text="Register a new account if you have one" />
+        <ToolTip iconName="bitcoin" iconSize={16} text="Register a new account if you don't have one" />
       </View>
       
       {/* Use a light status bar on iOS to account for the black space above the modal */}

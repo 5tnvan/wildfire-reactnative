@@ -37,12 +37,12 @@ export default function LoginScreen() {
   return (
     <View className="flex-col px-4 grow">
       <View className='flex-col items-center mt-10 mb-10'>
-        {/* <Image
+        <Image
           source={require('@/assets/images/adaptive-icon-sm.png')}
           className='w-12 h-12'
           width={12}
           height={12}
-        /><LogoWildfireLit /> */}
+        /><LogoWildfireLit />
       </View>
       <View className='w-full'>
         <View>
