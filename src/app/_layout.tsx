@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { useColorScheme } from '@/src/app/components/useColorScheme';
 import AuthProvider from './providers/AuthProvider';
 export { ErrorBoundary, } from 'expo-router'; // Catch any errors thrown by the Layout component.
-export const unstable_settings = { initialRouteName: 'index', }; // Ensure that reloading on `/modal` keeps a back button present.
+export const unstable_settings = { initialRouteName: '(auth)', }; // Ensure that reloading on `/modal` keeps a back button present.
 SplashScreen.preventAutoHideAsync(); // Prevent the splash screen from auto-hiding before asset loading is complete.
 
 /** 
