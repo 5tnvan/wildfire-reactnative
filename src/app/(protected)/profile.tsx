@@ -8,22 +8,26 @@ import {
   FlatList,
   Image,
   useColorScheme,
+  ScrollView,
 } from "react-native";
-import { Button, Input } from "react-native-elements";
-import { Session } from "@supabase/supabase-js";
-import { supabase } from "@/src/lib/supabase";
 import { useAuthUser } from "../../services/providers/AuthUserProvider";
 import { Text } from "../../components/Themed";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar } from "../../components/avatars/avatar";
-import { Link } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAuthUserFollows } from "@/src/services/providers/AuthUserFollowsProvider";
+import { useIncomingTransactions } from "@/src/hooks/useIncomingTransactions";
+import { useOutgoingTransactions } from "@/src/hooks/useOutgoingTransactions";
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const { isLoading, profile, followers, following } = useAuthUser();
-  console.log("profile avatar", profile.avatar_url);
+  const { isLoading: isLoadingUser, profile } = useAuthUser();
+  const { isLoading: isLoadingFollows, followers, following } = useAuthUserFollows();
+  const incomingRes = useIncomingTransactions(profile.wallet_id);
+  const outgoingRes = useOutgoingTransactions(profile.wallet_id);
+  console.log("incomingRes", incomingRes);
+  console.log("outgoingRes", outgoingRes);
 
   return (
     <>
@@ -88,6 +92,7 @@ export default function ProfileScreen() {
             />
           </Pressable>
         </SafeAreaView>
+        <ScrollView><Text>{JSON.stringify(incomingRes.baseData)}</Text></ScrollView>
       </View>
       <Modal
         visible={isModalVisible}

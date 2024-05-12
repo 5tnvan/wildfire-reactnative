@@ -9,6 +9,7 @@ import { useColorScheme } from '@/src/components/useColorScheme';
 import { useClientOnlyValue } from '@/src/components/useClientOnlyValue';
 import { useAuth } from '../../services/providers/AuthProvider';
 import AuthUserProvider, { useAuthUser } from '../../services/providers/AuthUserProvider';
+import AuthUserFollowsProvider from '@/src/services/providers/AuthUserFollowsProvider';
 
 /** 
  * TAB BAR ICON
@@ -36,7 +37,7 @@ function ProtectedLayoutNav() {
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, false),
       }}
-      >
+    >
       <Tabs.Screen
         name="index"
         options={{
@@ -56,7 +57,7 @@ function ProtectedLayoutNav() {
         options={{
           title: 'Skort',
           tabBarIcon: ({ color }) => <MaterialIcons name="app-shortcut" size={24} color={color} />,
-          tabBarStyle: { display: segment[1] === "skort" ? 'none' : 'flex'} //hide tab bar for this screen
+          tabBarStyle: { display: segment[1] === "skort" ? 'none' : 'flex' } //hide tab bar for this screen
         }}
       />
       <Tabs.Screen
@@ -83,7 +84,7 @@ function ProtectedLayoutNav() {
  * _layout for /(protected)
  * **/
 export default function ProtectedLayout() {
-  
+
   const { isAuthenticated, user } = useAuth();
   console.log("userId", user?.id);
 
@@ -93,7 +94,9 @@ export default function ProtectedLayout() {
 
   return (
     <AuthUserProvider>
-      <ProtectedLayoutNav />
+      <AuthUserFollowsProvider>
+          <ProtectedLayoutNav />
+      </AuthUserFollowsProvider>
     </AuthUserProvider>
   );
 }

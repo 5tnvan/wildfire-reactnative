@@ -1,25 +1,26 @@
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/src/lib/supabase';
-import { Alert } from 'react-native';
 import { fetchFollowers } from '@/src/utils/fetch/fetchFollowers';
 import { fetchFollowing } from '@/src/utils/fetch/fetchFollowing';
-import fetchProfile from '@/src/utils/fetch/fetchProfile';
 
-type AuthUserContext = {
+type AuthUserFollowsContext = {
     isLoading: boolean | null;
-    profile: any;
+    followers: any;
+    following: any;
 };
 
-const AuthUserContext = createContext<AuthUserContext>({
+const AuthUserFollowsContext = createContext<AuthUserFollowsContext>({
     isLoading: null,
-    profile: null,
+    followers: null,
+    following: null,
 });
 
-export default function AuthUserProvider({ children }: PropsWithChildren) {
+export default function AuthUserFollowsProvider({ children }: PropsWithChildren) {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [session, setSession] = useState<Session | null>(null);
-    const [profile, setProfile] = useState<any>();
+    const [followers, setFollowers] = useState<any>();
+    const [following, setFollowing] = useState<any>();
 
     /**
      * SUPABASE CALL
@@ -42,23 +43,27 @@ export default function AuthUserProvider({ children }: PropsWithChildren) {
     useEffect(() => {
         if (session) {
             setIsLoading(true);
-            fetchProfile(session.user.id).then((data) => {
-                setProfile(data);
+            fetchFollowers(session.user.id).then((res) => {
+                setFollowers(res);
+            });
+            fetchFollowing(session.user.id).then((res) => {
+                setFollowing(res);
             });
             setIsLoading(false);
         }
     }, [session])
 
     return (
-        <AuthUserContext.Provider
+        <AuthUserFollowsContext.Provider
             value={{
                 isLoading,
-                profile
+                followers,
+                following
             }}
         >
             {children}
-        </AuthUserContext.Provider>
+        </AuthUserFollowsContext.Provider>
     );
 }
 
-export const useAuthUser = () => useContext(AuthUserContext);
+export const useAuthUserFollows = () => useContext(AuthUserFollowsContext);
