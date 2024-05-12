@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { Platform, StyleSheet, useColorScheme } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Image } from 'react-native';
-import { Text, View } from "@/src/app/components/Themed";
+import { Text, View } from "@/src/components/Themed";
 
 type Props = {
   iconName: any,

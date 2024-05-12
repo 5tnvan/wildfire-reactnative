@@ -1,5 +1,5 @@
 import { View, Text, Image } from 'react-native';
-import AuthLogin from '../components/auth/AuthLogin';
+import AuthLogin from '../../components/auth/AuthLogin';
 import { Link } from 'expo-router';
 
 export default function IndexScreen() {

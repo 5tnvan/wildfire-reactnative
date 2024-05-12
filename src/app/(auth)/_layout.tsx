@@ -3,10 +3,10 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, Redirect, Tabs } from 'expo-router';
 import { Pressable } from 'react-native';
 
-import Colors from '@/src/app/constants/Colors';
-import { useColorScheme } from '@/src/app/components/useColorScheme';
-import { useClientOnlyValue } from '@/src/app/components/useClientOnlyValue';
-import { useAuth } from '../providers/AuthProvider';
+import Colors from '@/src/constants/Colors';
+import { useColorScheme } from '@/src/components/useColorScheme';
+import { useClientOnlyValue } from '@/src/components/useClientOnlyValue';
+import { useAuth } from '../../services/providers/AuthProvider';
 
 /** 
  * TAB BAR ICON

@@ -4,11 +4,11 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
 import { Redirect, Tabs, useSegments } from 'expo-router';
-import Colors from '@/src/app/constants/Colors';
-import { useColorScheme } from '@/src/app/components/useColorScheme';
-import { useClientOnlyValue } from '@/src/app/components/useClientOnlyValue';
-import { useAuth } from '../providers/AuthProvider';
-import AuthUserProvider, { useAuthUser } from '../providers/AuthUserProvider';
+import Colors from '@/src/constants/Colors';
+import { useColorScheme } from '@/src/components/useColorScheme';
+import { useClientOnlyValue } from '@/src/components/useClientOnlyValue';
+import { useAuth } from '../../services/providers/AuthProvider';
+import AuthUserProvider, { useAuthUser } from '../../services/providers/AuthUserProvider';
 
 /** 
  * TAB BAR ICON

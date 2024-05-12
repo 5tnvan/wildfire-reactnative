@@ -1,6 +1,6 @@
 import { View, Dimensions } from 'react-native';
 import React from 'react';
-import SkortComponent from '../components/SkortComponent';
+import SkortComponent from '../../components/SkortComponent';
 
 export default function SkortScreen() {
   const windowWidth = Dimensions.get('window').width;

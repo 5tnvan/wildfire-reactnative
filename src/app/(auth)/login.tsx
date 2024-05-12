@@ -1,6 +1,6 @@
 import { Alert, AppState, Image, Pressable, useColorScheme } from 'react-native';
-import { Text, View } from "@/src/app/components/Themed";
-import { LogoWildfireLit } from '../components/logos/LogoFireLit';
+import { Text, View } from "@/src/components/Themed";
+import { LogoWildfireLit } from '../../components/logos/LogoFireLit';
 import 'react-native-url-polyfill/auto'
 import { useState } from 'react'
 import { supabase } from '@/src/lib/supabase';

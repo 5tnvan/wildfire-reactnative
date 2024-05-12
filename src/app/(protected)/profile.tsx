@@ -12,10 +12,10 @@ import {
 import { Button, Input } from "react-native-elements";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/src/lib/supabase";
-import { useAuthUser } from "../providers/AuthUserProvider";
-import { Text } from "../components/Themed";
+import { useAuthUser } from "../../services/providers/AuthUserProvider";
+import { Text } from "../../components/Themed";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Avatar } from "../components/avatars/avatar";
+import { Avatar } from "../../components/avatars/avatar";
 import { Link } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
