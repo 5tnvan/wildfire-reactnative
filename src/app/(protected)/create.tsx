@@ -1,5 +1,4 @@
 import { View, Text, Image } from 'react-native';
-import AuthLogin from '../../components/auth/AuthLogin';
 
 export default function CreateScreen() {
   return (
