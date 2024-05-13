@@ -18,6 +18,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuthUserFollows } from "@/src/services/providers/AuthUserFollowsProvider";
 import { useIncomingTransactions } from "@/src/hooks/useIncomingTransactions";
 import { useOutgoingTransactions } from "@/src/hooks/useOutgoingTransactions";
+import { calculateSum } from "@/src/utils/calculateSum";
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
@@ -26,8 +27,8 @@ export default function ProfileScreen() {
   const { isLoading: isLoadingFollows, followers, following } = useAuthUserFollows();
   const incomingRes = useIncomingTransactions(profile.wallet_id);
   const outgoingRes = useOutgoingTransactions(profile.wallet_id);
-  console.log("incomingRes", incomingRes);
-  console.log("outgoingRes", outgoingRes);
+  console.log("eth", calculateSum(incomingRes.ethereumData));
+  console.log("base", calculateSum(outgoingRes.baseData));
 
   return (
     <>
@@ -73,8 +74,8 @@ export default function ProfileScreen() {
               </View>
             </View>
             <View className="flex-col items-end">
-              <Text className="text-xl font-semibold text-accent">$17k</Text>
-              <Text className="text-base text-zinc-400">3Ξ</Text>
+              <Text className="text-xl font-semibold text-accent">${(calculateSum(incomingRes.ethereumData) + calculateSum(incomingRes.baseData)).toFixed(3)}Ξ</Text>
+              <Text className="text-base text-zinc-400">${(calculateSum(incomingRes.ethereumData) + calculateSum(incomingRes.baseData)).toFixed(3)}Ξ</Text>
             </View>
           </View>
 
