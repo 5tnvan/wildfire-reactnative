@@ -16,92 +16,28 @@ import { PressableBuy } from './pressables/PressableBuy';
 import FormatNumber from './FormatNumber';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PressableNFT } from './pressables/PressableNFT';
+import { supabase } from '../lib/supabase';
 
-const videos2 = [
-  {
-    uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-    title: "This is for bigger fun!",
-    fires: 1456,
-    comments: 50,
-    shares: 203,
-    views: 5034,
-    username: "big_bunny",
-    avatar_url: "https://media1.tenor.com/m/hOFCCrNX1-4AAAAC/deadpixels-dpgc.gif",
-    followers: 53,
-  },
-  {
-    uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    title: "Bigger Blazes :)",
-    fires: 220,
-    comments: 5,
-    shares: 30,
-    views: 68730,
-    username: "small_pie",
-    avatar_url: "https://media1.tenor.com/m/s1tF13IX81gAAAAC/blank-stare-really.gif",
-    followers: 1003,
-  },
-  {
-    uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    title: "Big buck big",
-    fires: 1030,
-    comments: 540,
-    shares: 270,
-    views: 687330,
-    username: "big_bunny",
-    avatar_url: "https://media1.tenor.com/m/hOFCCrNX1-4AAAAC/deadpixels-dpgc.gif",
-    followers: 2209,
-  },
-  {
-    uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    title: "Elephant do not forget",
-    fires: 2700,
-    comments: 770,
-    shares: 370,
-    views: 397893,
-    username: "small_pie",
-    avatar_url: "https://media1.tenor.com/m/s1tF13IX81gAAAAC/blank-stare-really.gif",
-    followers: 114232,
-  },
-  {
-    uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4",
-    title: "Big escapes",
-    fires: 200,
-    comments: 70,
-    shares: 30,
-    views: 29887,
-    username: "chewbaka",
-    avatar_url: "https://media1.tenor.com/m/rgJleMzUa8MAAAAC/bailes.gif",
-    followers: 1234456,
-  },
-  {
-    uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-    title: "The Smoking Tire heads out to Adams Motorsports Park in Riverside",
-    fires: 2700,
-    comments: 770,
-    shares: 370,
-    views: 397893,
-    username: "small_pie",
-    avatar_url: "https://media1.tenor.com/m/s1tF13IX81gAAAAC/blank-stare-really.gif",
-    followers: 114232,
-  },
-  {
-    uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
-    title: "The Smoking Tire is going on the 2010 Bullrun Live Rally in a 2011 Shelby GT500",
-    fires: 230,
-    comments: 730,
-    shares: 30,
-    views: 2987,
-    username: "chewbaka",
-    avatar_url: "https://media1.tenor.com/m/rgJleMzUa8MAAAAC/bailes.gif",
-    followers: 1234456,
-  },
-];
+// const videos2 = [
+//   {
+//     uri: "https://poalybuqvwrnukxylhad.supabase.co/storage/v1/object/public/1sec/30e68e4b-7e19-43be-b890-0592e3e1ec38/1715815285268.mp4",
+//     title: "This is for bigger fun!",
+//     fires: 1456,
+//     comments: 50,
+//     shares: 203,
+//     views: 5034,
+//     username: "big_bunny",
+//     avatar_url: "https://media1.tenor.com/m/hOFCCrNX1-4AAAAC/deadpixels-dpgc.gif",
+//     followers: 53,
+//   },
+// ];
 
 /** 
  * SKORT SCREEN
  * Skort is a short with a reveal
  * **/
 export default function SkortComponent() {
+  
   const router = useRouter();
   const [currentViewableItemIndex, setCurrentViewableItemIndex] = useState(0);
   const viewabilityConfig = { viewAreaCoveragePercentThreshold: 50 };
@@ -111,6 +47,39 @@ export default function SkortComponent() {
     }
   };
   const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
+
+  const [videos2, setVideos2] = useState<any[]>([]);
+
+useEffect(() => {
+  const fetchVideos = async () => {
+    try {
+      const { data } = await supabase
+        .from('1sec')
+        .select('video_url');
+
+      if (data && data.length > 0) {
+        const videos = data.map((video: any) => ({
+          uri: video.video_url,
+          title: "This is for bigger fun!",
+          fires: 1456,
+          comments: 50,
+          shares: 203,
+          views: 5034,
+          username: "big_bunny",
+          avatar_url: "https://media1.tenor.com/m/hOFCCrNX1-4AAAAC/deadpixels-dpgc.gif",
+          followers: 53,
+        }));
+
+        setVideos2(videos);
+      }
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+    }
+  };
+
+  fetchVideos();
+}, []);
+
 
   useEffect(() => {
     // Cleanup function to reset the playlist when navigating back
