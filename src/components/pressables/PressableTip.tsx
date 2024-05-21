@@ -5,7 +5,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 export function PressableTip() {
   return (
     <Pressable
-      className='flex-row items-center bg-zinc-800/70 py-1 px-2 rounded-2xl border border-zinc-800'
+      className='flex-row items-center'
       onPress={() => {
         alert("skort");
       }}

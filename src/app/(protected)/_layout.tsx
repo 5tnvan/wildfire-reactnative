@@ -55,8 +55,8 @@ function ProtectedLayoutNav() {
       <Tabs.Screen
         name="skort"
         options={{
-          title: 'Skort',
-          tabBarIcon: ({ color }) => <MaterialIcons name="app-shortcut" size={24} color={color} />,
+          title: 'Now',
+          tabBarIcon: ({ color }) => <Fontisto name="world-o" size={24} color={color} />,
           tabBarStyle: { display: segment[1] === "skort" ? 'none' : 'flex' } //hide tab bar for this screen
         }}
       />
@@ -64,7 +64,7 @@ function ProtectedLayoutNav() {
         name="discover"
         options={{
           title: 'Discover',
-          tabBarIcon: ({ color }) => <Fontisto name="world-o" size={24} color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="app-shortcut" size={24} color={color} />,
         }}
       />
       <Tabs.Screen

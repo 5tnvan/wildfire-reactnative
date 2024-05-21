@@ -20,11 +20,11 @@ type Props = {
 
     if (size == "md" && ring) {
       border = 2;
-      halo = 14;
+      halo = 12;
     }
 
     return (
-      <View className={`w-${halo} h-${halo} flex-row justify-center items-center rounded-full overflow-hidden bg-accent`}>
+      <View className={`w-${halo} h-${halo} flex-row justify-center items-center rounded-full overflow-hidden border-accent border-4`}>
         <View className={`border-${border} w-${width} h-${height} border-white rounded-full`}>
         <Image
           source={{ uri: avatar_url }}

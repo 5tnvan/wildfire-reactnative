@@ -104,7 +104,7 @@ export default function RegisterScreen() {
           source={require("@/assets/images/wildpay-logo.png")}
           className="w-5 h-5 mr-1"
         />
-        <Text className="text-indigo-600 text-lg font-bold mr-2">wildpay</Text>
+        <Text className="text-lg font-bold mr-2" style={{ color: '#3D45E7' }}>wildpay</Text>
         <Text className="text-lg text-black dark:text-white font-bold">
           account
         </Text>

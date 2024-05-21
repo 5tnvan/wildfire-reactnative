@@ -1,10 +1,8 @@
 import { StatusBar } from "expo-status-bar";
 import { Platform, StyleSheet, useColorScheme } from "react-native";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Image } from 'react-native';
 import { Text, View } from "@/src/components/Themed";
-import Colors from "@/src/constants/Colors";
-import { Stack } from "expo-router";
+import { MaterialIcons } from '@expo/vector-icons';
 
 type Props = {
   iconName: any,
@@ -14,10 +12,9 @@ type Props = {
 
 export function ToolTip({ iconName, iconSize, text } : Props) {
   const colorScheme = useColorScheme();
-  
   return (
     <View className={`flex flex-row mb-3 p-5 ${colorScheme === 'dark' ? "bg-secondary" : "bg-neutral"} rounded-full`}>
-      <Text><FontAwesome name={iconName} size={iconSize} /></Text>
+      <Text><MaterialIcons name={iconName} size={iconSize} color={"white"} /></Text>
       <Text className="ml-3">{text}</Text>
     </View>
   );
@@ -33,14 +30,14 @@ export default function ModalScreen() {
           source={require('@/assets/images/wildpay-logo.png')}
           className='w-5 h-5 mr-1'
         />
-        <Text className='text-indigo-700 text-lg font-bold mr-2'>wildpay</Text>
+        <Text className='text-lg font-bold mr-2' style={{ color: '#3D45E7' }}>wildpay</Text>
         <Text className="text-lg font-bold">account</Text>
       </View>
       {/* Tooltips */}
       <View className="flex flex-col w-full">
-        <ToolTip iconName="user" iconSize={16} text="Wildpay keeps your payments in-check" />
-        <ToolTip iconName="key" iconSize={16} text="Sync your Wildpay followers to Wildfire" />
-        <ToolTip iconName="bitcoin" iconSize={16} text="Withdraw your coins from Wildpay, instantly" />
+        <ToolTip iconName="money" iconSize={16} text="Wildpay keeps your payments in-check" />
+        <ToolTip iconName="accessibility-new" iconSize={16} text="Sync your Wildpay followers to Wildfire" />
+        <ToolTip iconName="currency-bitcoin" iconSize={16} text="Withdraw your coins from Wildpay, instantly" />
       </View>
       
       {/* Use a light status bar on iOS to account for the black space above the modal */}

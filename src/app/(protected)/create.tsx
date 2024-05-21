@@ -7,6 +7,7 @@ import {
   Pressable,
   Image,
   Button,
+  ActivityIndicator,
 } from 'react-native';
 import {
   useCameraPermission,
@@ -29,6 +30,10 @@ import { useAuth } from '@/src/services/providers/AuthProvider';
 import * as FileSystem from 'expo-file-system';
 import { decode } from 'base64-arraybuffer';
 import { getPublicURL } from '@/src/utils/getPublicUrl';
+import axios from 'axios';
+import RNFS from 'react-native-fs';
+import BunnyAPI from '@/src/constants/BunnyAPI';
+import { Buffer } from 'buffer';
 
 const CameraScreen = () => {
 
@@ -133,7 +138,7 @@ const CameraScreen = () => {
     setTimeout(() => {
       console.log("im here");
       camera.current?.stopRecording()
-    }, 1500)
+    }, 3000)
   };
 
   // const onStopRecording = async () => {
@@ -142,11 +147,73 @@ const CameraScreen = () => {
 
   //   camera.current?.stopRecording();
   // };
-
+  
+  
   /**
    * Handle upload
-   * **/
+   **/
+  const [isUploading, setIsUploading] = useState(false);
+  
   const uploadVideo = async () => {
+    // Set up video URI
+    let videoUri = '';
+    if (cameraRollVideo) {
+      videoUri = cameraRollVideo;
+    } else if (video) {
+      videoUri = video.path;
+    }
+  
+    // Read the video file as binary
+    const filePath = videoUri;
+    let fileContents;
+    try {
+      fileContents = await RNFS.readFile(filePath, 'base64'); // Read the file as base64 encoded string
+    } catch (error) {
+      console.error('Error reading file:', error);
+      return;
+    }
+  
+    // Convert base64 encoded string to binary data
+    const binaryData = Buffer.from(fileContents, 'base64');
+  
+    const fileName = new Date().getTime();
+    const bunnyUrl = `https://${BunnyAPI.HOSTNAME}/${BunnyAPI.STORAGE_ZONE_NAME}/${user?.id}/${fileName}.mp4`;
+    const pullZoneUrl = `https://wildfire.b-cdn.net/${user?.id}/${fileName}.mp4`
+    console.log('BunnyAPI Access Key:', BunnyAPI.ACCESS_KEY);
+    
+    // Define the upload options
+    const options = {
+      method: 'PUT',
+      url: bunnyUrl,
+      headers: {
+        AccessKey: BunnyAPI.ACCESS_KEY,
+        'Content-Type': 'video/mp4',
+      },
+      data: binaryData, // Use binary data
+      responseType: 'arraybuffer' as const, // Ensure the response is handled correctly and the type is compatible
+    };
+  
+    // Perform the upload
+    setIsUploading(true);
+    try {
+      const response = await axios(options);
+      console.log('Upload response:', response.data);
+      const { error } = await supabase.from("1sec").insert({ user_id: user?.id, video_url: pullZoneUrl });
+      if(!error) {
+        console.log("uploaded!!");
+        setVideo(undefined);
+        setCameraRollVideo(undefined);
+        router.push("/(protected)/profile");
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+  
+  const uploadVideo1 = async () => {
+    setIsUploading(true);
 
     //set up video uri
     let videoUri = "";
@@ -167,10 +234,12 @@ const CameraScreen = () => {
       const { error } = await supabase.from("1sec").insert({ user_id: user?.id, video_url: res2.publicUrl });
       if(!error) {
         console.log("uploaded!!");
-        router.push("home");
+        setIsUploading(false);
+        setVideo(undefined);
+        setCameraRollVideo(undefined);
+        router.push("/(protected)/profile");
       }
     }
-
   };
 
   /**
@@ -192,7 +261,8 @@ const CameraScreen = () => {
       aspect: [9, 16],
       quality: 1,
       selectionLimit: 1,
-      videoMaxDuration: 1.5,
+      videoMaxDuration: 3,
+      exif: true,
     });
 
     console.log(result);
@@ -238,7 +308,10 @@ const CameraScreen = () => {
               color="white"
               style={{ position: 'absolute', top: 20, left: 10 }}
             />
-            <Pressable className='absolute bottom-6 right-4 items-center justify-center p-3 rounded-full bg-accent' onPress={uploadVideo}><Text>Publish</Text></Pressable>
+            <Pressable className='absolute flex-row bottom-6 right-4 items-center justify-center p-4 rounded-full bg-accent' onPress={uploadVideo}>
+              <Text className='text-base font-semibold'>Publish</Text>
+              {isUploading && <ActivityIndicator size="small" color="#0000ff" className='ml-1' />}
+            </Pressable>
           </View>
 
         </>
@@ -263,7 +336,10 @@ const CameraScreen = () => {
               color="white"
               style={{ position: 'absolute', top: 20, left: 10 }}
             />
-            <Pressable className='absolute bottom-6 right-4 items-center justify-center p-3 rounded-full bg-accent' onPress={uploadVideo}><Text>Publish</Text></Pressable>
+            <Pressable className='absolute flex-row bottom-6 right-4 items-center justify-center p-4 rounded-full bg-accent' onPress={uploadVideo}>
+              <Text className='text-base font-semibold'>Publish</Text>
+              {isUploading && <ActivityIndicator size="small" color="#0000ff" className='ml-1'/>}
+            </Pressable>
           </View>
         </>
       )}
@@ -285,15 +361,23 @@ const CameraScreen = () => {
               name="flip-camera-android"
               size={30}
               color="white"
-              onPress={() => setPosition(prev => (prev === 'back' ? 'front' : 'back'))} />
+              onPress={() => {
+                if (position === 'back') setFlash('off');
+                setPosition(prev => (prev === 'back' ? 'front' : 'back'));
+                
+              }}
+            />
             <Ionicons
               name={flash === 'off' ? 'flash-off' : 'flash'}
-              onPress={() =>
-                setFlash((curValue) => (curValue === 'off' ? 'on' : 'off'))
-              }
+              onPress={() => {
+                if (position === 'back') {
+                  setFlash((curValue) => (curValue === 'off' ? 'on' : 'off'));
+                }
+              }}
               size={30}
               color="white"
             />
+
           </View>
 
           <Pressable className='absolute bottom-10 left-10' onPress={pickVideo}>

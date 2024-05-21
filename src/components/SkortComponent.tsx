@@ -17,20 +17,9 @@ import FormatNumber from './FormatNumber';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PressableNFT } from './pressables/PressableNFT';
 import { supabase } from '../lib/supabase';
-
-// const videos2 = [
-//   {
-//     uri: "https://poalybuqvwrnukxylhad.supabase.co/storage/v1/object/public/1sec/30e68e4b-7e19-43be-b890-0592e3e1ec38/1715815285268.mp4",
-//     title: "This is for bigger fun!",
-//     fires: 1456,
-//     comments: 50,
-//     shares: 203,
-//     views: 5034,
-//     username: "big_bunny",
-//     avatar_url: "https://media1.tenor.com/m/hOFCCrNX1-4AAAAC/deadpixels-dpgc.gif",
-//     followers: 53,
-//   },
-// ];
+import { TimeAgo } from './TimeAgo';
+import { Entypo } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 
 /** 
  * SKORT SCREEN
@@ -55,19 +44,20 @@ useEffect(() => {
     try {
       const { data } = await supabase
         .from('1sec')
-        .select('video_url');
+        .select('video_url, created_at, profile:user_id(id, username, avatar_url)');
+
+        console.log("video data", data);
 
       if (data && data.length > 0) {
         const videos = data.map((video: any) => ({
           uri: video.video_url,
-          title: "This is for bigger fun!",
           fires: 1456,
           comments: 50,
           shares: 203,
           views: 5034,
-          username: "big_bunny",
-          avatar_url: "https://media1.tenor.com/m/hOFCCrNX1-4AAAAC/deadpixels-dpgc.gif",
-          followers: 53,
+          username: video.profile.username,
+          avatar_url: video.profile.avatar_url,
+          created_at: video.created_at
         }));
 
         setVideos2(videos);
@@ -146,8 +136,9 @@ const Item = ({ item, shouldPlay }: { shouldPlay: boolean; item: any }) => {
       {/* SKORT TOP */}
       <SafeAreaView className='absolute'>
         <View className="flex-row items-center justify-end w-full px-3" style={styles.shadow}>
+          <View className='flex-row items-center gap-1 mr-2'><FontAwesome name="map-pin" size={18} color="orange" /><Text className='text-accent text-base font-bold'>Czechia</Text></View>
           <ViewCount amount={item.views} />
-          <View className='ml-3'><PressableGift /></View>
+          {/* <View className='ml-3'><PressableGift /></View> */}
         </View>
       </SafeAreaView>
       {/* SKORT BOTTOM */}
@@ -155,23 +146,28 @@ const Item = ({ item, shouldPlay }: { shouldPlay: boolean; item: any }) => {
         <View className='flex-row items-center'>
           <View className='flex-row items-center'>
             <PressableAvatarWithUsername avatar_url={item.avatar_url} username={item.username} />
-            <Text className='ml-1 text-base text-slate-200 mr-2'><FormatNumber number={item.followers}></FormatNumber> followers</Text>
+            <Text className='ml-1 text-lg text-slate-200 mr-2'><TimeAgo timestamp={item.created_at}></TimeAgo></Text>
           </View>
         </View>
-        <Text className='text-white text-lg ml-2'>{item.title}</Text>
-        <View className='flex-row items-center mt-2 mb-5'>
+        {/* <View className='flex-row items-center mt-2 mb-5'>
           <View className='mr-1'><PressableTip /></View>
           <View className='mr-1'><PressableNFT /></View>
           <View className='mr-1'><PressableBuy name={item.username}/></View>
+        </View> */}
+        <View className='flex-row items-center mt-2 mb-5'>
+          <View className='bg-secondary/70 rounded-full px-4 py-1 mr-2' style={styles.shadow}><PressableComment amount={item.comments} /></View>
+          <View className='bg-secondary/70 flex-row rounded-full px-4 py-1 mr-2' style={styles.shadow}><PressableShare amount={item.shares} /></View>
+          <View className='bg-secondary/70 flew-row rounded-full px-4 py-1 mr-2' style={styles.shadow}><PressableFire amount={item.fires} /></View>
+          <View className='bg-secondary/70 flew-row rounded-full px-4 py-2 mr-2' style={styles.shadow}><PressableTip /></View>
         </View>
       </LinearGradient>
 
       {/* SKORT RIGHT */}
-      <View className='absolute bottom-32 right-2'>
+      {/* <View className='absolute bottom-32 right-2'>
         <View className='mb-3' style={styles.shadow}><PressableFire amount={item.fires} /></View>
         <View className='mb-3' style={styles.shadow}><PressableComment amount={item.comments} /></View>
         <View className='mb-3' style={styles.shadow}><PressableShare amount={item.shares} /></View>
-      </View>
+      </View> */}
     </Pressable>
   );
 }

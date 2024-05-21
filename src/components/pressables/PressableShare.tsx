@@ -11,7 +11,7 @@ type Props = {
 export function PressableShare({ amount } : Props) {
   return (
     <Pressable
-      className='flex-col items-center'
+      className='flex-row items-center'
       onPress={() => {
         alert("fire");
       }}
