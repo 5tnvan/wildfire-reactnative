@@ -21,8 +21,9 @@ export const useUserFeed = (user_id: any) => {
     setIsLoading(true);
     const { data } = await supabase
     .from('1sec')
-    .select('video_url, thumbnail_url, created_at, profile:user_id(id, username, avatar_url)')
-    .eq('user_id', user_id);
+    .select('id, video_url, thumbnail_url, created_at, profile:user_id(id, username, avatar_url)')
+    .eq('user_id', user_id)
+    .order("created_at", { ascending: false });
 
     setFeed(data);
     setIsLoading(false);

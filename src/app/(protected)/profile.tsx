@@ -9,6 +9,7 @@ import {
   Image,
   useColorScheme,
   ScrollView,
+  useWindowDimensions,
 } from "react-native";
 import { useAuthUser } from "../../services/providers/AuthUserProvider";
 import { Text } from "../../components/Themed";
@@ -20,6 +21,13 @@ import { useIncomingTransactions } from "@/src/hooks/useIncomingTransactions";
 import { useOutgoingTransactions } from "@/src/hooks/useOutgoingTransactions";
 import { calculateSum } from "@/src/utils/calculateSum";
 import { useUserFeed } from "@/src/hooks/useUserFeed";
+import Animated, {
+  useAnimatedScrollHandler,
+  useSharedValue,
+} from 'react-native-reanimated';
+import Item from "@/src/components/Item";
+import Button from "@/src/components/Button";
+//import {SystemBars} from 'react-native-bars';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
@@ -32,6 +40,20 @@ export default function ProfileScreen() {
   console.log("eth", calculateSum(incomingRes.ethereumData));
   console.log("base", calculateSum(outgoingRes.baseData));
   console.log("feed", feed);
+
+  const {width} = useWindowDimensions();
+  const x = useSharedValue(0);
+  const ITEM_WIDTH = 250;
+  const ITEM_HEIGHT = 450;
+  const MARGin_HORIZONTAL = 20;
+  const ITEM_FULL_WIDTH = ITEM_WIDTH + MARGin_HORIZONTAL * 2;
+  const SPACER = (width - ITEM_FULL_WIDTH) / 2;
+
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: event => {
+      x.value = event.contentOffset.x;
+    },
+  });
 
   return (
     <>
@@ -96,11 +118,41 @@ export default function ProfileScreen() {
           </Pressable>
         </SafeAreaView>
       </View>
-      <FlatList
-            data={feed}
-            renderItem={({ item }) => <Text>{item.thumbnail_url}</Text>}
-            keyExtractor={(item, index) => index.toString()}
-          />
+      <SafeAreaView style={styles.container}>
+      {/* <SystemBars animated={true} barStyle={'light-content'} /> */}
+      {/* <View style={styles.textContainer}>
+        <Text style={styles.text}>Choose a style that perfectly</Text>
+        <Text style={styles.text}>reflects your true self</Text>
+      </View> */}
+      <Animated.FlatList
+        onScroll={onScroll}
+        ListHeaderComponent={<View />}
+        ListHeaderComponentStyle={{width: SPACER}}
+        ListFooterComponent={<View />}
+        ListFooterComponentStyle={{width: SPACER}}
+        data={feed}
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={item => item.id + item.name}
+        renderItem={({item, index}) => {
+          return (
+            <Item
+              item={item}
+              index={index}
+              x={x}
+              width={ITEM_WIDTH}
+              height={ITEM_HEIGHT}
+              marginHorizontal={MARGin_HORIZONTAL}
+              fullWidth={ITEM_FULL_WIDTH}
+            />
+          );
+        }}
+        horizontal
+        scrollEventThrottle={16}
+        decelerationRate="fast"
+        snapToInterval={ITEM_FULL_WIDTH}
+      />
+      {/* <Button /> */}
+    </SafeAreaView>
       <Modal
         visible={isModalVisible}
         onRequestClose={() => setIsModalVisible(false)}
@@ -140,6 +192,7 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 40,
     padding: 12,
+    flex: 1,
   },
   verticallySpaced: {
     paddingTop: 4,
@@ -148,5 +201,15 @@ const styles = StyleSheet.create({
   },
   mt20: {
     marginTop: 20,
+  },
+  textContainer: {
+    flex: 2,
+    justifyContent: 'center',
+  },
+  text: {
+    color: 'white',
+    fontSize: 26,
+    fontWeight: '300',
+    textAlign: 'center',
   },
 });
