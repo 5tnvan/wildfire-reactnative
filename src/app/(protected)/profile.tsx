@@ -19,6 +19,7 @@ import { useAuthUserFollows } from "@/src/services/providers/AuthUserFollowsProv
 import { useIncomingTransactions } from "@/src/hooks/useIncomingTransactions";
 import { useOutgoingTransactions } from "@/src/hooks/useOutgoingTransactions";
 import { calculateSum } from "@/src/utils/calculateSum";
+import { useUserFeed } from "@/src/hooks/useUserFeed";
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
@@ -27,17 +28,19 @@ export default function ProfileScreen() {
   const { isLoading: isLoadingFollows, followers, following } = useAuthUserFollows();
   const incomingRes = useIncomingTransactions(profile.wallet_id);
   const outgoingRes = useOutgoingTransactions(profile.wallet_id);
+  const { feed } = useUserFeed(profile.id);
   console.log("eth", calculateSum(incomingRes.ethereumData));
   console.log("base", calculateSum(outgoingRes.baseData));
+  console.log("feed", feed);
 
   return (
     <>
       <View
         className={`${
           colorScheme == "dark" ? "bg-zinc-900" : "bg-white"
-        } rounded-b-3xl`}
+        } pt-5`}
       >
-        <SafeAreaView className="px-3 pt-10">
+        <SafeAreaView className="px-3">
           <View className="flex-row justify-between">
             <View className="flex-row items-center mb-3">
               <Avatar
@@ -78,7 +81,6 @@ export default function ProfileScreen() {
               <Text className="text-base text-zinc-400">${(calculateSum(incomingRes.ethereumData) + calculateSum(incomingRes.baseData)).toFixed(3)}Ξ</Text>
             </View>
           </View>
-
           <Pressable
             className={`${
               colorScheme == "dark" ? "bg-secondary" : "bg-zinc-200"
@@ -93,8 +95,12 @@ export default function ProfileScreen() {
             />
           </Pressable>
         </SafeAreaView>
-        <ScrollView><Text>{JSON.stringify(incomingRes.baseData)}</Text></ScrollView>
       </View>
+      <FlatList
+            data={feed}
+            renderItem={({ item }) => <Text>{item.thumbnail_url}</Text>}
+            keyExtractor={(item, index) => index.toString()}
+          />
       <Modal
         visible={isModalVisible}
         onRequestClose={() => setIsModalVisible(false)}

@@ -34,6 +34,7 @@ import axios from 'axios';
 import RNFS from 'react-native-fs';
 import BunnyAPI from '@/src/constants/BunnyAPI';
 import { Buffer } from 'buffer';
+import * as VideoThumbnails from 'expo-video-thumbnails';
 
 const CameraScreen = () => {
 
@@ -152,53 +153,92 @@ const CameraScreen = () => {
   /**
    * Handle upload
    **/
+  const generateThumbnail = async (video_url: any) => {
+    try {
+      const { uri } = await VideoThumbnails.getThumbnailAsync(
+        video_url,
+        { time: 15000 }
+      );
+      return uri;
+    } catch (e) {
+      console.warn(e);
+      return null;
+    }
+  };
+
   const [isUploading, setIsUploading] = useState(false);
   
   const uploadVideo = async () => {
+    setIsUploading(true);
+    const now = new Date().getTime();
+
     // Set up video URI
     let videoUri = '';
-    if (cameraRollVideo) {
-      videoUri = cameraRollVideo;
-    } else if (video) {
-      videoUri = video.path;
-    }
-  
-    // Read the video file as binary
-    const filePath = videoUri;
-    let fileContents;
+    if (cameraRollVideo) videoUri = cameraRollVideo;
+    else if (video) videoUri = video.path;
+
+     // Generate thumbnail
+    const thumbUri = await generateThumbnail(videoUri);
+    if (!thumbUri) return;
+
+    // Read the thumbnail file as binary
+    let thumbBinary = await RNFS.readFile(thumbUri, 'base64');
+
+    // Convert base64 encoded string to binary data
+    const thumbBinaryData = Buffer.from(thumbBinary, 'base64');
+    const thumbBunnyUrl = `https://${BunnyAPI.HOSTNAME}/${BunnyAPI.STORAGE_ZONE_NAME}/${user?.id}/${now}.jpg`;
+    const pullZoneThumbUrl = `https://wildfire.b-cdn.net/${user?.id}/${now}.jpg`
+
+    // Define the upload options for the thumbnail
+    const thumbOptions = {
+      method: 'PUT',
+      url: thumbBunnyUrl,
+      headers: {
+        AccessKey: BunnyAPI.ACCESS_KEY,
+        'Content-Type': 'image/jpeg',
+      },
+      data: thumbBinaryData,
+      responseType: 'arraybuffer' as const,
+    };
+
+    // Perform the thumbnail upload
     try {
-      fileContents = await RNFS.readFile(filePath, 'base64'); // Read the file as base64 encoded string
+      await axios(thumbOptions);
     } catch (error) {
-      console.error('Error reading file:', error);
+      console.error('Thumbnail upload error:', error);
       return;
     }
   
-    // Convert base64 encoded string to binary data
-    const binaryData = Buffer.from(fileContents, 'base64');
+    // Read the video file as binary
+    let videoBinary = await RNFS.readFile(videoUri, 'base64');
   
-    const fileName = new Date().getTime();
-    const bunnyUrl = `https://${BunnyAPI.HOSTNAME}/${BunnyAPI.STORAGE_ZONE_NAME}/${user?.id}/${fileName}.mp4`;
-    const pullZoneUrl = `https://wildfire.b-cdn.net/${user?.id}/${fileName}.mp4`
-    console.log('BunnyAPI Access Key:', BunnyAPI.ACCESS_KEY);
+    // Convert base64 encoded string to binary data
+    const videoBinaryData = Buffer.from(videoBinary, 'base64');
+    const bunnyVideoUrl = `https://${BunnyAPI.HOSTNAME}/${BunnyAPI.STORAGE_ZONE_NAME}/${user?.id}/${now}.mp4`;
+    const pullZoneVideoUrl = `https://wildfire.b-cdn.net/${user?.id}/${now}.mp4`
     
     // Define the upload options
     const options = {
       method: 'PUT',
-      url: bunnyUrl,
+      url: bunnyVideoUrl,
       headers: {
         AccessKey: BunnyAPI.ACCESS_KEY,
         'Content-Type': 'video/mp4',
       },
-      data: binaryData, // Use binary data
+      data: videoBinaryData, // Use binary data
       responseType: 'arraybuffer' as const, // Ensure the response is handled correctly and the type is compatible
     };
   
     // Perform the upload
-    setIsUploading(true);
+    
     try {
       const response = await axios(options);
       console.log('Upload response:', response.data);
-      const { error } = await supabase.from("1sec").insert({ user_id: user?.id, video_url: pullZoneUrl });
+      const { error } = await supabase.from("1sec").insert({ 
+        user_id: user?.id, 
+        video_url: pullZoneVideoUrl,
+        thumbnail_url: pullZoneThumbUrl,
+      });
       if(!error) {
         console.log("uploaded!!");
         setVideo(undefined);
@@ -209,36 +249,6 @@ const CameraScreen = () => {
       console.error('Upload error:', error);
     } finally {
       setIsUploading(false);
-    }
-  };
-  
-  const uploadVideo1 = async () => {
-    setIsUploading(true);
-
-    //set up video uri
-    let videoUri = "";
-    if (cameraRollVideo) videoUri = cameraRollVideo;
-    else if (video) videoUri = video.path;
-
-    //set up video filedata for supabase storage
-    const base64 = await FileSystem.readAsStringAsync(videoUri, { encoding: 'base64' });
-    const filePath = `${user?.id}/${new Date().getTime()}.mp4`;
-    const contentType = 'video/mp4';
-    
-    //upload video to storage
-    const res = await supabase.storage.from('1sec').upload(filePath, decode(base64), { contentType } );
-
-    //upload video url to 1sec table
-    if (!res.error) {
-      const res2 = await getPublicURL(res.data.path);
-      const { error } = await supabase.from("1sec").insert({ user_id: user?.id, video_url: res2.publicUrl });
-      if(!error) {
-        console.log("uploaded!!");
-        setIsUploading(false);
-        setVideo(undefined);
-        setCameraRollVideo(undefined);
-        router.push("/(protected)/profile");
-      }
     }
   };
 
