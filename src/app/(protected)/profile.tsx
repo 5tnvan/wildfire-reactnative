@@ -86,6 +86,7 @@ export default function ProfileScreen() {
                 <View className="flex-row items-center mb-3">
                   <Avatar
                     avatar_url={profile.avatar_url}
+                    username={profile.username}
                     size="md"
                     ring={true}
                   ></Avatar>

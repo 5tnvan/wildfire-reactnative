@@ -1,12 +1,29 @@
 import { View, Text, Image } from 'react-native';
 import { Link } from 'expo-router';
+import HorizontalScrollCards from '@/src/components/HorizontalScrollCards';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuthUser } from '@/src/services/providers/AuthUserProvider';
+import { useAuthUserFollows } from '@/src/services/providers/AuthUserFollowsProvider';
+import FollowingScroll from '@/src/components/FollowingScroll';
 
 export default function IndexScreen() {
+  const { profile } = useAuthUser();
+  const { isLoading: isLoadingFollows, followers, following } = useAuthUserFollows();
+
   return (
-    <View className="flex flex-col justify-center items-end px-4 grow">
-      <Image source={{ uri: "https://media.tenor.com/UQxp24htvsoAAAAi/pixel-gem.gif" }} width={80} height={80}/>
-      <Text className="text-3xl text-primary">Home</Text>
-      <Link href="/(auth)">Tabs</Link>
-    </View>
+    <>
+      <SafeAreaView className=''>
+        <View className='mb-2'>
+          <Text className='text-white text-2xl font-bold p-2'>Home</Text>
+        </View>
+        <View className='mb-2'>
+          <HorizontalScrollCards data={profile} />
+        </View>
+      </SafeAreaView>
+      <View className='absolute bottom-0'>
+        <FollowingScroll data={following} />
+      </View>
+    </>
+
   );
 }

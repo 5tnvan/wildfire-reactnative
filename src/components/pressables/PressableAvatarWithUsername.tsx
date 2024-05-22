@@ -15,7 +15,7 @@ export function PressableAvatarWithUsername({ username, avatar_url }: Props) {
         alert("avatar");
       }}
     >
-      <Avatar avatar_url={avatar_url} size={"md"} ring={true} />
+      <Avatar avatar_url={avatar_url} username={username} size={"md"} ring={true} />
       <Text className='font-semibold text-lg text-white ml-1'>{username}</Text>
     </Pressable>
   );
