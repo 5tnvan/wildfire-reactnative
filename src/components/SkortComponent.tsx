@@ -27,22 +27,31 @@ type Props = {
 
 /** 
  * SKORT SCREEN
- * Skort is a short with a reveal
+ * Feed of videos
  * **/
 export default function SkortComponent({ data }: Props) {
   const router = useRouter();
+
+  //Keeps track of which video is currently in the user's view. This is crucial for knowing which video to play.
   const [currentViewableItemIndex, setCurrentViewableItemIndex] = useState(0);
+
+  //Manages how videos in the feed are played and paused based on their visibility on the screen.
   const viewabilityConfig = { viewAreaCoveragePercentThreshold: 50 };
 
-  const onViewableItemsChanged = useCallback(({ viewableItems }: any) => {
+  //This function updates currentViewableItemIndex based on the item currently in view.
+  //It's essential for determining which video should be playing as the user scrolls.
+  const onViewableItemsChanged = ({ viewableItems }: any) => {
     if (viewableItems.length > 0) {
       setCurrentViewableItemIndex(viewableItems[0].index ?? 0);
     }
-  }, []);
+  };
+
+  //Manages how videos in the feed are played and paused based on their visibility on the screen.
   const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
 
+  //Handle when user goes back
   const reset = () => {
-    setCurrentViewableItemIndex(0);
+    // setCurrentViewableItemIndex(0);
     router.back();
   };
 
@@ -59,7 +68,6 @@ export default function SkortComponent({ data }: Props) {
         horizontal={false}
         showsVerticalScrollIndicator={false}
         viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
-        extraData={currentViewableItemIndex}
       />
 
       {/* BACK BUTTON */}

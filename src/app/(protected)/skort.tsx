@@ -15,6 +15,7 @@ export default function SkortScreen() {
   // Call refetch function every time the screen is focused
   useEffect(() => {
     if (isFocused) {
+      console.log("refetching skorts")
       refetch();
     }
   }, [isFocused]);

@@ -86,7 +86,6 @@ function ProtectedLayoutNav() {
 export default function ProtectedLayout() {
 
   const { isAuthenticated, user } = useAuth();
-  console.log("userId", user?.id);
 
   if (!isAuthenticated) {
     return <Redirect href="/(auth)" />;

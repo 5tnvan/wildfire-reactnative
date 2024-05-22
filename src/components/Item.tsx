@@ -45,8 +45,6 @@ const Item = ({
     };
   });
 
-  console.log("thumb", item.thumbnail_url);
-
   return (
     <Animated.View
       style={[

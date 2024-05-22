@@ -28,8 +28,6 @@ export default function AuthLayout() {
 
   const { isAuthenticated, user, session } = useAuth();
 
-  console.log("userId", user?.id);
-
   if (isAuthenticated) {
     return <Redirect href="/(protected)" />;
   }

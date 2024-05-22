@@ -127,7 +127,6 @@ const CameraScreen = () => {
       flash: flash === 'on' ? 'on' : 'off',
       videoBitRate: 'high',
       onRecordingFinished: async (video) => {
-        console.log("on recording finish", video);
         setIsRecording(false);
         setVideo(video);
       },
@@ -137,7 +136,6 @@ const CameraScreen = () => {
       }
     })
     setTimeout(() => {
-      console.log("im here");
       camera.current?.stopRecording()
     }, 3000)
   };
@@ -274,8 +272,6 @@ const CameraScreen = () => {
       videoMaxDuration: 3,
       exif: true,
     });
-
-    console.log(result);
 
     if (!result.canceled) {
       setCameraRollVideo(result.assets[0].uri);
