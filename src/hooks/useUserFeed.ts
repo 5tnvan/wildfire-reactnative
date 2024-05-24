@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
-import * as VideoThumbnails from 'expo-video-thumbnails';
+import * as VideoThumbnails from "expo-video-thumbnails";
 
 /**
- * USEFEED HOOK
- * Use this to get feed of videos
+ * useUserFeed HOOK
+ * Use this to get feed of videos from any user
  **/
 export const useUserFeed = (user_id: any) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -14,18 +14,62 @@ export const useUserFeed = (user_id: any) => {
   const [triggerRefetch, setTriggerRefetch] = useState(false);
 
   const refetch = () => {
-    setTriggerRefetch(prev => !prev);
+    setTriggerRefetch((prev) => !prev);
   };
 
   const init = async () => {
     setIsLoading(true);
     const { data } = await supabase
-    .from('1sec')
-    .select('id, video_url, thumbnail_url, created_at, profile:user_id(id, username, avatar_url)')
-    .eq('user_id', user_id)
-    .order("created_at", { ascending: false });
+      .from("1sec")
+      .select(
+        "id, video_url, thumbnail_url, created_at, views, profile:user_id(id, username, avatar_url)"
+      )
+      .eq("user_id", user_id)
+      .order("created_at", { ascending: false });
 
     setFeed(data);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    init();
+  }, [triggerRefetch]);
+
+  return { isLoading, feed, refetch };
+};
+
+/**
+ * USEFEED HOOK
+ * Use this to get feed of videos
+ **/
+export const useUserFeedByUsername = (username: any) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [feed, setFeed] = useState<any>();
+  const [triggerRefetch, setTriggerRefetch] = useState(false);
+
+  const refetch = () => {
+    setTriggerRefetch((prev) => !prev);
+  };
+
+  const init = async () => {
+    setIsLoading(true);
+    const { data } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("username", username)
+      .single();
+
+    if (data) {
+      const { data: feed } = await supabase
+        .from("1sec")
+        .select(
+          "id, video_url, thumbnail_url, created_at, views, profile:user_id(id, username, avatar_url)"
+        )
+        .eq("user_id", data.id)
+        .order("created_at", { ascending: false });
+      setFeed(feed);
+    }
+
     setIsLoading(false);
   };
 

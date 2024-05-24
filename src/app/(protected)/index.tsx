@@ -1,29 +1,71 @@
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
-import HorizontalScrollCards from '@/src/components/HorizontalScrollCards';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthUser } from '@/src/services/providers/AuthUserProvider';
 import { useAuthUserFollows } from '@/src/services/providers/AuthUserFollowsProvider';
-import FollowingScroll from '@/src/components/FollowingScroll';
+import { useUserFeed } from '@/src/hooks/useUserFeed';
+import { useEffect } from 'react';
+import { useIsFocused } from '@react-navigation/native';
+import { useIncomingTransactions } from '@/src/hooks/useIncomingTransactions';
+import StatCarousel from '@/src/components/carousel/StatCarousel';
+import FollowingCarousel from '@/src/components/carousel/FollowingCarousel';
+import { useUserFollowingFeed } from '@/src/hooks/useUserFollowingFeed';
+import Header from '../../components/igfeed/Header';
+import Navigation from '../../components/igfeed/Navigation';
+import Posts from '../../components/igfeed/Posts';
+import Stories from '../../components/igfeed/Stories';
 
 export default function IndexScreen() {
+  const isFocused = useIsFocused(); // Get focused state
+
+  /**
+   * CONSUME PROVIDERS
+   */
   const { profile } = useAuthUser();
   const { isLoading: isLoadingFollows, followers, following } = useAuthUserFollows();
+  /**
+   * FETCH DIRECTLY
+   */
+  const incomingRes = useIncomingTransactions(profile?.wallet_id);
+  const { feed: userFeed, refetch: refetchUserFeed } = useUserFeed(profile?.id);
+
+  /**
+   * REFETCH PROVIDERS WHEN SCREEN IS IN FOCUS
+   */
+  // 
+  useEffect(() => {
+    if (isFocused) {
+      console.log("refetching index feed")
+      refetchUserFeed();
+    }
+  }, [isFocused]);
 
   return (
     <>
-      <SafeAreaView className=''>
+      <Header />
+
+      {/* STAT */}
+      <View className=''>
         <View className='mb-2'>
-          <Text className='text-white text-2xl font-bold p-2'>Home</Text>
+          <StatCarousel data={{ profile, userFeed, incomingRes }} />
         </View>
-        <View className='mb-2'>
-          <HorizontalScrollCards data={profile} />
-        </View>
-      </SafeAreaView>
-      <View className='absolute bottom-0'>
-        <FollowingScroll data={following} />
       </View>
+
+      {/* FEED */}
+      <Posts />
+
+      {/* FOLLOWING */}
+      {/* <SafeAreaView className='absolute bottom-0'>
+        <FollowingCarousel data={following} />
+      </SafeAreaView> */}
     </>
 
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'black', // Ensures the background color allows for transparency
+  },
+});

@@ -1,6 +1,6 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
 import { Redirect, Tabs, useSegments } from 'expo-router';
@@ -10,16 +10,18 @@ import { useClientOnlyValue } from '@/src/components/useClientOnlyValue';
 import { useAuth } from '../../services/providers/AuthProvider';
 import AuthUserProvider, { useAuthUser } from '../../services/providers/AuthUserProvider';
 import AuthUserFollowsProvider from '@/src/services/providers/AuthUserFollowsProvider';
+import { AntDesign } from '@expo/vector-icons';
+import { Avatar } from '@/src/components/avatars/avatar';
 
 /** 
  * TAB BAR ICON
  * Icons: https://icons.expo.fyi/
  * **/
 function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
+  name: React.ComponentProps<typeof AntDesign>['name'];
   color: string;
 }) {
-  return <FontAwesome size={20} style={{ marginBottom: -3 }} {...props} />;
+  return <AntDesign size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
 /** 
@@ -28,6 +30,7 @@ function TabBarIcon(props: {
 function ProtectedLayoutNav() {
   const segment = useSegments();
   const colorScheme = useColorScheme();
+  const { profile } = useAuthUser();
 
   return (
     <Tabs
@@ -42,21 +45,25 @@ function ProtectedLayoutNav() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />
+          tabBarLabel: () => null,
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color}
+           />
         }}
       />
       <Tabs.Screen
         name="create"
         options={{
           title: 'Create',
-          tabBarIcon: ({ color }) => <TabBarIcon name="plus" color={color} />,
+          tabBarLabel: () => null,
+          tabBarIcon: ({ color }) => <TabBarIcon name="pluscircleo" color={color} />,
         }}
       />
       <Tabs.Screen
         name="skort"
         options={{
-          title: 'Now',
-          tabBarIcon: ({ color }) => <Fontisto name="world-o" size={24} color={color} />,
+          title: '3 sec',
+          tabBarLabel: () => null,
+          tabBarIcon: ({ color }) => <MaterialIcons name="123" style={{ marginBottom: -3 }} size={40} color={color} />,
           tabBarStyle: { display: segment[1] === "skort" ? 'none' : 'flex' } //hide tab bar for this screen
         }}
       />
@@ -64,14 +71,16 @@ function ProtectedLayoutNav() {
         name="discover"
         options={{
           title: 'Discover',
-          tabBarIcon: ({ color }) => <MaterialIcons name="app-shortcut" size={24} color={color} />,
+          tabBarLabel: () => null,
+          tabBarIcon: ({ color }) => <MaterialIcons name="app-shortcut" style={{ marginBottom: -3 }} size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="face-woman-profile" size={24} color={color} />,
+          tabBarLabel: () => null,
+          tabBarIcon: ({ color }) => <Avatar avatar_url={profile?.avatar_url} username={profile?.username} size={'sm'} ring={true} />,
         }}
       />
       {/* <Tabs.Screen name="modals/follows-modal" options={{ href: null }} /> */}

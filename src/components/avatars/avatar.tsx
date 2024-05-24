@@ -9,56 +9,40 @@ type Props = {
 };
 
 export function Avatar({ avatar_url, username, size, ring }: Props) {
-  let width = 0;
-  let height = 0;
-  let border = 0;
-  let halo = 0;
+  let width1 = 0;
+  let height1 = 0;
 
-  if (size == "md") {
-    width = 12;
-    height = 12;
+  if (size == "sm") {
+    width1 = 30;
+    height1 = 30;
   }
 
-  if (size == "md" && ring) {
-    border = 2;
-    halo = 12;
+  if (size == "md") {
+    width1 = 40;
+    height1 = 40;
   }
 
   if (size == "lg") {
-    width = 16;
-    height = 16;
-  }
-
-  if (size == "lg" && ring) {
-    border = 2;
-    halo = 16;
+    width1 = 50;
+    height1 = 50;
   }
 
   return (
     <>
       {avatar_url && 
-      <View className={`w-${halo} h-${halo} flex-row justify-center items-center rounded-full overflow-hidden border-accent border-4`}>
-        <View className={`border-${border} w-${width} h-${height} border-white rounded-full`}>
-          <Image
-            source={{ uri: avatar_url }}
-            className={`rounded-full bg-contain`}
-            style={styles.image}
-          />
-        </View>
-      </View>}
+      <View className={`rounded-full`} style = {{ width: width1, height: height1}}>
+      <Image
+        source={{ uri: avatar_url }}
+        className={`rounded-full bg-contain w-full h-full`}
+      />
+    </View>}
       {!avatar_url && 
-      <View className={`w-${halo} h-${halo} flex-row justify-center items-center rounded-full overflow-hidden border-accent border-4`}>
-        <View className={`border-${border} w-${width} h-${height} border-white rounded-full items-center justify-center bg-slate-300`}>
-          <Text className="font-semibold text-lg text-secondary">{username.charAt(0).toUpperCase()}</Text>
-        </View>
-      </View>}
+      <View className={`border-white rounded-full items-center justify-center bg-slate-300`} style = {{ width: width1, height: height1}}>
+      <Text className="font-semibold text-lg text-secondary">{username?.charAt(0).toUpperCase()}</Text>
+    </View>}
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  image: {
-    width: '100%',
-    height: '100%',
-  },
 });

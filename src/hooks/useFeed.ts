@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { fetchFollowing } from "../utils/fetch/fetchFollowing";
+import { fetchUser } from "../utils/fetch/fetchUser";
 
 /**
- * USEFEED HOOK
+ * useFeed HOOK
  * Use this to get feed of videos
  **/
 export const useFeed = () => {
@@ -18,6 +20,7 @@ export const useFeed = () => {
 
   const init = async () => {
     setIsLoading(true);
+
     const { data } = await supabase
     .from('1sec')
     .select('video_url, created_at, profile:user_id(id, username, avatar_url)');

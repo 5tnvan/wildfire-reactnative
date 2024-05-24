@@ -152,7 +152,7 @@ export default function StoryComponent({ data, onFinishStory} : Props) {
   }, [currentStoryIndex, isPaused]);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <Pressable
         onPress={handleScreenTouch}
         onLongPress={handlePressIn}
@@ -192,7 +192,7 @@ export default function StoryComponent({ data, onFinishStory} : Props) {
           </SafeAreaView>
         </View>
       </Pressable>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     },
     safeArea: {
       flex: 1,
-      backgroundColor: '#000',
+      backgroundColor: '#fff',
     },
     progressBarContainer: {
       flexDirection: 'row',

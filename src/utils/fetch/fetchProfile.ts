@@ -5,7 +5,7 @@ const fetchProfile = async (userId: string) => {
     try {
         const { data, error, status } = await supabase
             .from('profiles')
-            .select()
+            .select("*, levels(id, level, created_at)")
             .eq('id', userId)
             .single()
         if (error && status !== 406) throw error

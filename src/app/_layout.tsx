@@ -1,7 +1,7 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { useColorScheme } from '@/src/components/useColorScheme';
@@ -22,6 +22,7 @@ function RootLayoutNav() {
       <Stack>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(protected)" options={{ headerShown: false }} />
+        <Stack.Screen name="(profile)/[username]" options={{ }} />
         <Stack.Screen name="modals/tool-tip-register-modal" options={{ title: 'Tooltip', presentation: 'card', headerBackTitle: 'Back' }} />
         <Stack.Screen name="modals/tool-tip-login-modal" options={{ title: 'Tooltip', presentation: 'card', headerBackTitle: 'Back' }} />
       </Stack>
