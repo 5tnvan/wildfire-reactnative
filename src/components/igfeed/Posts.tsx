@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FlatList, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, View, Text } from 'react-native';
 import PostItem from './PostItem';
 import { useUserFollowingFeed } from "@/src/hooks/useUserFollowingFeed";
 import { useIsFocused } from '@react-navigation/native';
@@ -7,10 +7,10 @@ import { useIsFocused } from '@react-navigation/native';
 export default function Posts() {
   const isFocused = useIsFocused();
 
-  //FETCH DIRECTLY
-  const { isLoading, feed: userFollowingFeed, hasMore, fetchMore, refetch } = useUserFollowingFeed();
+  // FETCH DIRECTLY
+  const { isLoading, feed: userFollowingFeed, fetchMore, refetch } = useUserFollowingFeed();
 
-  //FIGURE OUT WHICH VIDEO IS IN USER'S VIEW TO PLAY
+  // FIGURE OUT WHICH VIDEO IS IN USER'S VIEW TO PLAY
   const [playingIndex, setPlayingIndex] = useState<any>(null);
   const viewabilityConfig = { itemVisiblePercentThreshold: 50 };
   const onViewableItemsChanged = ({ viewableItems } : any) => {
@@ -26,21 +26,22 @@ export default function Posts() {
     setIsMuted(!isMuted);
   };
 
-  // HANDLE END REACH
+  // HANDLE END REACHED
   const handleEndReached = () => {
-    if (hasMore && !isLoading) {
+    console.log("end reached");
+    if (!isLoading) {
       fetchMore();
     }
   };
 
-  // REFETCH WHEN SCREEN IS IN FOCUS
-  useEffect(() => {
-    if (!isFocused) {
-      setPlayingIndex(null);
-    } else {
-      refetch();
-    }
-  }, [isFocused]);
+  // HANDLE REFRESH
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    refetch();
+    setRefreshing(false);
+  };
 
   return (
     <FlatList
@@ -54,8 +55,11 @@ export default function Posts() {
         />
       )}
       viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
       onEndReached={handleEndReached}
-      onEndReachedThreshold={0.5} // Adjust the threshold as needed
+      onEndReachedThreshold={0.1} // Adjust the threshold as needed
+      ListFooterComponent={() => (isLoading ? <ActivityIndicator size="large" color="#0000ff" /> : null)}
     />
   );
 }

@@ -74,7 +74,6 @@ export default function StatCarousel() {
             data={cardData}
             horizontal
             showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
             renderItem={({ item }) => <Item id={item.id} title={item.title} stat={item.stat} cta={item.cta} icon={item.icon} avatar={item.avatar} profile={profile} onPress={handleCta} />}
             snapToInterval={CARD_WIDTH + MARGIN_LEFT + MARGIN_RIGHT} // Calculate the size for a card including marginLeft and marginRight
             decelerationRate="fast" // Make the scrolling feel snappier

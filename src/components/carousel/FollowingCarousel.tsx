@@ -20,7 +20,7 @@ type Props = {
 const Item = ({ id, profile, colorScheme, onPress } : Props) => (
     <Pressable style={styles.card} className='items-center' onPress={() => onPress(profile.username)}>
         <Avatar avatar_url={profile.avatar_url} username={profile.username} size={'lg'} ring={true}></Avatar>
-        <Text numberOfLines={1} ellipsizeMode='tail' className={`${colorScheme == "dark" ? "text-white" : "text-black"}`}>{profile.username}{id}</Text>
+        {/* <Text numberOfLines={1} ellipsizeMode='tail' className={`${colorScheme == "dark" ? "text-white" : "text-black"}`}>{profile.username}</Text> */}
     </Pressable>
 );
 
@@ -42,7 +42,8 @@ export default function FollowingCarousel({ data } : any) {
             data={data}
             horizontal
             showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
+            initialNumToRender={3}
+            maxToRenderPerBatch={6}
             renderItem={({ item }) => <Item id={item.following.id} profile={item.following} colorScheme={colorScheme} onPress={handleLink}/>}
             snapToInterval={CARD_WIDTH + MARGIN_LEFT + MARGIN_RIGHT} // Calculate the size for a card including marginLeft and marginRight
             decelerationRate="fast" // Make the scrolling feel snappier

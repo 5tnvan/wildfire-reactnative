@@ -46,8 +46,8 @@ export default function IndexScreen() {
 
       {/* STAT */}
       <View className='mb-2'>
-        {/* <FollowingCarousel data={following} />
-        <StatCarousel /> */}
+        <FollowingCarousel data={following} />
+        <StatCarousel />
       </View>
 
       {/* FEED */}
