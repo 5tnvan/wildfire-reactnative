@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, Dimensions, Pressable, Linking } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Avatar } from '../avatars/avatar';
 import { calculateSum } from '../../utils/calculateSum';
 import { useRouter } from 'expo-router';
+import { useIsFocused } from '@react-navigation/native';
+import { useAuthUser } from '@/src/services/providers/AuthUserProvider';
+import { useIncomingTransactions } from '@/src/hooks/useIncomingTransactions';
+import { useUserFeed } from '@/src/hooks/useUserFeed';
 
 const CARD_WIDTH = Dimensions.get('window').width * 0.6;
 const CARD_HEIGHT = 145
-const MARGIN_LEFT = 7;
+const MARGIN_LEFT = 1;
 const MARGIN_RIGHT = 7;
 
 const cardData = [
@@ -16,16 +20,29 @@ const cardData = [
     { id: '3', title: 'Balance', stat: 0, cta: 'View Wildpay', icon: 'coins' },
 ];
 
-export default function StatCarousel({ data }: any) {
+export default function StatCarousel() {
     const router = useRouter();
-    /**
-     * DYNAMICALLY GENERATE CARDS DATA
-     */
-    const sumOfViews = data.feed?.reduce((total: any, item: any) => total + item.views, 0);
-    const highestLevel = data.profile?.levels.reduce((max: number, item: any) => item.level > max ? item.level : max, 0);
+    const isFocused = useIsFocused(); // Get focused state
+
+    //CONSUME PROVIDERS
+    const { profile } = useAuthUser();
+
+    //FETCH DIRECTLY
+    const incomingRes = useIncomingTransactions(profile?.wallet_id);
+    const { feed: userFeed, refetch: refetchUserFeed } = useUserFeed(profile?.id);
+
+    //REFETCH PROVIDERS WHEN SCREEN IS IN FOCUS
+    useEffect(() => {
+        if (isFocused) refetchUserFeed();
+    }, [isFocused]);
+
+    
+    //DYNAMICALLY GENERATE CARDS DATA
+    const sumOfViews = userFeed?.reduce((total: any, item: any) => total + item.views, 0);
+    const highestLevel = profile?.levels.reduce((max: number, item: any) => item.level > max ? item.level : max, 0);
     const levelNames = ["noob", "creator", "builder", "architect", "visionary", "god-mode"];
     const levelName = levelNames[highestLevel] || "unknown";
-    const balance = (calculateSum(data.incomingRes.ethereumData) + calculateSum(data.incomingRes.baseData)).toFixed(3);
+    const balance = (calculateSum(incomingRes.ethereumData) + calculateSum(incomingRes.baseData)).toFixed(3);
 
     cardData[0].stat = sumOfViews;
     cardData[1].title = 'Level ' + highestLevel;
@@ -58,7 +75,7 @@ export default function StatCarousel({ data }: any) {
             horizontal
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <Item id={item.id} title={item.title} stat={item.stat} cta={item.cta} icon={item.icon} avatar={item.avatar} profile={data.profile} onPress={handleCta} />}
+            renderItem={({ item }) => <Item id={item.id} title={item.title} stat={item.stat} cta={item.cta} icon={item.icon} avatar={item.avatar} profile={profile} onPress={handleCta} />}
             snapToInterval={CARD_WIDTH + MARGIN_LEFT + MARGIN_RIGHT} // Calculate the size for a card including marginLeft and marginRight
             decelerationRate="fast" // Make the scrolling feel snappier
             contentContainerStyle={styles.container}

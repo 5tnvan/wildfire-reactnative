@@ -61,7 +61,7 @@ const Item = ({
       </View>
       <View style={styles.bottomContainer}>
         <View style={styles.textContainer}>
-          <Text style={styles.textName}>Location</Text>
+          <Text style={styles.textName}>{item.country?.name}</Text>
           <Text style={styles.textExp}><TimeAgo timestamp={item.created_at}></TimeAgo> ago</Text>
         </View>
         <View style={styles.visaContainer}>

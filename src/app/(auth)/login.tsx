@@ -21,7 +21,6 @@ AppState.addEventListener('change', (state) => {
 
 export default function LoginScreen() {
   const colorScheme = useColorScheme();
-  
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordShown, setPasswordShown] = useState(false);

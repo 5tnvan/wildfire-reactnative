@@ -45,10 +45,8 @@ export default function IndexScreen() {
       <Header />
 
       {/* STAT */}
-      <View className=''>
-        <View className='mb-2'>
-          <StatCarousel data={{ profile, userFeed, incomingRes }} />
-        </View>
+      <View className='mb-2'>
+        <StatCarousel />
       </View>
 
       {/* FEED */}

@@ -12,14 +12,14 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
   const videoRef = useRef(null);
 
   return (
-    <View className="bg-zinc-900 mb-3 rounded-2xl flex-1">
+    <View className="bg-zinc-900 mb-3 rounded-2xl">
+      {/* HEADER */}
       <View className="bg-transparent flex-row items-center px-3 py-4 rounded-2xl">
-          
           <Text className="ml-2 font-semibold text-base">@{item.profile.username}</Text>
           <Text className="ml-1 text-base"><TimeAgo timestamp={item.created_at}></TimeAgo></Text>
         </View>
+      {/* VIDEO */}
       <View className="w-full h-[500px] relative mb-1">
-        {/* VIDEO */}
         <Video
           ref={videoRef}
           source={{ uri: item.video_url }}

@@ -2,33 +2,25 @@ import { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
-  Alert,
   Pressable,
   Modal,
-  FlatList,
-  Image,
   useColorScheme,
-  ScrollView,
   useWindowDimensions,
 } from "react-native";
 import { useAuthUser } from "../../services/providers/AuthUserProvider";
 import { Text } from "../../components/Themed";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar } from "../../components/avatars/avatar";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuthUserFollows } from "@/src/services/providers/AuthUserFollowsProvider";
 import { useIncomingTransactions } from "@/src/hooks/useIncomingTransactions";
 import { useOutgoingTransactions } from "@/src/hooks/useOutgoingTransactions";
-import { calculateSum } from "@/src/utils/calculateSum";
 import { useUserFeed } from "@/src/hooks/useUserFeed";
 import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
 } from 'react-native-reanimated';
 import Item from "@/src/components/Item";
-import Button from "@/src/components/Button";
 import StoryComponent from "@/src/components/StoryComponent";
-//import {SystemBars} from 'react-native-bars';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Stack } from "expo-router";
 

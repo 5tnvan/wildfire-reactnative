@@ -3,7 +3,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
-import { Redirect, Tabs, useSegments } from 'expo-router';
+import { Redirect, Stack, Tabs, useSegments } from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import { useColorScheme } from '@/src/components/useColorScheme';
 import { useClientOnlyValue } from '@/src/components/useClientOnlyValue';
@@ -101,10 +101,13 @@ export default function ProtectedLayout() {
   }
 
   return (
-    <AuthUserProvider>
+    <>
+      <AuthUserProvider>
       <AuthUserFollowsProvider>
           <ProtectedLayoutNav />
       </AuthUserFollowsProvider>
     </AuthUserProvider>
+    </>
+    
   );
 }

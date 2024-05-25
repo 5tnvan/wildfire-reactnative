@@ -5,7 +5,7 @@ import { useUserFollowingFeed } from "@/src/hooks/useUserFollowingFeed";
 import { useIsFocused } from '@react-navigation/native';
 
 export default function Posts() {
-  const { feed: userFollowingFeed } = useUserFollowingFeed();
+  const { feed: userFollowingFeed, refetch } = useUserFollowingFeed();
   const [playingIndex, setPlayingIndex] = useState(null);
   const [isMuted, setIsMuted] = useState(true);
   const isFocused = useIsFocused();
@@ -25,6 +25,8 @@ export default function Posts() {
   useEffect(() => {
     if (!isFocused) {
       setPlayingIndex(null);
+    } else {
+      refetch();
     }
   }, [isFocused]);
 

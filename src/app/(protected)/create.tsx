@@ -1,25 +1,23 @@
-import { Stack, useRouter } from 'expo-router';
+import { Link, Stack, useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Pressable,
-  Image,
-  Button,
   ActivityIndicator,
+  useColorScheme,
 } from 'react-native';
 import {
   useCameraPermission,
   useMicrophonePermission,
   useCameraDevice,
   Camera,
-  PhotoFile,
   TakePhotoOptions,
   VideoFile,
 } from 'react-native-vision-camera';
 import { useFocusEffect } from 'expo-router';
-import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { Video } from 'expo-av';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
@@ -27,23 +25,30 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { supabase } from '@/src/lib/supabase';
 import { useAuth } from '@/src/services/providers/AuthProvider';
-import * as FileSystem from 'expo-file-system';
-import { decode } from 'base64-arraybuffer';
-import { getPublicURL } from '@/src/utils/getPublicUrl';
 import axios from 'axios';
 import RNFS from 'react-native-fs';
 import BunnyAPI from '@/src/constants/BunnyAPI';
 import { Buffer } from 'buffer';
 import * as VideoThumbnails from 'expo-video-thumbnails';
+import Colors from '@/src/constants/Colors';
+import { SetCountryModal } from '@/src/components/modals/SetCountryModal';
 
 const CameraScreen = () => {
 
   const router = useRouter();
+  const colorScheme = useColorScheme();
+
+  //STATES
+  const [modalVisible, setModalVisible] = useState(false); //location modal
+  const [video, setVideo] = useState<VideoFile>(); //video taken from camera
+  const [cameraRollVideo, setCameraRollVideo] = useState<string>(); //video taken from camera roll
+  const [locationId, setLocationId] = useState<any>(null);
+  const [locationName, setLocationName] = useState("Set location");
+
+  //CONSUME PROVIDERS
   const { user } = useAuth();
 
-  /**
-   * Cam & mic permissions
-   * **/
+  //SET CAM AND MIC PERMISSIONS
   const { hasPermission: hasCam, requestPermission: requestCam } = useCameraPermission();
   const { hasPermission: hasMic, requestPermission: requestMic } = useMicrophonePermission();
 
@@ -52,9 +57,7 @@ const CameraScreen = () => {
     if (!hasMic) requestMic();
   }, [hasCam, hasMic]);
 
-  /**
-   * Camera settings
-   * **/
+  //SET CAMERA SETTINGS
   const [position, setPosition] = useState<'front' | 'back'>('back');
   const device = useCameraDevice(position);
   const camera = useRef<Camera>(null);
@@ -71,14 +74,7 @@ const CameraScreen = () => {
     }, [])
   );
 
-  /**
-   * Video results
-   * **/
-  const [video, setVideo] = useState<VideoFile>();
-
-  /**
-   * Timer, counts from to 15 secs
-   * **/
+  //TIMER THAT COUNTS TO 3 SECS
   const [counter, setCounter] = useState(0);
 
   useEffect(() => {
@@ -108,7 +104,6 @@ const CameraScreen = () => {
     };
   }, [isRecording]);
   
-
   const formatCounter = (counter: number) => {
     const seconds = Math.floor(counter / 1000);
     const milliseconds = Math.floor(counter % 1000);
@@ -116,10 +111,8 @@ const CameraScreen = () => {
   };
   
 
-  /**
-   * Handle recording
-   * **/
-  const onStartRecording = async () => {
+  //HANDLE RECORDING
+  const handleStartRecording = async () => {
     if (!camera.current) return;
     setIsRecording(true);
 
@@ -127,6 +120,7 @@ const CameraScreen = () => {
       flash: flash === 'on' ? 'on' : 'off',
       videoBitRate: 'high',
       onRecordingFinished: async (video) => {
+        console.log("on recording finish", video);
         setIsRecording(false);
         setVideo(video);
       },
@@ -142,15 +136,39 @@ const CameraScreen = () => {
 
   // const onStopRecording = async () => {
   //   if (!camera.current) return;
-  //   console.log("im there");
-
   //   camera.current?.stopRecording();
   // };
-  
-  
-  /**
-   * Handle upload
-   **/
+
+  //HANDLE PICKING VIDEO FROM CAMERA ROLL
+  const handlePickVideo = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      allowsEditing: true,
+      aspect: [9, 16],
+      quality: 1,
+      selectionLimit: 1,
+      videoMaxDuration: 3,
+      exif: true,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setCameraRollVideo(result.assets[0].uri);
+    }
+  };
+
+  //HANDLE COUNTRY SELECT
+  const handleCountrySelect = (countryId: string, countryName: string) => {
+    console.log("countryId", countryId);
+    setLocationId(countryId);
+    setLocationName(countryName);
+    //setModalVisible(false);
+  };
+
+  //HANDLE PUBLISHING
+  const [isUploading, setIsUploading] = useState(false);
   const generateThumbnail = async (video_url: any) => {
     try {
       const { uri } = await VideoThumbnails.getThumbnailAsync(
@@ -163,10 +181,7 @@ const CameraScreen = () => {
       return null;
     }
   };
-
-  const [isUploading, setIsUploading] = useState(false);
-  
-  const uploadVideo = async () => {
+  const handlePublishing = async () => {
     setIsUploading(true);
     const now = new Date().getTime();
 
@@ -236,6 +251,7 @@ const CameraScreen = () => {
         user_id: user?.id, 
         video_url: pullZoneVideoUrl,
         thumbnail_url: pullZoneThumbUrl,
+        country_id: locationId,
       });
       if(!error) {
         console.log("uploaded!!");
@@ -250,39 +266,31 @@ const CameraScreen = () => {
     }
   };
 
-  /**
-   * Error settings
-   * **/
+  //ERROR SETTINGS
   if (!hasCam || !hasMic) return <SafeAreaView><Text>You need to grant camera or microphone access.</Text></SafeAreaView>;
   if (!device) return <SafeAreaView><Text>Camera device not found</Text></SafeAreaView>;
 
-  /**
-   * Video picker
-   * **/
-  const [cameraRollVideo, setCameraRollVideo] = useState<string>();
-
-  const pickVideo = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-      allowsEditing: true,
-      aspect: [9, 16],
-      quality: 1,
-      selectionLimit: 1,
-      videoMaxDuration: 3,
-      exif: true,
-    });
-
-    if (!result.canceled) {
-      setCameraRollVideo(result.assets[0].uri);
-    }
-  };
-
-
   return (
     <View style={{ flex: 1 }}>
-      <Stack.Screen options={{ headerShown: true }} />
 
+      {/* HEADER */}
+      <Stack.Screen options={{ headerShown: true, title: "Create", headerRight: () => (
+            <Link href="/modals/tool-tip-create" asChild>
+              <Pressable>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="info-circle"
+                    size={25}
+                    color={Colors[colorScheme ?? 'light'].text}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+            </Link>
+          ),
+         }} />
+
+      {/* CAMERA */}
       <Camera
         ref={camera}
         style={StyleSheet.absoluteFill}
@@ -292,64 +300,8 @@ const CameraScreen = () => {
         audio
       />
 
-      {isRecording && <SafeAreaView className='absolute self-center'><Text className='bg-gray-700 text-white p-3'>{formatCounter(counter)}s</Text></SafeAreaView>}
-
-
-      {video && (
-        <>
-          <View className='bg-black'>
-            <Video
-              className='w-full h-full'
-              source={{
-                uri: video.path,
-              }}
-              useNativeControls={false}
-              isLooping
-              shouldPlay
-            />
-            <Ionicons
-              onPress={() => setVideo(undefined)}
-              name="chevron-back"
-              size={28}
-              color="white"
-              style={{ position: 'absolute', top: 20, left: 10 }}
-            />
-            <Pressable className='absolute flex-row bottom-6 right-4 items-center justify-center p-4 rounded-full bg-accent' onPress={uploadVideo}>
-              <Text className='text-base font-semibold'>Publish</Text>
-              {isUploading && <ActivityIndicator size="small" color="#0000ff" className='ml-1' />}
-            </Pressable>
-          </View>
-
-        </>
-      )}
-
-      {cameraRollVideo && (
-        <>
-          <View className='bg-black'>
-            <Video
-              className='w-full h-full'
-              source={{
-                uri: cameraRollVideo,
-              }}
-              useNativeControls={false}
-              isLooping
-              shouldPlay
-            />
-            <Ionicons
-              onPress={() => setCameraRollVideo(undefined)}
-              name="chevron-back"
-              size={28}
-              color="white"
-              style={{ position: 'absolute', top: 20, left: 10 }}
-            />
-            <Pressable className='absolute flex-row bottom-6 right-4 items-center justify-center p-4 rounded-full bg-accent' onPress={uploadVideo}>
-              <Text className='text-base font-semibold'>Publish</Text>
-              {isUploading && <ActivityIndicator size="small" color="#0000ff" className='ml-1'/>}
-            </Pressable>
-          </View>
-        </>
-      )}
-
+      {/* RECORDING */}
+      {isRecording && <SafeAreaView className='absolute self-center'><Text className='bg-gray-700 text-white p-3 rounded-full'>{formatCounter(counter)}s</Text></SafeAreaView>}
       {!video && !cameraRollVideo && (
         <>
           <View
@@ -386,14 +338,14 @@ const CameraScreen = () => {
 
           </View>
 
-          <Pressable className='absolute bottom-10 left-10' onPress={pickVideo}>
+          <Pressable className='absolute bottom-10 left-10' onPress={handlePickVideo}>
             <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)'}} className='w-14 h-16 bg-black rounded-2xl justify-center items-center border border-zinc-400'>
               <Feather name="film" size={24} color="#CBCBCB" />
             </View>
           </Pressable>
 
           <Pressable
-            onLongPress={onStartRecording}
+            onLongPress={handleStartRecording}
             className={`absolute bottom-10 self-center  rounded-full flex-1 justify-center items-center ${
               isRecording ? 'bg-red-500 w-24 h-24' : 'bg-white w-20 h-20'
             }`}
@@ -402,6 +354,82 @@ const CameraScreen = () => {
           </Pressable>
         </>
       )}
+
+      {/* LOCATION MODAL */}
+      <SetCountryModal visible={modalVisible} onClose={() => setModalVisible(false)} passBack={handleCountrySelect}/>
+
+      {/* VIDEO RESULT */}
+      {video && (
+        <>
+          <View className='bg-black'>
+            <Video
+              className='w-full h-full'
+              source={{
+                uri: video.path,
+              }}
+              useNativeControls={false}
+              isLooping
+              shouldPlay
+            />
+            <Ionicons
+              onPress={() => setVideo(undefined)}
+              name="chevron-back"
+              size={28}
+              color="white"
+              style={{ position: 'absolute', top: 20, left: 10 }}
+            />
+            <View className='absolute bottom-3 flex-row w-full items-center px-3'>
+              <Pressable className='flex-row justify-between grow py-3 px-3 items-center rounded-full bg-white mt-3 mr-3' onPress={() => setModalVisible(true)}>
+                <View><FontAwesome name="location-arrow" size={14} color="black" /></View>
+                <Text className='text-base font-semibold'>{locationName}</Text>
+                <View></View>
+              </Pressable>
+              <Pressable className='flex-row justify-between grow py-3 px-2 items-center rounded-full bg-accent mt-3' onPress={() => console.log("yaya")}>
+                <View></View>
+                <Text className='text-base font-semibold'>Publish</Text>
+                <Ionicons name="chevron-forward" size={22} color="black" />
+                {isUploading && <ActivityIndicator size="small" color="#0000ff" className='ml-1' />}
+              </Pressable>
+            </View>
+          </View>
+        </>
+      )}
+
+      {cameraRollVideo && (
+        <>
+          <View className='bg-black'>
+            <Video
+              className='w-full h-full'
+              source={{
+                uri: cameraRollVideo,
+              }}
+              useNativeControls={false}
+              isLooping
+              shouldPlay
+            />
+            <Ionicons
+              onPress={() => setCameraRollVideo(undefined)}
+              name="chevron-back"
+              size={28}
+              color="white"
+              style={{ position: 'absolute', top: 20, left: 10 }}
+            />
+            <View className='absolute bottom-3 flex-row w-full items-center px-3'>
+              <Pressable className='flex-row justify-between grow py-3 px-3 items-center rounded-full bg-white mt-3 mr-3' onPress={() => setModalVisible(true)}>
+                <View><FontAwesome name="location-arrow" size={14} color="black" /></View>
+                <Text className='text-base font-semibold'>{locationName}</Text>
+                <View></View>
+              </Pressable>
+              <Pressable className='flex-row justify-between grow py-3 px-2 items-center rounded-full bg-accent mt-3' onPress={handlePublishing}>
+                <View></View>
+                <Text className='text-base font-semibold'>Publish</Text>
+                <Ionicons name="chevron-forward" size={22} color="black" />
+                {isUploading && <ActivityIndicator size="small" color="#0000ff" className='ml-1' />}
+              </Pressable>
+            </View>
+          </View>
+        </>
+      )}      
     </View>
   );
 };
