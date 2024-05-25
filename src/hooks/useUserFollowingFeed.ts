@@ -11,38 +11,53 @@ import { fetchFollowing } from "../utils/fetch/fetchFollowing";
  **/
 export const useUserFollowingFeed = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [feed, setFeed] = useState<any>();
+  const [feed, setFeed] = useState<any[]>([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const [triggerRefetch, setTriggerRefetch] = useState(false);
 
   const refetch = () => {
-    setTriggerRefetch(prev => !prev);
+    setPage(0); // Reset to first page
+    setFeed([]); // Clear existing feed
+    setHasMore(true); // Reset hasMore flag
+    setTriggerRefetch(prev => !prev); // Trigger refetch
   };
 
-  const init = async () => {
+  const fetchFeed = async (page: number) => {
     setIsLoading(true);
     
-    //get list of auth's user following
+    // Get list of auth's user following
     const user = await fetchUser();
     const following = await fetchFollowing(user.user?.id);
 
-    
-    if(following) {
-      const followingArray = following?.map((f: any) => f.following.id); // Create an array of IDs from following
+    if (following) {
+      const followingArray = following.map((f: any) => f.following.id); // Create an array of IDs from following
 
-      const { data } = await supabase
-      .from('1sec')
-      .select('video_url, created_at, profile:user_id(id, username, avatar_url)')
-      .in('user_id', followingArray);
+      const { data, error } = await supabase
+        .from('1sec')
+        .select('id, video_url, created_at, profile:user_id(id, username, avatar_url)')
+        .in('user_id', followingArray)
+        .order('created_at', { ascending: false })
+        .range(page * 3, (page + 1) * 3 - 1); // Fetch 3 items per page
 
-      setFeed(data);
+      if (error) {
+        console.error(error);
+        setIsLoading(false);
+        return;
+      }
+
+      if (!data || data.length < 3) {
+        setHasMore(false);
+      }
+
+      setFeed(prevFeed => [...prevFeed, ...data]); // Append new data to existing feed
       setIsLoading(false);
     }
-    
   };
 
   useEffect(() => {
-    init();
-  }, [triggerRefetch]);
+    fetchFeed(page);
+  }, [page, triggerRefetch]);
 
-  return { isLoading, feed, refetch };
+  return { isLoading, feed, hasMore, fetchMore: () => setPage(prev => prev + 1), refetch };
 };

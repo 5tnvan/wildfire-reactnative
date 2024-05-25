@@ -30,14 +30,14 @@ export function Avatar({ avatar_url, username, size, ring }: Props) {
   return (
     <>
       {avatar_url && 
-      <View className={`rounded-full`} style = {{ width: width1, height: height1}}>
+      <View className={`rounded-full ${ring ? 'border-2 border-accent' : ''}`} style = {{ width: width1, height: height1}}>
       <Image
         source={{ uri: avatar_url }}
         className={`rounded-full bg-contain w-full h-full`}
       />
     </View>}
       {!avatar_url && 
-      <View className={`border-white rounded-full items-center justify-center bg-slate-300`} style = {{ width: width1, height: height1}}>
+      <View className={`rounded-full ${ring ? 'border-2 border-accent' : ''} items-center justify-center bg-slate-300`} style = {{ width: width1, height: height1}}>
       <Text className="font-semibold text-lg text-secondary">{username?.charAt(0).toUpperCase()}</Text>
     </View>}
     </>

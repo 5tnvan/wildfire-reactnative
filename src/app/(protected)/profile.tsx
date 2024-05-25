@@ -23,22 +23,29 @@ import Item from "@/src/components/Item";
 import StoryComponent from "@/src/components/StoryComponent";
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Stack } from "expo-router";
+import { PressableAnimated } from "@/src/components/pressables/PressableAnimated";
 
 export default function ProfileScreen() {
+  const isFocused = useIsFocused(); // Get focused state
   const colorScheme = useColorScheme();
+  const { width } = useWindowDimensions();
+  const [storyIndex, setStoryIndex] = useState<any>(null);
+
+  //CONSUME PROVIDERS
   const { isLoading: isLoadingUser, profile } = useAuthUser();
   const { isLoading: isLoadingFollows, followers, following } = useAuthUserFollows();
+  const { feed, refetch } = useUserFeed(profile.id);
+
+  //FETCH DIRECTLY 
   const incomingRes = useIncomingTransactions(profile.wallet_id);
   const outgoingRes = useOutgoingTransactions(profile.wallet_id);
-  const { feed, refetch } = useUserFeed(profile.id);
-  const isFocused = useIsFocused(); // Get focused state
-
-  const { width } = useWindowDimensions();
+  
+  //SPINNING CAROUSELL ANIMATION 
   const x = useSharedValue(0);
   const ITEM_WIDTH = 250;
   const ITEM_HEIGHT = 450;
-  const MARGin_HORIZONTAL = 20;
-  const ITEM_FULL_WIDTH = ITEM_WIDTH + MARGin_HORIZONTAL * 2;
+  const MARGIN_HORIZONTAL = 20;
+  const ITEM_FULL_WIDTH = ITEM_WIDTH + MARGIN_HORIZONTAL * 2;
   const SPACER = (width - ITEM_FULL_WIDTH) / 2;
 
   const onScroll = useAnimatedScrollHandler({
@@ -47,6 +54,7 @@ export default function ProfileScreen() {
     },
   });
 
+  //OPEN CLOSE STORY MODAL 
   const [insideModal, setInsideModal] = useState(false);
   function openModal() { setInsideModal(true); }
   function closeModal() { setInsideModal(false); }
@@ -55,7 +63,7 @@ export default function ProfileScreen() {
   function openStory() { setInsideStory(true); openModal(); }
   function closeStory() { setInsideStory(false); closeModal() }
 
-  // Call refetch function every time the screen is focused
+  //REFETCH DATA WHEN SCREEN IS FOCUSED 
   useEffect(() => {
     if (isFocused) {
       console.log("refetching profile feed")
@@ -63,23 +71,34 @@ export default function ProfileScreen() {
     }
   }, [isFocused]);
 
+  //HANDLE PRESS ITEM
+  const handleItemPress = (index: number) => {
+    setStoryIndex(index);
+    openStory();
+  };
+
   return (
     <>
-      {insideStory ? <Modal
-                visible={insideModal}
-                onRequestClose={() => closeModal()}
-                animationType="slide"
-                presentationStyle="pageSheet"
-            >
-                <StoryComponent data={feed} onFinishStory={closeStory} />
-            </Modal> :
+      {insideStory ? 
+        // STORY MODAL
+        <Modal
+          visible={insideModal}
+          onRequestClose={() => closeModal()}
+          animationType="slide"
+          presentationStyle="pageSheet"
+        >
+          <StoryComponent data={feed} storyIndex={storyIndex} onFinishStory={closeStory} />
+        </Modal>
+        :
         <>
+          {/* HEADER */}
           <Stack.Screen options={{
             headerShown: true, title: '@' + profile.username, 
             headerRight: () => (
-              <Pressable style={{ paddingHorizontal: 20, paddingVertical: 5, backgroundColor: '#222222', borderRadius: 100}} onPress={() => console.log("hdjfdsfd")}><Text>Follow</Text></Pressable>
+              <PressableAnimated className="py-1 px-3 mr-1" onPress={() => alert("hdjfdsfd")}><Text>Follow</Text></PressableAnimated>
             )
           }} />
+          {/* SPINNING CAROUSEL */}
           <View style={styles.container}>
             <Animated.FlatList
               onScroll={onScroll}
@@ -98,8 +117,9 @@ export default function ProfileScreen() {
                     x={x}
                     width={ITEM_WIDTH}
                     height={ITEM_HEIGHT}
-                    marginHorizontal={MARGin_HORIZONTAL}
+                    marginHorizontal={MARGIN_HORIZONTAL}
                     fullWidth={ITEM_FULL_WIDTH}
+                    onPress={handleItemPress}
                   />
                 );
               }}
@@ -108,9 +128,8 @@ export default function ProfileScreen() {
               decelerationRate="fast"
               snapToInterval={ITEM_FULL_WIDTH}
             />
-            {/* <Button /> */}
-            {/* <Pressable onPress={openStory} className="bg-primary text-white p-5 rounded-lg"><Text>Open Story</Text></Pressable> */}
           </View>
+          {/* USER INTRO */}
           <View className={`${colorScheme == "dark" ? "bg-zinc-900" : "bg-white"} absolute bottom-0 w-full items-center justify-center p-10`}>
             {/* 
             * AVATAR
@@ -147,8 +166,8 @@ export default function ProfileScreen() {
               <Text className="text-base text-zinc-400">${(calculateSum(incomingRes.ethereumData) + calculateSum(incomingRes.baseData)).toFixed(3)}Ξ</Text>
             </View> */}
 
-            <Pressable
-              className={`${colorScheme == "dark" ? "bg-secondary" : "bg-zinc-200"} flex-row justify-between rounded-full items-center px-4 py-2 w-full`}
+            <PressableAnimated
+              className={''}
               onPress={openStory}>
               <Text className="text-lg"> </Text>
               <Text className="text-base">Tip Now</Text>
@@ -157,8 +176,7 @@ export default function ProfileScreen() {
                 size={17}
                 color={colorScheme === "dark" ? "white" : "black"} // Adjust color based on colorScheme
               />
-            </Pressable>
-
+            </PressableAnimated>
           </View>
         </>}
 

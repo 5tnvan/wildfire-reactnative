@@ -5,23 +5,35 @@ import { useUserFollowingFeed } from "@/src/hooks/useUserFollowingFeed";
 import { useIsFocused } from '@react-navigation/native';
 
 export default function Posts() {
-  const { feed: userFollowingFeed, refetch } = useUserFollowingFeed();
-  const [playingIndex, setPlayingIndex] = useState(null);
-  const [isMuted, setIsMuted] = useState(true);
   const isFocused = useIsFocused();
 
-  const viewabilityConfig = {
-    itemVisiblePercentThreshold: 50,
-  };
+  //FETCH DIRECTLY
+  const { isLoading, feed: userFollowingFeed, hasMore, fetchMore, refetch } = useUserFollowingFeed();
 
+  //FIGURE OUT WHICH VIDEO IS IN USER'S VIEW TO PLAY
+  const [playingIndex, setPlayingIndex] = useState<any>(null);
+  const viewabilityConfig = { itemVisiblePercentThreshold: 50 };
   const onViewableItemsChanged = ({ viewableItems } : any) => {
     if (viewableItems.length > 0) {
       setPlayingIndex(viewableItems[0].index);
     }
   };
-
   const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
 
+  // HANDLE TOGGLE MUTE
+  const [isMuted, setIsMuted] = useState(true);
+  const handleToggleMute = () => {
+    setIsMuted(!isMuted);
+  };
+
+  // HANDLE END REACH
+  const handleEndReached = () => {
+    if (hasMore && !isLoading) {
+      fetchMore();
+    }
+  };
+
+  // REFETCH WHEN SCREEN IS IN FOCUS
   useEffect(() => {
     if (!isFocused) {
       setPlayingIndex(null);
@@ -30,23 +42,20 @@ export default function Posts() {
     }
   }, [isFocused]);
 
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-  };
-
   return (
     <FlatList
       data={userFollowingFeed}
-      keyExtractor={(item, index) => index.toString()}
       renderItem={({ item, index }) => (
         <PostItem
           item={item}
           isPlaying={index === playingIndex}
           isMuted={isMuted}
-          toggleMute={toggleMute}
+          toggleMute={handleToggleMute}
         />
       )}
       viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
+      onEndReached={handleEndReached}
+      onEndReachedThreshold={0.5} // Adjust the threshold as needed
     />
   );
 }

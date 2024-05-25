@@ -15,7 +15,7 @@ const MARGIN_LEFT = 1;
 const MARGIN_RIGHT = 7;
 
 const cardData = [
-    { id: '1', title: 'Total Views', stat: 0, cta: 'Create', icon: 'eye', avatar: false },
+    // { id: '1', title: 'Total Views', stat: 0, cta: 'Create', icon: 'eye', avatar: false },
     { id: '2', title: '', stat: '', cta: 'View all levels', avatar: true },
     { id: '3', title: 'Balance', stat: 0, cta: 'View Wildpay', icon: 'coins' },
 ];
@@ -38,16 +38,16 @@ export default function StatCarousel() {
 
     
     //DYNAMICALLY GENERATE CARDS DATA
-    const sumOfViews = userFeed?.reduce((total: any, item: any) => total + item.views, 0);
+    // const sumOfViews = userFeed?.reduce((total: any, item: any) => total + item.views, 0);
     const highestLevel = profile?.levels.reduce((max: number, item: any) => item.level > max ? item.level : max, 0);
     const levelNames = ["noob", "creator", "builder", "architect", "visionary", "god-mode"];
     const levelName = levelNames[highestLevel] || "unknown";
     const balance = (calculateSum(incomingRes.ethereumData) + calculateSum(incomingRes.baseData)).toFixed(3);
 
-    cardData[0].stat = sumOfViews;
-    cardData[1].title = 'Level ' + highestLevel;
-    cardData[1].stat = levelName;
-    cardData[2].stat = balance;
+    // cardData[0].stat = sumOfViews;
+    cardData[0].title = 'Level ' + highestLevel;
+    cardData[0].stat = levelName;
+    cardData[1].stat = balance;
 
     /**
      * HANDLE PRESS EVENT

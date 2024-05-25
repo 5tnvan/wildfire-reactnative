@@ -1,4 +1,4 @@
-import {Image, StyleSheet, Text, View} from 'react-native';
+import { Image, Pressable, StyleSheet, TouchableHighlight, TouchableOpacity, View, useColorScheme } from 'react-native';
 import React from 'react';
 import Animated, {
   Extrapolation,
@@ -7,6 +7,8 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import { TimeAgo } from './TimeAgo';
+import { Text } from "../components/Themed";
+import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
 
 type Props = {
   item: any;
@@ -16,6 +18,7 @@ type Props = {
   fullWidth: number;
   x: SharedValue<number>;
   index: number;
+  onPress: (index: number) => void;
 };
 
 const Item = ({
@@ -26,6 +29,7 @@ const Item = ({
   fullWidth,
   x,
   index,
+  onPress,
 }: Props) => {
   const animatedStyle = useAnimatedStyle(() => {
     const rotateZ = interpolate(
@@ -41,78 +45,40 @@ const Item = ({
       Extrapolation.CLAMP,
     );
     return {
-      transform: [{rotateZ: `${rotateZ}deg`}, {translateY: translateY}],
+      transform: [{ rotateZ: `${rotateZ}deg` }, { translateY: translateY }],
     };
   });
 
+  const colorScheme = useColorScheme();
+
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        {width: width, height: height, marginHorizontal: marginHorizontal},
-        animatedStyle,
-      ]}>
-      <View style={styles.imageContainer}>
-        <Image
-          source={{uri: item.thumbnail_url}}
-          style={[styles.image, {width: width}]}
-          resizeMode="cover"
-        />
-      </View>
-      <View style={styles.bottomContainer}>
-        <View style={styles.textContainer}>
-          <Text style={styles.textName}>{item.country?.name}</Text>
-          <Text style={styles.textExp}><TimeAgo timestamp={item.created_at}></TimeAgo> ago</Text>
+    <Pressable onPress={() => onPress(index)}>
+      <Animated.View
+        style={[
+          { width: width, height: height, marginHorizontal: marginHorizontal, transformOrigin: 'bottom' },
+          animatedStyle,
+        ]}
+        className={`${colorScheme == "dark" ? 'bg-zinc-900' : 'bg-neutral'} rounded-3xl overflow-hidden`}>
+        {/* VIDEO THUMBNAIL */}
+        <View className='flex-1'>
+          <Image
+            source={{ uri: item.thumbnail_url }}
+            style={{ width: width }}
+            resizeMode="cover"
+            className='flex-1'
+          />
         </View>
-        <View style={styles.visaContainer}>
-          <Image source={require('../../assets/images/wildfire-logo-lit.png')} resizeMode="contain" style={styles.logo} />
+        {/* BOTTOM */}
+        <View className='absolute bottom-0 w-full bg-zinc-100 flex-row justify-between items-center px-4 py-2'>
+          <View>
+            {item.country && <Text className='text-black font-semibold'>{item.country?.name}</Text>}
+            <Text className='text-black'><TimeAgo timestamp={item.created_at}></TimeAgo> ago</Text>
+          </View>
+          <View><Image source={require('../../assets/images/wildfire-logo-lit.png')} resizeMode="contain" className='w-12' /></View>
         </View>
-      </View>
-    </Animated.View>
+      </Animated.View>
+    </Pressable>
   );
 };
 
 export default Item;
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    transformOrigin: 'bottom',
-    overflow: 'hidden',
-  },
-  imageContainer: {flex: 4},
-  image: {flex: 1},
-  bottomContainer: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  textContainer: {
-    justifyContent: 'center',
-    marginHorizontal: 10,
-  },
-  textName: {
-    color: '#111111',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  textExp: {
-    color: '#111111',
-    fontSize: 16,
-  },
-  visaContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    width: 58,
-  },
-  chip: {
-    position: 'absolute',
-    transform: [{scale: 0.4}, {rotateZ: '90deg'}],
-    right: -40,
-    top: 20,
-  },
-});

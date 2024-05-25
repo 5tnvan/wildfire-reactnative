@@ -19,8 +19,8 @@ type Props = {
 
 const Item = ({ id, profile, colorScheme, onPress } : Props) => (
     <Pressable style={styles.card} className='items-center' onPress={() => onPress(profile.username)}>
-        <Avatar avatar_url={profile.avatar_url} username={profile.username} size={'md'} ring={true}></Avatar>
-        {/* <Text numberOfLines={1} ellipsizeMode='tail' className={`${colorScheme == "dark" ? "text-white" : "text-black"}`}>{profile.username}</Text> */}
+        <Avatar avatar_url={profile.avatar_url} username={profile.username} size={'lg'} ring={true}></Avatar>
+        <Text numberOfLines={1} ellipsizeMode='tail' className={`${colorScheme == "dark" ? "text-white" : "text-black"}`}>{profile.username}{id}</Text>
     </Pressable>
 );
 

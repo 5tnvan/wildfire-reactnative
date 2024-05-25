@@ -22,13 +22,14 @@ import Video from 'react-native-video';
 
 type Props = {
     data: any;
+    storyIndex?: number;
     onFinishStory: () => void;
 };
 
 const {width} = Dimensions.get('window');
 
-export default function StoryComponent({ data, onFinishStory} : Props) {
-  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+export default function StoryComponent({ data, storyIndex, onFinishStory} : Props) {
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(storyIndex || 0);
   const currentStory = data[currentStoryIndex];
   const progressAnim = useRef(new Animated.Value(0)).current;
   const pausedProgress = useRef(0);
@@ -233,13 +234,13 @@ const styles = StyleSheet.create({
     topBar: {
       position: 'absolute',
       left: 15,
-      top: 18,
+      top: 3,
       flexDirection: 'row',
       alignItems: 'center',
     },
     logo: {
-      width: 40,
-      height: 40,
+      width: 70,
+      height: 70,
       resizeMode: 'contain',
     },
     icon: {

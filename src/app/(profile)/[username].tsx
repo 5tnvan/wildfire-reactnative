@@ -1,4 +1,4 @@
-import { View, Image, Pressable, useColorScheme, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Image, Pressable, useColorScheme, StyleSheet, useWindowDimensions, Modal } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from '../../components/Themed';
@@ -15,17 +15,25 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import Item from '@/src/components/Item';
+import { PressableAnimated } from '@/src/components/pressables/PressableAnimated';
+import { useIsFocused } from '@react-navigation/native';
+import StoryComponent from '@/src/components/StoryComponent';
 
 export default function ProfileUsernameScreen() {
-  
+
+  const isFocused = useIsFocused(); // Get focused state
   const colorScheme = useColorScheme();
+  const { width } = useWindowDimensions();
   const { username } = useLocalSearchParams();
   const usernameAsTitle = Array.isArray(username) ? username[0] : username;
+  const [storyIndex, setStoryIndex] = useState<any>(null);
+
+  //CONSUME PROVIDERS
   const { user } = useUser(username);
   const { followers, following } = useUserFollows(username);
   const { feed, refetch } = useUserFeedByUsername(username);
 
-  const { width } = useWindowDimensions();
+  //SPINNING CAROUSELL ANIMATION 
   const x = useSharedValue(0);
   const ITEM_WIDTH = 250;
   const ITEM_HEIGHT = 450;
@@ -39,79 +47,112 @@ export default function ProfileUsernameScreen() {
     },
   });
 
+  //OPEN CLOSE STORY MODAL 
+  const [insideModal, setInsideModal] = useState(false);
+  function openModal() { setInsideModal(true); }
+  function closeModal() { setInsideModal(false); }
+
+  const [insideStory, setInsideStory] = useState(false);
+  function openStory() { setInsideStory(true); openModal(); }
+  function closeStory() { setInsideStory(false); closeModal() }
+
+  //HANDLE PRESS ITEM
+  const handleItemPress = (index: number) => {
+    setStoryIndex(index);
+    openStory();
+  };
+
   if (!user) return <><Text>User not found</Text></>
 
   return (
     <>
-      <View style={styles.container}>
-      <Stack.Screen options={{ headerShown: true, headerBackTitle: 'Back', title: '@' + usernameAsTitle ?? '' }} />
-        <Animated.FlatList
-          onScroll={onScroll}
-          ListHeaderComponent={<View />}
-          ListHeaderComponentStyle={{ width: SPACER }}
-          ListFooterComponent={<View />}
-          ListFooterComponentStyle={{ width: SPACER }}
-          data={feed}
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={item => item.id + item.name}
-          renderItem={({ item, index }) => {
-            return (
-              <Item
-                item={item}
-                index={index}
-                x={x}
-                width={ITEM_WIDTH}
-                height={ITEM_HEIGHT}
-                marginHorizontal={MARGin_HORIZONTAL}
-                fullWidth={ITEM_FULL_WIDTH}
-              />
-            );
-          }}
-          horizontal
-          scrollEventThrottle={16}
-          decelerationRate="fast"
-          snapToInterval={ITEM_FULL_WIDTH}
-        />
-        {/* <Button /> */}
-        {/* <Pressable onPress={openStory} className="bg-primary text-white p-5 rounded-lg"><Text>Open Story</Text></Pressable> */}
-      </View>
-      <SafeAreaView className=''>
-        <Text>Hello {username}</Text>
-        <Text>{user.username}</Text>
-      </SafeAreaView>
-      <View className={`${colorScheme == "dark" ? "bg-zinc-900" : "bg-white"} absolute bottom-0 w-full items-center justify-center p-10`}>
-        <View className='absolute' style={{ top: -30 }}>
-          <Avatar
-            avatar_url={user.avatar_url}
-            username={user.username}
-            size="lg"
-            ring={true}
-          ></Avatar>
-        </View>
-        <Text className='font-medium text-lg text-accent'>@{user.username}</Text>
-        <Pressable className="flex-row gap-1 mb-3">
-          <Text className="font-semibold text-lg text-accent">
-            {followers?.length}
-          </Text>
-          <Text className="text-lg">followers</Text>
-          {/* <Text className="font-semibold text-lg text-accent">
+      {insideStory ?
+        // STORY MODAL
+        <Modal
+          visible={insideModal}
+          onRequestClose={() => closeModal()}
+          animationType="slide"
+          presentationStyle="pageSheet"
+        >
+          <StoryComponent data={feed} storyIndex={storyIndex} onFinishStory={closeStory} />
+        </Modal>
+        :
+        <>
+          {/* HEADER */}
+          <Stack.Screen options={{
+            headerShown: true,
+            headerBackTitle: 'Back',
+            title: '@' + usernameAsTitle ?? '',
+            headerRight: () => (
+              <PressableAnimated className="py-1 px-3" onPress={() => alert("hdjfdsfd")}><Text>Follow</Text></PressableAnimated>
+            )
+          }} />
+          {/* SPINNING CAROUSEL */}
+          <View style={styles.container}>
+            <Animated.FlatList
+              onScroll={onScroll}
+              ListHeaderComponent={<View />}
+              ListHeaderComponentStyle={{ width: SPACER }}
+              ListFooterComponent={<View />}
+              ListFooterComponentStyle={{ width: SPACER }}
+              data={feed}
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={item => item.id + item.name}
+              renderItem={({ item, index }) => {
+                return (
+                  <Item
+                    item={item}
+                    index={index}
+                    x={x}
+                    width={ITEM_WIDTH}
+                    height={ITEM_HEIGHT}
+                    marginHorizontal={MARGin_HORIZONTAL}
+                    fullWidth={ITEM_FULL_WIDTH}
+                    onPress={handleItemPress}
+                  />
+                );
+              }}
+              horizontal
+              scrollEventThrottle={16}
+              decelerationRate="fast"
+              snapToInterval={ITEM_FULL_WIDTH}
+            />
+          </View>
+          {/* USER INTRO */}
+          <View className={`${colorScheme == "dark" ? "bg-zinc-900" : "bg-white"} absolute bottom-0 w-full items-center justify-center p-10`}>
+            <View className='absolute' style={{ top: -30 }}>
+              <Avatar
+                avatar_url={user.avatar_url}
+                username={user.username}
+                size="lg"
+                ring={true}
+              ></Avatar>
+            </View>
+            <Text className='font-medium text-lg text-accent'>@{user.username}</Text>
+            <Pressable className="flex-row gap-1 mb-3">
+              <Text className="font-semibold text-lg text-accent">
+                {followers?.length}
+              </Text>
+              <Text className="text-lg">followers</Text>
+              {/* <Text className="font-semibold text-lg text-accent">
             {following?.length}
           </Text>
           <Text className="text-lg">following</Text> */}
-        </Pressable>
-        <Pressable
-          className={`${colorScheme == "dark" ? "bg-secondary" : "bg-zinc-200"} flex-row justify-between rounded-full items-center px-4 py-2 w-full`}>
-          <Text className="text-lg"> </Text>
-          <Text className="text-base">Tip Now</Text>
-          <MaterialCommunityIcons
-            name="ethereum"
-            size={17}
-            color={colorScheme === "dark" ? "white" : "black"} // Adjust color based on colorScheme
-          />
-        </Pressable>
-      </View>
-
+            </Pressable>
+            <PressableAnimated
+              onPress={() => alert("djhdjs")}>
+              <Text className="text-lg"> </Text>
+              <Text className="text-base">Tip Now</Text>
+              <MaterialCommunityIcons
+                name="ethereum"
+                size={17}
+                color={colorScheme === "dark" ? "white" : "black"} // Adjust color based on colorScheme
+              />
+            </PressableAnimated>
+          </View>
+        </>}
     </>
+
   );
 }
 

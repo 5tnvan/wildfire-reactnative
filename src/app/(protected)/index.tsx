@@ -32,7 +32,6 @@ export default function IndexScreen() {
   /**
    * REFETCH PROVIDERS WHEN SCREEN IS IN FOCUS
    */
-  // 
   useEffect(() => {
     if (isFocused) {
       console.log("refetching index feed")
@@ -42,20 +41,17 @@ export default function IndexScreen() {
 
   return (
     <>
+      {/* HEADER */}
       <Header />
 
       {/* STAT */}
       <View className='mb-2'>
-        <StatCarousel />
+        {/* <FollowingCarousel data={following} />
+        <StatCarousel /> */}
       </View>
 
       {/* FEED */}
       <Posts />
-
-      {/* FOLLOWING */}
-      {/* <SafeAreaView className='absolute bottom-0'>
-        <FollowingCarousel data={following} />
-      </SafeAreaView> */}
     </>
 
   );
