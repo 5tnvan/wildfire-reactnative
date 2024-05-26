@@ -10,7 +10,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { PressableAnimated } from '@/src/components/pressables/PressableAnimated';
 
 export default function DiscoverScreen() {
-  const [selectedItemId, setSelectedItemId] = useState('3');
+  const [selectedItemId, setSelectedItemId] = useState('1');
   const [searchUserModalVisible, setSearchUserModalVisible] = useState(false); //follows modal
 
   const handlePress = (id: any) => {
@@ -21,10 +21,9 @@ export default function DiscoverScreen() {
     switch (selectedItemId) {
       case '1':
         return <FeedCarouselByTime />;
+      // case '2':
+      //   return null;
       case '2':
-        setSearchUserModalVisible(true);
-        return null;
-      case '3':
         return <FeedCarouselByCountry />;
       default:
         return null;

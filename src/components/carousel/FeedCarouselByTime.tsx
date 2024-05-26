@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Text, FlatList, Dimensions, Pressable, Modal } from 'react-native';
 import { TimeAgo } from '../TimeAgo';
 import Video from 'react-native-video';
@@ -13,6 +13,18 @@ const MARGIN_RIGHT = 4;
 
 export default function FeedCarouselByTime() {
     const { isLoading, feed: masterFeed, refetch } = useFeedFromTime();
+    
+    // FIGURE OUT WHICH VIDEO IS PLAYING
+    const [playingIndex, setPlayingIndex] = useState<any>(null);
+    const viewabilityConfig = { viewAreaCoveragePercentThreshold: 50 };
+    const onViewableItemsChanged = ({ viewableItems }: any) => {
+        if (viewableItems.length > 0) {
+            setPlayingIndex(viewableItems[0].index);
+        } else {
+            setPlayingIndex(null);
+        }
+    };
+    const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
 
     // SET UP STORY COMPONENT
     const [storyFeed, setStoryFeed] = useState(null);
@@ -20,6 +32,7 @@ export default function FeedCarouselByTime() {
     function openStory(storyFeed: any) {
         setStoryFeed(storyFeed);
         setInsideStory(true);
+        setPlayingIndex(null); //stop playing video when opening a story
         openModal();
     }
     function closeStory() { setInsideStory(false); closeModal() }
@@ -29,10 +42,11 @@ export default function FeedCarouselByTime() {
     function openModal() { setInsideModal(true); }
     function closeModal() { setInsideModal(false); }
 
-    // REFETCH DATA WHEN SCREEN IS IN FOCUS
+    // HANDLE WHEN SCREEN IS IN/OUT OF FOCUS
     const isFocused = useIsFocused();
     useEffect(() => {
-        if (isFocused) refetch();
+        if (isFocused) { refetch(); } // refetch data when in focus
+        else { setPlayingIndex(null); } // stop playing when out of focus
     }, [isFocused]);
 
     return (
@@ -53,7 +67,13 @@ export default function FeedCarouselByTime() {
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item) => item.id}
-                renderItem={({ item }) => <Item video_url={item.first_video.video_url} time={item.time} onPress={() => openStory(item.data)} />}
+                renderItem={({ item, index }) => 
+                <Item 
+                    video_url={item.first_video.video_url} 
+                    time={item.time}
+                    onPress={() => openStory(item.data)} 
+                    isPlaying={index === playingIndex}
+                    />}
                 snapToInterval={CARD_WIDTH + MARGIN_LEFT + MARGIN_RIGHT} // Calculate the size for a card including marginLeft and marginRight
                 decelerationRate="fast" // Make the scrolling feel snappier
                 contentContainerStyle={styles.container}
@@ -67,17 +87,19 @@ export default function FeedCarouselByTime() {
 type Props = {
     time: any,
     video_url: any,
+    isPlaying: any,
     onPress: any,
 };
 
-const Item = ({ time, video_url, onPress }: Props) => (
+const Item = ({ time, video_url, isPlaying, onPress }: Props) => (
     <Pressable style={styles.card} onPress={onPress}>
         <Video
             source={{ uri: video_url }}
             resizeMode="cover"
             style={styles.backgroundImage}
-            //   repeat={true}
-            volume={1}
+            repeat={true}
+            volume={0}
+            paused={!isPlaying}
         />
         <View className='flex-row justify-end p-2 '>
             <View className='bg-zinc-800/70 py-1 px-3 rounded-full'>

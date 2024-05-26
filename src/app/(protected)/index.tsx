@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useAuthUserFollows } from '@/src/services/providers/AuthUserFollowsProvider';
 import { useIsFocused } from '@react-navigation/native';
@@ -8,9 +9,8 @@ import Posts from '../../components/feed/Posts';
 
 export default function IndexScreen() {
   const isFocused = useIsFocused();
-
-  //CONSUME PROVIDERS
   const { isLoading: isLoadingFollows, followers, following } = useAuthUserFollows();
+  const [isScrolling, setIsScrolling] = useState(false);
 
   return (
     <>
@@ -18,13 +18,16 @@ export default function IndexScreen() {
       <Header />
 
       {/* STAT */}
-      <View className='mb-2'>
-        <FollowingCarousel data={following} />
-        <StatCarousel />
-      </View>
+      
+        <View className='mb-2'>
+          <FollowingCarousel data={following} />
+          {!isScrolling && (
+          <StatCarousel />)}
+        </View>
+      
 
       {/* FEED */}
-      <Posts />
+      <Posts setIsScrolling={setIsScrolling} />
     </>
   );
 }
@@ -32,6 +35,6 @@ export default function IndexScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black', // Ensures the background color allows for transparency
+    backgroundColor: 'black',
   },
 });

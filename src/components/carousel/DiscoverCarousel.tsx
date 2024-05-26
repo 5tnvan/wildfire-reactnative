@@ -8,9 +8,9 @@ const MARGIN_LEFT = 7;
 const MARGIN_RIGHT = 7;
 
 const cardData = [
-    { id: '1', title: 'A time to remember', stat: 'Yesterday', icon: 'clock' },
-    { id: '2', title: 'A person to follow', stat: 'Rising Star', icon: 'person' },
-    { id: '3', title: 'A country to visit', stat: '249', icon: 'location-arrow'}
+    { id: '1', title: 'A time to remember', stat: '24hrs', icon: 'clock' },
+    // { id: '2', title: 'A person to follow', stat: 'Rising Star', icon: 'person' },
+    { id: '2', title: 'A country to visit', stat: '249', icon: 'location-arrow'}
 ];
 
 type ComponentProps = {

@@ -14,7 +14,8 @@ export const fetchFeedByCountry = async (country_id: any) => {
     .select(
       "video_url, thumbnail_url, created_at, country:country_id(name), profile:user_id(id, username, avatar_url)"
     )
-    .eq("country_id", country_id);
+    .eq("country_id", country_id)
+    .limit(3)
 
   return data;
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Text, FlatList, Dimensions, Pressable, Modal } from 'react-native';
 import Video from 'react-native-video';
 import { useFeedFromCountry } from '@/src/hooks/useFeedFromCountry';
@@ -19,12 +19,25 @@ export default function FeedCarouselByCountry() {
     // SET UP MASTER FEED
     const { feed: masterFeed, refetch } = useFeedFromCountry(3);
 
+    // FIGURE OUT WHICH VIDEO IS PLAYING
+    const [playingIndex, setPlayingIndex] = useState<any>(null);
+    const viewabilityConfig = { viewAreaCoveragePercentThreshold: 50 };
+    const onViewableItemsChanged = ({ viewableItems }: any) => {
+        if (viewableItems.length > 0) {
+            setPlayingIndex(viewableItems[0].index);
+        } else {
+            setPlayingIndex(null);
+        }
+    };
+    const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
+
     // SET UP STORY COMPONENT
     const [storyFeed, setStoryFeed] = useState(null);
     const [insideStory, setInsideStory] = useState(false);
     function openStory(storyFeed: any) {
         setStoryFeed(storyFeed);
         setInsideStory(true);
+        setPlayingIndex(null);
         openModal();
     }
     function closeStory() { setInsideStory(false); closeModal() }
@@ -34,10 +47,11 @@ export default function FeedCarouselByCountry() {
     function openModal() { setInsideModal(true); }
     function closeModal() { setInsideModal(false); }
 
-    // REFETCH DATA WHEN SCREEN IS IN FOCUS
+    // HANDLE WHEN SCREEN IS IN/OUT OF FOCUS
     const isFocused = useIsFocused();
     useEffect(() => {
-        if (isFocused) refetch();
+        if (isFocused) { refetch(); } // refetch data when in focus
+        else { setPlayingIndex(null); } // stop playing when out of focus
     }, [isFocused]);
 
     return (
@@ -59,11 +73,18 @@ export default function FeedCarouselByCountry() {
                         horizontal
                         showsHorizontalScrollIndicator={false}
                         keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => <Item video_url={item.first_video} country={item.country_name} onPress={() => openStory(item.data)} />}
+                        renderItem={({ item, index }) => 
+                        <Item 
+                            video_url={item.first_video} 
+                            country={item.country_name} 
+                            onPress={() => openStory(item.data)}
+                            isPlaying={index === playingIndex}
+                        />}
                         snapToInterval={CARD_WIDTH + MARGIN_LEFT + MARGIN_RIGHT} // Calculate the size for a card including marginLeft and marginRight
                         decelerationRate="fast" // Make the scrolling feel snappier
                         contentContainerStyle={styles.container}
                         snapToAlignment="center" // Snap to the start of the card
+                        viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
                     />
                 )}
 
@@ -77,17 +98,19 @@ export default function FeedCarouselByCountry() {
 type Props = {
     video_url: any,
     country: any,
+    isPlaying: any,
     onPress: any,
 };
 
-const Item = ({ video_url, country, onPress }: Props) => (
+const Item = ({ video_url, country, isPlaying, onPress }: Props) => (
     <Pressable style={styles.card} onPress={onPress}>
         <Video
             source={{ uri: video_url }}
             resizeMode="cover"
             style={styles.backgroundImage}
-            //   repeat={true}
-            volume={1}
+            repeat={true}
+            volume={0}
+            paused={!isPlaying}
         />
         <View className='flex-row justify-end p-2 '>
             <View className='bg-zinc-800/70 py-1 px-3 rounded-full'>

@@ -28,10 +28,11 @@ export const useFeedFromTime = () => {
 
   const fetchFeed = async (startTime: Date, endTime: Date) => {
     const { data, error } = await supabase
-      .from('1sec')
-      .select('video_url, thumbnail_url, created_at, profile:user_id(id, username, avatar_url)')
+      .from('1sec_random_view')
+      .select('id, video_url, thumbnail_url, created_at, profile:user_id(id, username, avatar_url)')
       .gte('created_at', endTime.toISOString())
-      .lt('created_at', startTime.toISOString());
+      .lt('created_at', startTime.toISOString())
+      .limit(3)
 
     if (error) {
       console.error("Error fetching data:", error);
@@ -47,7 +48,7 @@ export const useFeedFromTime = () => {
     startOf24HoursAgo.setHours(startOf24HoursAgo.getHours() - 24);
 
     const endOf48HoursAgo = new Date(startOf24HoursAgo);
-    endOf48HoursAgo.setHours(endOf48HoursAgo.getHours() - 24);
+    endOf48HoursAgo.setHours(endOf48HoursAgo.getHours() - 48);
 
     const startOf48HoursAgo = new Date(startOf24HoursAgo);
     const startOfWeekAgo = new Date(now);

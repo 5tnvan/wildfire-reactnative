@@ -4,7 +4,7 @@ import PostItem from './PostItem';
 import { useUserFollowingFeed } from "@/src/hooks/useUserFollowingFeed";
 import { useIsFocused } from '@react-navigation/native';
 
-export default function Posts() {
+export default function Posts({ setIsScrolling } : any) {
   const isFocused = useIsFocused();
 
   // FETCH DIRECTLY
@@ -19,6 +19,14 @@ export default function Posts() {
     }
   };
   const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
+
+  // HANDLE SCROLL
+  const handleScroll = (event:any) => {
+    if (setIsScrolling) {
+      const scrollY = event.nativeEvent.contentOffset.y;
+      setIsScrolling(scrollY > 0);
+    }
+  };
 
   // HANDLE TOGGLE MUTE
   const [isMuted, setIsMuted] = useState(true);
@@ -50,7 +58,6 @@ export default function Posts() {
     }
   }, [isFocused]);
 
-  console.log('playingindex', playingIndex);
 
   return (
     <FlatList
@@ -69,6 +76,8 @@ export default function Posts() {
       onEndReached={handleEndReached}
       onEndReachedThreshold={0.1} // Adjust the threshold as needed
       ListFooterComponent={() => (isLoading ? <ActivityIndicator size="large" color="#0000ff" /> : null)}
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
     />
   );
 }
