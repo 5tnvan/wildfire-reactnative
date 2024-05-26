@@ -20,50 +20,57 @@ import { supabase } from '../lib/supabase';
 import { TimeAgo } from './TimeAgo';
 import { Entypo } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
+import { useFeed } from '../hooks/useFeed';
+import { useIsFocused } from '@react-navigation/native';
 
-type Props = {
-  data: any;
-};
 
 /** 
- * SKORT SCREEN
- * Feed of videos
+ * THREE SECS SCREEN
+ * Infinity Scroll
  * **/
-export default function SkortComponent({ data }: Props) {
+export default function InfiniteScroll() {
   const router = useRouter();
+  const isFocused = useIsFocused(); // Get focused state
+  
+  //FETCH DIRECTLY
+  const { isLoading, feed, refetch } = useFeed();
 
-  //Keeps track of which video is currently in the user's view. This is crucial for knowing which video to play.
-  const [currentViewableItemIndex, setCurrentViewableItemIndex] = useState(0);
+  console.log("feed", JSON.stringify(feed, null, 2));
 
-  //Manages how videos in the feed are played and paused based on their visibility on the screen.
+  // FIGURE OUT WHICH VIDEO IS IN USER'S VIEW TO PLAY
+  const [playingIndex, setPlayingIndex] = useState(0);
   const viewabilityConfig = { viewAreaCoveragePercentThreshold: 50 };
-
-  //This function updates currentViewableItemIndex based on the item currently in view.
-  //It's essential for determining which video should be playing as the user scrolls.
   const onViewableItemsChanged = ({ viewableItems }: any) => {
     if (viewableItems.length > 0) {
-      setCurrentViewableItemIndex(viewableItems[0].index ?? 0);
+      setPlayingIndex(viewableItems[0].index ?? 0);
     }
   };
-
-  //Manages how videos in the feed are played and paused based on their visibility on the screen.
   const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
 
-  //Handle when user goes back
+  // HANDLE EXIT
   const reset = () => {
-    // setCurrentViewableItemIndex(0);
+    // setplayingIndex(0);
     router.back();
   };
+
+  // HANDLE WHEN IN FOCUSED
+  useEffect(() => {
+    if (isFocused) {
+      console.log("refetching 3secs")
+      refetch(); //refetch data
+    }
+  }, [isFocused]);
 
   return (
     <View className='flex-1'>
       {/* VIDEO FEED */}
       <FlatList
-        data={data}
+        data={feed}
         renderItem={({ item, index }) => (
-          <Item item={item} shouldPlay={index === currentViewableItemIndex} />
+          <Item 
+          item={item} 
+          isPlaying={index === playingIndex} />
         )}
-        keyExtractor={(item, index) => index.toString()}
         pagingEnabled
         horizontal={false}
         showsVerticalScrollIndicator={false}
@@ -83,20 +90,21 @@ export default function SkortComponent({ data }: Props) {
   );
 }
 
-const Item = ({ item, shouldPlay }: { shouldPlay: boolean; item: any }) => {
-  const video = React.useRef<Video | null>(null);
+const Item = ({ item, isPlaying }: any) => {
+  const video = React.useRef<any>(null);
   const [status, setStatus] = useState<any>(null);
 
+  //CHECK IF VIDEO IS BEING VIEWED
   useEffect(() => {
     if (!video.current) return;
 
-    if (shouldPlay) {
+    if (isPlaying) { //it is in view, play
       video.current.playAsync();
-    } else {
+    } else { // it is not in view, pause
       video.current.pauseAsync();
       video.current.setPositionAsync(0);
     }
-  }, [shouldPlay]);
+  }, [isPlaying]);
 
   return (
     <Pressable onPress={() => status.isPlaying ? video.current?.pauseAsync() : video.current?.playAsync()}>
@@ -104,10 +112,10 @@ const Item = ({ item, shouldPlay }: { shouldPlay: boolean; item: any }) => {
       <View style={styles.videoContainer}>
         <Video
           ref={video}
-          source={{ uri: item.uri }}
+          source={{ uri: item.video_url }}
+          resizeMode={ResizeMode.COVER}
           style={styles.video}
           isLooping
-          resizeMode={ResizeMode.COVER}
           useNativeControls={false}
           onPlaybackStatusUpdate={status => setStatus(() => status)}
         />
@@ -115,35 +123,37 @@ const Item = ({ item, shouldPlay }: { shouldPlay: boolean; item: any }) => {
       {/* SKORT TOP */}
       <SafeAreaView className='absolute'>
         <View className="flex-row items-center justify-end w-full px-3" style={styles.shadow}>
-          <View className='flex-row items-center gap-1 mr-2'>
-            <FontAwesome name="map-pin" size={18} color="orange" />
-            <Text className='text-accent text-base font-bold'>Czechia</Text>
-          </View>
-          <ViewCount amount={item.views} />
-          {/* <View className='ml-3'><PressableGift /></View> */}
+          <ViewCount amount={70} />
         </View>
       </SafeAreaView>
       {/* SKORT BOTTOM */}
       <LinearGradient className='absolute bottom-0 p-3 w-full' colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 1)']}>
-        <View className='flex-row items-center'>
-          <View className='flex-row items-center'>
-            <PressableAvatarWithUsername avatar_url={item.avatar_url} username={item.username} />
-            <Text className='ml-1 text-lg text-slate-200 mr-2'>
+        <View className='flex-col items-center justify-between'>
+          <View className='flex-row items-center' >
+            <PressableAvatarWithUsername avatar_url={item.profile.avatar_url} username={item.profile.username} />
+            <Text className='ml-1 text-lg text-white mr-2' style={styles.shadow}>
               <TimeAgo timestamp={item.created_at}></TimeAgo>
             </Text>
           </View>
+          {item.country && 
+          <View className='flex-row items-center' style={styles.shadow}>
+          <FontAwesome name="location-arrow" size={14} color="white" />
+          <Text className='text-white text-lg ml-1'>{item.country?.name}</Text>
+          </View>
+          }
+          
         </View>
-        <View className='flex-row items-center mt-2 mb-5'>
-          <View className='bg-secondary/70 rounded-full px-4 py-1 mr-2' style={styles.shadow}>
-            <PressableComment amount={item.comments} />
+        <View className='flex-row items-center mt-2 mb-5 justify-stretch'>
+          <View className='bg-secondary/70 rounded-full px-4 py-1 mr-2'>
+            <PressableComment amount={100} />
           </View>
-          <View className='bg-secondary/70 flex-row rounded-full px-4 py-1 mr-2' style={styles.shadow}>
-            <PressableShare amount={item.shares} />
+          <View className='bg-secondary/70 flex-row rounded-full px-4 py-1 mr-2'>
+            <PressableShare amount={100} />
           </View>
-          <View className='bg-secondary/70 flew-row rounded-full px-4 py-1 mr-2' style={styles.shadow}>
-            <PressableFire amount={item.fires} />
+          <View className='bg-secondary/70 flew-row rounded-full px-4 py-1 mr-2'>
+            <PressableFire amount={100} />
           </View>
-          <View className='bg-secondary/70 flew-row rounded-full px-4 py-2 mr-2' style={styles.shadow}>
+          <View className='bg-secondary/70 flew-row rounded-full px-4 py-2 mr-2'>
             <PressableTip />
           </View>
         </View>
@@ -166,14 +176,14 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   shadow: {
-    // shadowColor: "#000",
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 3,
-    // },
-    // shadowOpacity: 0.27,
-    // shadowRadius: 4.65,
+    shadowColor: "#fff",
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 10,
 
-    // elevation: 6,
+    elevation: 0,
   }
 });

@@ -59,12 +59,12 @@ function ProtectedLayoutNav() {
         }}
       />
       <Tabs.Screen
-        name="skort"
+        name="threesecs"
         options={{
           title: '3 sec',
           tabBarLabel: () => null,
           tabBarIcon: ({ color }) => <MaterialIcons name="123" style={{ marginBottom: -3 }} size={40} color={color} />,
-          tabBarStyle: { display: segment[1] === "skort" ? 'none' : 'flex' } //hide tab bar for this screen
+          tabBarStyle: { display: segment[1] === "threesecs" ? 'none' : 'flex' } //hide tab bar for this screen
         }}
       />
       <Tabs.Screen

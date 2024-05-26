@@ -1,4 +1,4 @@
-"use client";
+"use client"; // Removed this line as it's not necessary in a React Native environment
 
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
@@ -11,7 +11,7 @@ import { fetchUser } from "../utils/fetch/fetchUser";
  **/
 export const useFeed = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [feed, setFeed] = useState<any[]>([]);
+  const [feed, setFeed] = useState<any>();
   const [triggerRefetch, setTriggerRefetch] = useState(false);
 
   const refetch = () => {
@@ -22,24 +22,12 @@ export const useFeed = () => {
     setIsLoading(true);
 
     const { data } = await supabase
-    .from('1sec')
-    .select('video_url, created_at, profile:user_id(id, username, avatar_url)');
+      .from('1sec_desc_view')
+      .select('id, video_url, created_at, views, country:country_id(id, name), profile:user_id(id, username, avatar_url)');
 
-  if (data && data.length > 0) {
-    const videos = data.map((video: any) => ({
-      uri: video.video_url,
-      fires: 1456,
-      comments: 50,
-      shares: 203,
-      views: 5034,
-      username: video.profile.username,
-      avatar_url: video.profile.avatar_url,
-      created_at: video.created_at
-    }));
-
-    setFeed(videos);
+    setFeed(data);
     setIsLoading(false);
-  }};
+  };
 
   useEffect(() => {
     init();

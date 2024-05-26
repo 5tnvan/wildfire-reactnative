@@ -1,38 +1,16 @@
-import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
-import { useAuthUser } from '@/src/services/providers/AuthUserProvider';
+import { View, StyleSheet } from 'react-native';
 import { useAuthUserFollows } from '@/src/services/providers/AuthUserFollowsProvider';
-import { useUserFeed } from '@/src/hooks/useUserFeed';
-import { useEffect } from 'react';
 import { useIsFocused } from '@react-navigation/native';
-import { useIncomingTransactions } from '@/src/hooks/useIncomingTransactions';
 import StatCarousel from '@/src/components/carousel/StatCarousel';
 import FollowingCarousel from '@/src/components/carousel/FollowingCarousel';
-import Header from '../../components/igfeed/Header';
-import Posts from '../../components/igfeed/Posts';
+import Header from '../../components/feed/Header';
+import Posts from '../../components/feed/Posts';
 
 export default function IndexScreen() {
-  const isFocused = useIsFocused(); // Get focused state
+  const isFocused = useIsFocused();
 
-  /**
-   * CONSUME PROVIDERS
-   */
-  const { profile } = useAuthUser();
+  //CONSUME PROVIDERS
   const { isLoading: isLoadingFollows, followers, following } = useAuthUserFollows();
-  /**
-   * FETCH DIRECTLY
-   */
-  const incomingRes = useIncomingTransactions(profile?.wallet_id);
-  const { feed: userFeed, refetch: refetchUserFeed } = useUserFeed(profile?.id);
-
-  /**
-   * REFETCH PROVIDERS WHEN SCREEN IS IN FOCUS
-   */
-  useEffect(() => {
-    if (isFocused) {
-      console.log("refetching index feed")
-      refetchUserFeed();
-    }
-  }, [isFocused]);
 
   return (
     <>
@@ -48,7 +26,6 @@ export default function IndexScreen() {
       {/* FEED */}
       <Posts />
     </>
-
   );
 }
 

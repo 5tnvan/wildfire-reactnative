@@ -43,6 +43,15 @@ export default function Posts() {
     setRefreshing(false);
   };
 
+  // PAUSE ALL VIDEOS WHEN NOT IN FOCUS
+  useEffect(() => {
+    if (!isFocused) {
+      setPlayingIndex(null);
+    }
+  }, [isFocused]);
+
+  console.log('playingindex', playingIndex);
+
   return (
     <FlatList
       data={userFollowingFeed}

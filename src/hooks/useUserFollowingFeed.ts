@@ -57,7 +57,7 @@ export const useUserFollowingFeed = () => {
       if (error) {
         console.error("Error fetching data:", error);
       } else {
-        console.log("data", JSON.stringify(data, null, 2));
+        // console.log("data", JSON.stringify(data, null, 2));
 
         if (data.length < range) {
           setHasMore(false); // No more data to fetch

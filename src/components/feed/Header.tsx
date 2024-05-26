@@ -2,7 +2,7 @@ import { StyleSheet, Image, useColorScheme } from "react-native";
 import React from 'react';
 import { Text, View } from "../Themed";
 
-function Header() {
+export default function Header() {
   const colorScheme = useColorScheme();
   return (
     <View style={styles.container}>
@@ -38,5 +38,3 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
 });
-
-export default Header;
