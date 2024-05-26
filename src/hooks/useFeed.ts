@@ -5,33 +5,65 @@ import { supabase } from "../lib/supabase";
 import { fetchFollowing } from "../utils/fetch/fetchFollowing";
 import { fetchUser } from "../utils/fetch/fetchUser";
 
+const getRange = (page: number, range: number) => {
+  const from = page * range;
+  const to = from + range - 1;
+  console.log("page, from, to", page, from, to);
+  return { from, to };
+};
+
 /**
  * useFeed HOOK
  * Use this to get feed of videos
  **/
 export const useFeed = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [feed, setFeed] = useState<any>();
+  const range = 3;
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [feed, setFeed] = useState<any[]>([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const [triggerRefetch, setTriggerRefetch] = useState(false);
 
   const refetch = () => {
-    setTriggerRefetch(prev => !prev);
+    setPage(0); // Reset page
+    setFeed([]); // Reset feed
+    setHasMore(true); // Reset hasMore to true
+    setTriggerRefetch(prev => !prev); // Trigger refetch
   };
 
-  const init = async () => {
+  const fetchMore = () => {
+    if (hasMore) {
+      setPage((prevPage) => prevPage + 1); // Increase page by 1
+    }
+  };
+
+  const fetchFeed = async () => {
     setIsLoading(true);
+    const { from, to } = getRange(page, range);
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('1sec_desc_view')
-      .select('id, video_url, created_at, views, country:country_id(id, name), profile:user_id(id, username, avatar_url)');
+      .select('id, video_url, created_at, views, country:country_id(id, name), profile:user_id(id, username, avatar_url)')
+      .range(from, to)
 
-    setFeed(data);
+      if (error) {
+        console.error("Error fetching data:", error);
+      } else {
+        // console.log("data", JSON.stringify(data, null, 2));
+
+        if (data.length < range) {
+          setHasMore(false); // No more data to fetch
+        }
+
+        setFeed((existingFeed) => [...existingFeed, ...data]);
+      }
     setIsLoading(false);
   };
 
   useEffect(() => {
-    init();
-  }, [triggerRefetch]);
+    fetchFeed();
+  }, [page, triggerRefetch]);
 
-  return { isLoading, feed, refetch };
+  return { isLoading, feed, fetchMore, refetch };
 };

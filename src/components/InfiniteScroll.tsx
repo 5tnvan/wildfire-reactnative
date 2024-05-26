@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { View, Text, Dimensions, FlatList, StyleSheet, Pressable } from 'react-native';
+import { View, Text, Dimensions, FlatList, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Video, ResizeMode } from 'expo-av';
 import { LogoWildfireLit } from './logos/LogoFireLit';
 import { ViewCount } from './counts/ViewCount';
@@ -33,33 +33,48 @@ export default function InfiniteScroll() {
   const isFocused = useIsFocused(); // Get focused state
   
   //FETCH DIRECTLY
-  const { isLoading, feed, refetch } = useFeed();
-
-  console.log("feed", JSON.stringify(feed, null, 2));
+  const { isLoading, feed, fetchMore, refetch } = useFeed();
 
   // FIGURE OUT WHICH VIDEO IS IN USER'S VIEW TO PLAY
-  const [playingIndex, setPlayingIndex] = useState(0);
+  const [playingIndex, setPlayingIndex] = useState<any>(null);
   const viewabilityConfig = { viewAreaCoveragePercentThreshold: 50 };
   const onViewableItemsChanged = ({ viewableItems }: any) => {
     if (viewableItems.length > 0) {
-      setPlayingIndex(viewableItems[0].index ?? 0);
+      setPlayingIndex(viewableItems[0].index);
     }
   };
   const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
 
-  // HANDLE EXIT
-  const reset = () => {
-    // setplayingIndex(0);
+  // HANDLE END REACHED
+  const handleEndReached = () => {
+    console.log("end reached");
+    if (!isLoading) {
+      fetchMore();
+    }
+  };
+
+  // HANDLE REFRESH
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setRefreshing(true); // Set refreshing state to true
+    refetch(); // Refetch data
+    setRefreshing(false); // Set refreshing state back to false
+  };
+
+  // HANDLE BACK (EXIT SCREEN)
+  const handleBack = () => {
+    setPlayingIndex(null);
     router.back();
   };
 
   // HANDLE WHEN IN FOCUSED
-  useEffect(() => {
-    if (isFocused) {
-      console.log("refetching 3secs")
-      refetch(); //refetch data
-    }
-  }, [isFocused]);
+  // useEffect(() => {
+  //   if (isFocused) {
+  //     console.log("refetching 3secs")
+  //     refetch(); //refetch data
+  //   }
+  // }, [isFocused]);
 
   return (
     <View className='flex-1'>
@@ -73,14 +88,19 @@ export default function InfiniteScroll() {
         )}
         pagingEnabled
         horizontal={false}
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={true}
         viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
+        refreshing={refreshing} // Set the refreshing state
+        onRefresh={handleRefresh} // Handle refresh
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.1}
+        ListFooterComponent={() => (isLoading ? <ActivityIndicator size="large" color="#0000ff" /> : null)}
       />
 
       {/* BACK BUTTON */}
       <SafeAreaView className='absolute'>
         <View className="flex-row items-center justify-between w-full px-3">
-          <Pressable onPress={reset} className='flex-row items-center'>
+          <Pressable onPress={handleBack} className='flex-row items-center'>
             <Ionicons name="chevron-back" size={18} color="#F10849" />
             <LogoWildfireLit />
           </Pressable>
@@ -94,12 +114,28 @@ const Item = ({ item, isPlaying }: any) => {
   const video = React.useRef<any>(null);
   const [status, setStatus] = useState<any>(null);
 
+  // console.log("status", status.isPlaying);
+
+  // HANDLE MANUAL PAUSE
+  const [paused, setPaused] = useState(false);
+
+  const handleManualPause = () => {
+    if (status?.isPlaying) {
+      video.current.pauseAsync();
+      setPaused(true); // Set paused state to true
+    } else {
+      video.current.playAsync();
+      setPaused(false); // Set paused state to false
+    }
+  };
+
   //CHECK IF VIDEO IS BEING VIEWED
   useEffect(() => {
     if (!video.current) return;
 
     if (isPlaying) { //it is in view, play
       video.current.playAsync();
+      setPaused(false); // Video is playing, so hide the play icon
     } else { // it is not in view, pause
       video.current.pauseAsync();
       video.current.setPositionAsync(0);
@@ -107,7 +143,7 @@ const Item = ({ item, isPlaying }: any) => {
   }, [isPlaying]);
 
   return (
-    <Pressable onPress={() => status.isPlaying ? video.current?.pauseAsync() : video.current?.playAsync()}>
+    <Pressable onPress={handleManualPause}>
       {/* SKORT VIDEO */}
       <View style={styles.videoContainer}>
         <Video
@@ -120,9 +156,15 @@ const Item = ({ item, isPlaying }: any) => {
           onPlaybackStatusUpdate={status => setStatus(() => status)}
         />
       </View>
+      {/* PLAY & TOP ICON */}
+      {paused && ( // Conditionally render the play icon overlay when video is paused
+          <View style={styles.playIconContainer} className='gap-2'>
+            <FontAwesome5 name="play" size={36} color="white" />
+          </View>
+        )}
       {/* SKORT TOP */}
       <SafeAreaView className='absolute'>
-        <View className="flex-row items-center justify-end w-full px-3" style={styles.shadow}>
+        <View className="flex-row items-center justify-end w-full px-3">
           <ViewCount amount={70} />
         </View>
       </SafeAreaView>
@@ -131,14 +173,14 @@ const Item = ({ item, isPlaying }: any) => {
         <View className='flex-col items-center justify-between'>
           <View className='flex-row items-center' >
             <PressableAvatarWithUsername avatar_url={item.profile.avatar_url} username={item.profile.username} />
-            <Text className='ml-1 text-lg text-white mr-2' style={styles.shadow}>
+            <Text className='ml-1 text-lg text-white mr-2'>
               <TimeAgo timestamp={item.created_at}></TimeAgo>
             </Text>
           </View>
           {item.country && 
-          <View className='flex-row items-center' style={styles.shadow}>
-          <FontAwesome name="location-arrow" size={14} color="white" />
-          <Text className='text-white text-lg ml-1'>{item.country?.name}</Text>
+          <View className='flex-row items-center'>
+            <FontAwesome name="location-arrow" size={14} color="white" />
+            <Text className='text-white text-lg ml-1'>{item.country?.name}</Text>
           </View>
           }
           
@@ -175,15 +217,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  shadow: {
-    shadowColor: "#fff",
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 1,
-    shadowRadius: 10,
-
-    elevation: 0,
-  }
+  playIconContainer: {
+    ...StyleSheet.absoluteFillObject, // Position the play icon container absolutely within the video container
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
