@@ -32,11 +32,15 @@ import { Buffer } from 'buffer';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import Colors from '@/src/constants/Colors';
 import { SetCountryModal } from '@/src/components/modals/SetCountryModal';
+import { useDailyPostLimit } from '@/src/hooks/useDailyPostLimit';
 
 const CameraScreen = () => {
 
   const router = useRouter();
   const colorScheme = useColorScheme();
+
+  // FETCH DIRECTLY
+  const { limit } = useDailyPostLimit();
 
   //STATES
   const [modalVisible, setModalVisible] = useState(false); //location modal
@@ -182,6 +186,12 @@ const CameraScreen = () => {
     }
   };
   const handlePublishing = async () => {
+
+    if(limit) {
+      alert("You've reached your 24hrs posting limit. Try again later.")
+      return;
+    }
+
     setIsUploading(true);
     const now = new Date().getTime();
 
@@ -420,10 +430,10 @@ const CameraScreen = () => {
                 <Text className='text-base font-semibold'>{locationName}</Text>
                 <View></View>
               </Pressable>
-              <Pressable className='flex-row justify-between grow py-3 px-2 items-center rounded-full bg-accent mt-3' onPress={handlePublishing}>
+              <Pressable className={`flex-row justify-center grow py-3 px-2 items-center rounded-full ${limit ? 'bg-primary' : 'bg-accent'}  mt-3`} onPress={handlePublishing}>
                 <View></View>
                 <Text className='text-base font-semibold'>Publish</Text>
-                <Ionicons name="chevron-forward" size={22} color="black" />
+                {/* <Ionicons name="chevron-forward" size={22} color="black" /> */}
                 {isUploading && <ActivityIndicator size="small" color="#0000ff" className='ml-1' />}
               </Pressable>
             </View>

@@ -12,10 +12,11 @@ export const useDailyPostLimit = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [limit, setLimit] = useState<boolean | null>(null);
   const [postLeft, setPostLeft] = useState<number | null>(null);
-  const [posts, setPosts] = useState<any>(null);
+  const [posts, setPosts] = useState<any>([null]);
   const [triggerRefetch, setTriggerRefetch] = useState(false);
 
   const refetch = () => {
+    console.log('refetchnggg')
     setTriggerRefetch(prev => !prev);
   };
 
@@ -34,7 +35,7 @@ export const useDailyPostLimit = () => {
 
     console.log("levelData", levelData);
 
-    // Fetch last 2 video posts
+    // Fetch last video posts
     const { data: posts, error: postsError } = await supabase
       .from('1sec')
       .select('id, created_at')
@@ -49,7 +50,8 @@ export const useDailyPostLimit = () => {
     }
 
     console.log("posts", posts);
-    if (posts) setPosts(posts);
+
+    setPosts(posts);
 
     const now = new Date();
 

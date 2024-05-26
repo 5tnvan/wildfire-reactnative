@@ -9,6 +9,10 @@ import { Stack } from "expo-router";
 import { useAuth } from "@/src/services/providers/AuthProvider";
 import { useDailyPostLimit } from "@/src/hooks/useDailyPostLimit";
 import { TimeAgo } from "@/src/components/TimeAgo";
+import StatCarousel from "@/src/components/carousel/StatCarousel";
+import { PressableAnimated } from "@/src/components/pressables/PressableAnimated";
+import { useIsFocused } from "@react-navigation/native";
+import { useEffect } from "react";
 
 type Props = {
   iconName: any,
@@ -16,7 +20,7 @@ type Props = {
   text: string,
 }
 
-export function ToolTip({ iconName, iconSize, text } : Props) {
+export function ToolTip({ iconName, iconSize, text }: Props) {
   const colorScheme = useColorScheme();
   return (
     <View className={`flex flex-row mb-3 p-5 ${colorScheme === 'dark' ? "bg-secondary" : "bg-neutral"} rounded-full`}>
@@ -27,35 +31,47 @@ export function ToolTip({ iconName, iconSize, text } : Props) {
 }
 
 export default function ModalScreen() {
-  const {limit, posts, postLeft, refetch} = useDailyPostLimit();
-  // console.log("limit", limit);
-  // console.log("posts", posts);
-  // console.log("postLeft", postLeft);
+
+  const { limit, posts, postLeft, refetch } = useDailyPostLimit();
+  console.log("limit", limit);
+  console.log("posts", posts);
+  console.log("postLeft", postLeft);
+
+
+  // HANDLE WHEN SCREEN IS IN/OUT OF FOCUS
+  const isFocused = useIsFocused();
+  useEffect(() => {
+      if (isFocused) { refetch(); } // refetch data when in focus
+  }, [isFocused]);
+
+  
   return (
     <>
-      <View className="flex grow items-center justify-start pt-20 pl-5 pr-5">
+      <View className="flex grow items-center justify-start p-5">
         {/* Create a wildpay account */}
         <View className='flex flex-row items-center justify-center mb-5'>
-          <Text className="text-lg mr-2 font-bold">Create a</Text>
-          <Text className='text-lg font-bold mr-2 text-accent'>3 sec</Text>
-          <Text className="text-lg mr-2 font-bold">memory</Text>
+          <Text className="text-lg mr-2 font-bold">You have</Text>
+          <Text className='text-lg font-bold mr-2 text-accent'>{postLeft}</Text>
+          <Text className="text-lg mr-2 font-bold">posts left today</Text>
         </View>
-        {/* Tooltips */}
-        <View className="flex flex-col w-full">
-          <Text>You have {postLeft} posts left today</Text>
-          {posts && posts.map((post: { created_at: string; id: string }) => (
-            <View key={post.id} className="mb-3">
-              <Text className="text-white"><TimeAgo timestamp={post.created_at}></TimeAgo></Text>
-              
-            </View>
-          ))}
-        </View>
-        <Pressable onPress={refetch}><Text className="white">Refetch</Text></Pressable>
-        
+
+        {posts && posts.length > 0 &&
+          <><View className='flex flex-row items-center justify-center mb-5'>
+            <Text className="text-lg mr-2 font-bold">You last post was</Text>
+            <Text className="text-lg font-bold mr-2 text-accent">
+              <TimeAgo timestamp={posts[0]?.created_at}></TimeAgo>
+            </Text>
+            <Text className="text-lg mr-2 font-bold">ago</Text>
+          </View>
+          </>
+        }
+
+        <PressableAnimated onPress={refetch}><Text className="white">Level Up</Text></PressableAnimated>
+
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
       </View>
     </>
-    
+
   );
 }

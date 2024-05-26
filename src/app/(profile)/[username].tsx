@@ -136,7 +136,8 @@ export default function ProfileUsernameScreen() {
             />
           </View>
           :
-          <View className='flex-1 p-20'><InfoWithEmoji emoji={'🤫'} text={`User hasn't posted yet`} /></View>
+          <PressableAnimated onPress={() => alert("dfd")}><Text>djshjds</Text></PressableAnimated>
+          // <PressableAnimated className='flex-1 justify-end pb-10 px-9' onPress={() => alert("yoyo")}><InfoWithEmoji emoji={'🤫'} text={`User hasn't posted yet`} /><Text>fsdf</Text></PressableAnimated>
           }
           
           {/* USER INTRO */}
