@@ -1,6 +1,4 @@
 import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
-import { Link } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthUser } from '@/src/services/providers/AuthUserProvider';
 import { useAuthUserFollows } from '@/src/services/providers/AuthUserFollowsProvider';
 import { useUserFeed } from '@/src/hooks/useUserFeed';
@@ -9,11 +7,8 @@ import { useIsFocused } from '@react-navigation/native';
 import { useIncomingTransactions } from '@/src/hooks/useIncomingTransactions';
 import StatCarousel from '@/src/components/carousel/StatCarousel';
 import FollowingCarousel from '@/src/components/carousel/FollowingCarousel';
-import { useUserFollowingFeed } from '@/src/hooks/useUserFollowingFeed';
 import Header from '../../components/igfeed/Header';
-import Navigation from '../../components/igfeed/Navigation';
 import Posts from '../../components/igfeed/Posts';
-import Stories from '../../components/igfeed/Stories';
 
 export default function IndexScreen() {
   const isFocused = useIsFocused(); // Get focused state

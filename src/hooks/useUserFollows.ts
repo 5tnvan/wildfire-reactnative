@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { fetchFollowers } from "../utils/fetch/fetchFollowers";
 import { fetchFollowing } from "../utils/fetch/fetchFollowing";
+import { fetchFollowed } from "../utils/fetch/fetchFollowed";
+import { fetchUser } from "../utils/fetch/fetchUser";
 
 /**
  * useUserFollows HOOK
@@ -11,6 +13,7 @@ import { fetchFollowing } from "../utils/fetch/fetchFollowing";
  **/
 export const useUserFollows = (username: any) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [followed, setFollowed] = useState(false);
   const [followers, setFollowers] = useState<any>();
   const [following, setFollowing] = useState<any>();
   const [triggerRefetch, setTriggerRefetch] = useState(false);
@@ -27,6 +30,10 @@ export const useUserFollows = (username: any) => {
     .eq('username', username)
     .single();
     if(data) {
+      const user = await fetchUser();
+      fetchFollowed(user?.user?.id, data.id).then((res:any) => {
+        setFollowed(res);
+      });
       fetchFollowers(data.id).then((res) => {
         setFollowers(res);
       });
@@ -43,5 +50,5 @@ export const useUserFollows = (username: any) => {
     
   }, [triggerRefetch]);
 
-  return { isLoading, followers, following, refetch };
+  return { isLoading, followed, followers, following, refetch };
 };

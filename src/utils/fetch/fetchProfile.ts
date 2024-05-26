@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 import { supabase } from '@/src/lib/supabase';
 
-const fetchProfile = async (userId: string) => {
+export const fetchProfile = async (userId: string) => {
     try {
         const { data, error, status } = await supabase
             .from('profiles')
@@ -16,4 +16,10 @@ const fetchProfile = async (userId: string) => {
     }
 };
 
-export default fetchProfile;
+export const fetchProfileMatchingWith = async (username: string) => {
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, username, avatar_url")
+    .ilike("username", `${username}%`);
+  return data;
+};

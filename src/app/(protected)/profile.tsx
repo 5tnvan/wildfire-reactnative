@@ -10,7 +10,7 @@ import {
 import { useAuthUser } from "../../services/providers/AuthUserProvider";
 import { Text } from "../../components/Themed";
 import { Avatar } from "../../components/avatars/avatar";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuthUserFollows } from "@/src/services/providers/AuthUserFollowsProvider";
 import { useIncomingTransactions } from "@/src/hooks/useIncomingTransactions";
 import { useOutgoingTransactions } from "@/src/hooks/useOutgoingTransactions";
@@ -24,12 +24,14 @@ import StoryComponent from "@/src/components/StoryComponent";
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Stack } from "expo-router";
 import { PressableAnimated } from "@/src/components/pressables/PressableAnimated";
+import { SettingsModal } from "@/src/components/modals/SettingsModal";
 
 export default function ProfileScreen() {
   const isFocused = useIsFocused(); // Get focused state
   const colorScheme = useColorScheme();
   const { width } = useWindowDimensions();
   const [storyIndex, setStoryIndex] = useState<any>(null);
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false); //settings modal
 
   //CONSUME PROVIDERS
   const { isLoading: isLoadingUser, profile } = useAuthUser();
@@ -95,9 +97,11 @@ export default function ProfileScreen() {
           <Stack.Screen options={{
             headerShown: true, title: '@' + profile.username, 
             headerRight: () => (
-              <PressableAnimated className="py-1 px-3 mr-1" onPress={() => alert("hdjfdsfd")}><Text>Follow</Text></PressableAnimated>
+              <PressableAnimated className="bg-transparent" onPress={() => setSettingsModalVisible(true)}><Ionicons name="settings" size={20} color="white" /></PressableAnimated>
             )
           }} />
+          {/* SETTINGS MODAL */}
+          <SettingsModal visible={settingsModalVisible} onClose={() => setSettingsModalVisible(false)}/>
           {/* SPINNING CAROUSEL */}
           <View style={styles.container}>
             <Animated.FlatList

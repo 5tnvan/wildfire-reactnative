@@ -4,7 +4,7 @@ import { supabase } from '@/src/lib/supabase';
 import { Alert } from 'react-native';
 import { fetchFollowers } from '@/src/utils/fetch/fetchFollowers';
 import { fetchFollowing } from '@/src/utils/fetch/fetchFollowing';
-import fetchProfile from '@/src/utils/fetch/fetchProfile';
+import { fetchProfile } from '@/src/utils/fetch/fetchProfile';
 
 type AuthUserContext = {
     isLoading: boolean | null;

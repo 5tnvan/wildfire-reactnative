@@ -5,7 +5,7 @@ import { Text } from '../../components/Themed';
 import { useUser } from '@/src/hooks/useUser';
 import { Avatar } from '@/src/components/avatars/avatar';
 import { useUserFollows } from '@/src/hooks/useUserFollows';
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo, FontAwesome, Fontisto, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useEffect, useState } from 'react';
 import { fetchUser } from '@/src/utils/fetch/fetchUser';
 import { supabase } from '@/src/lib/supabase';
@@ -18,6 +18,9 @@ import Item from '@/src/components/Item';
 import { PressableAnimated } from '@/src/components/pressables/PressableAnimated';
 import { useIsFocused } from '@react-navigation/native';
 import StoryComponent from '@/src/components/StoryComponent';
+import { Ionicons } from '@expo/vector-icons';
+import { FollowsModal } from '@/src/components/modals/FollowsModal';
+import { InfoWithEmoji } from '@/src/components/InfoWithEmoji';
 
 export default function ProfileUsernameScreen() {
 
@@ -26,12 +29,15 @@ export default function ProfileUsernameScreen() {
   const { width } = useWindowDimensions();
   const { username } = useLocalSearchParams();
   const usernameAsTitle = Array.isArray(username) ? username[0] : username;
+  const [followsModalVisible, setFollowsModalVisible] = useState(false); //follows modal
   const [storyIndex, setStoryIndex] = useState<any>(null);
 
   //CONSUME PROVIDERS
   const { user } = useUser(username);
-  const { followers, following } = useUserFollows(username);
+  const { followed, followers, following } = useUserFollows(username);
   const { feed, refetch } = useUserFeedByUsername(username);
+
+  console.log("feed", feed)
 
   //SPINNING CAROUSELL ANIMATION 
   const x = useSharedValue(0);
@@ -84,11 +90,22 @@ export default function ProfileUsernameScreen() {
             headerBackTitle: 'Back',
             title: '@' + usernameAsTitle ?? '',
             headerRight: () => (
-              <PressableAnimated className="py-1 px-3" onPress={() => alert("hdjfdsfd")}><Text>Follow</Text></PressableAnimated>
+              <View>
+                {followed ?
+                <PressableAnimated className="py-1 px-3 flex-row justify-center" onPress={() => setFollowsModalVisible(true)}>
+                  <Text>Following ✓</Text>
+                </PressableAnimated> : <PressableAnimated className="bg-accent py-1 px-3 flex-row justify-center" onPress={() => setFollowsModalVisible(true)}>
+                  <Text className='text-black font-medium'>Follow</Text>
+                </PressableAnimated>}
+              </View>
             )
           }} />
+          {/* FOLLOWS MODAL */}
+          <FollowsModal visible={followsModalVisible} data={user} onClose={() => setFollowsModalVisible(false)}/>
+
           {/* SPINNING CAROUSEL */}
-          <View style={styles.container}>
+          {feed?.length > 0 ? 
+            <View style={styles.container}>
             <Animated.FlatList
               onScroll={onScroll}
               ListHeaderComponent={<View />}
@@ -118,8 +135,12 @@ export default function ProfileUsernameScreen() {
               snapToInterval={ITEM_FULL_WIDTH}
             />
           </View>
+          :
+          <View className='flex-1 p-20'><InfoWithEmoji emoji={'🤫'} text={`User hasn't posted yet`} /></View>
+          }
+          
           {/* USER INTRO */}
-          <View className={`${colorScheme == "dark" ? "bg-zinc-900" : "bg-white"} absolute bottom-0 w-full items-center justify-center p-10`}>
+          <View className={`${colorScheme == "dark" ? "bg-zinc-900" : "bg-white"} w-full items-center justify-center p-10`}>
             <View className='absolute' style={{ top: -30 }}>
               <Avatar
                 avatar_url={user.avatar_url}
