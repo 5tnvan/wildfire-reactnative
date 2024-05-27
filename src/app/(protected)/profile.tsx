@@ -22,11 +22,12 @@ import Animated, {
 import Item from "@/src/components/Item";
 import StoryComponent from "@/src/components/StoryComponent";
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { PressableAnimated } from "@/src/components/pressables/PressableAnimated";
 import { SettingsModal } from "@/src/components/modals/SettingsModal";
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const isFocused = useIsFocused(); // Get focused state
   const colorScheme = useColorScheme();
   const { width } = useWindowDimensions();
@@ -41,7 +42,7 @@ export default function ProfileScreen() {
   //FETCH DIRECTLY 
   const incomingRes = useIncomingTransactions(profile.wallet_id);
   const outgoingRes = useOutgoingTransactions(profile.wallet_id);
-  
+
   //SPINNING CAROUSELL ANIMATION 
   const x = useSharedValue(0);
   const ITEM_WIDTH = 250;
@@ -81,7 +82,7 @@ export default function ProfileScreen() {
 
   return (
     <>
-      {insideStory ? 
+      {insideStory ?
         // STORY MODAL
         <Modal
           visible={insideModal}
@@ -95,92 +96,98 @@ export default function ProfileScreen() {
         <>
           {/* HEADER */}
           <Stack.Screen options={{
-            headerShown: true, title: '@' + profile.username, 
+            headerShown: true, title: '@' + profile.username,
             headerRight: () => (
-              <PressableAnimated className="bg-transparent" onPress={() => setSettingsModalVisible(true)}><Ionicons name="settings" size={20} color="white" /></PressableAnimated>
+              <PressableAnimated className="bg-transparent" onPress={() => setSettingsModalVisible(true)}><Ionicons name="settings" size={20} color={`${colorScheme == 'dark' ? 'white' : 'black'}`} /></PressableAnimated>
             )
           }} />
-          {/* SETTINGS MODAL */}
-          <SettingsModal visible={settingsModalVisible} onClose={() => setSettingsModalVisible(false)}/>
-          {/* SPINNING CAROUSEL */}
-          <View style={styles.container}>
-            <Animated.FlatList
-              onScroll={onScroll}
-              ListHeaderComponent={<View />}
-              ListHeaderComponentStyle={{ width: SPACER }}
-              ListFooterComponent={<View />}
-              ListFooterComponentStyle={{ width: SPACER }}
-              data={feed}
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={item => item.id + item.name}
-              renderItem={({ item, index }) => {
-                return (
-                  <Item
-                    item={item}
-                    index={index}
-                    x={x}
-                    width={ITEM_WIDTH}
-                    height={ITEM_HEIGHT}
-                    marginHorizontal={MARGIN_HORIZONTAL}
-                    fullWidth={ITEM_FULL_WIDTH}
-                    onPress={handleItemPress}
-                  />
-                );
-              }}
-              horizontal
-              scrollEventThrottle={16}
-              decelerationRate="fast"
-              snapToInterval={ITEM_FULL_WIDTH}
-            />
-          </View>
-          {/* USER INTRO */}
-          <View className={`${colorScheme == "dark" ? "bg-zinc-900" : "bg-white"} absolute bottom-0 w-full items-center justify-center p-10`}>
-            {/* 
-            * AVATAR
-            */}
-            <View className='absolute' style={{ top: -30 }}>
-              <Avatar
-                avatar_url={profile.avatar_url}
-                username={profile.username}
-                size="lg"
-                ring={true}
-              ></Avatar>
-            </View>
-            <View className="flex-row items-center mb-3">
-              <View className="ml-2">
-                <View className="flex-row items-center">
-                </View>
-                <Pressable
-                  className="flex-row gap-1"
-                  
-                >
-                  <Text className="font-semibold text-lg text-accent">
-                    {followers.length}
-                  </Text>
-                  <Text className="text-lg">followers</Text>
-                  <Text className="font-semibold text-lg text-accent">
-                    {following.length}
-                  </Text>
-                  <Text className="text-lg">following</Text>
-                </Pressable>
-              </View>
-            </View>
-            {/* <View className="flex-col items-end">
-              <Text className="text-xl font-semibold text-accent">${(calculateSum(incomingRes.ethereumData) + calculateSum(incomingRes.baseData)).toFixed(3)}Ξ</Text>
-              <Text className="text-base text-zinc-400">${(calculateSum(incomingRes.ethereumData) + calculateSum(incomingRes.baseData)).toFixed(3)}Ξ</Text>
-            </View> */}
 
-            <PressableAnimated
-              className={''}
-              onPress={openStory}>
-              <Text className="text-lg"> </Text>
-              <Text className="text-base">Tip Now</Text>
-              <MaterialCommunityIcons
-                name="ethereum"
-                size={17}
-                color={colorScheme === "dark" ? "white" : "black"} // Adjust color based on colorScheme
-              />
-            </PressableAnimated>
+          {/* SETTINGS MODAL */}
+          <SettingsModal visible={settingsModalVisible} onClose={() => setSettingsModalVisible(false)} />
+
+          {/* CONTAINER FOR MAIN CONTENT*/}
+          <View className="flex-1 flex-col justify-between">
+
+            {/* BLANK */}
+            {feed && feed.length === 0 && 
+            <View className="flex-row justify-center items-center grow ">
+              <PressableAnimated onPress={() => router.push("/create")}>🥳 Start your first post</PressableAnimated>
+            </View>}
+
+            {/* SPINNING CAROUSEL */}
+            {feed && feed.length > 0 &&
+              <>
+                <View className='flex-1 pt-10'>
+                  <Animated.FlatList
+                    onScroll={onScroll}
+                    ListHeaderComponent={<View />}
+                    ListHeaderComponentStyle={{ width: SPACER }}
+                    ListFooterComponent={<View />}
+                    ListFooterComponentStyle={{ width: SPACER }}
+                    data={feed}
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={item => item.id + item.name}
+                    renderItem={({ item, index }) => {
+                      return (
+                        <Item
+                          item={item}
+                          index={index}
+                          x={x}
+                          width={ITEM_WIDTH}
+                          height={ITEM_HEIGHT}
+                          marginHorizontal={MARGIN_HORIZONTAL}
+                          fullWidth={ITEM_FULL_WIDTH}
+                          onPress={handleItemPress}
+                        />
+                      );
+                    }}
+                    horizontal
+                    scrollEventThrottle={16}
+                    decelerationRate="fast"
+                    snapToInterval={ITEM_FULL_WIDTH}
+                  />
+                </View></>}
+
+                {/* USER BOTTOM INFO */}
+                <View className={`${colorScheme == "dark" ? "bg-zinc-900" : "bg-white"} w-full items-center justify-center p-8`}>
+                  <View className='absolute' style={{ top: -30 }}>
+                    <Avatar
+                      avatar_url={profile.avatar_url}
+                      username={profile.username}
+                      size="lg"
+                      ring={true}
+                    ></Avatar>
+                  </View>  
+                  <View className="flex-row items-center mb-3">
+                    <View className="ml-2">
+                      <View className="flex-row items-center">
+                      </View>
+                      <Pressable
+                        className="flex-row gap-1"
+                      >
+                        <Text className="font-semibold text-lg text-accent">
+                          {followers.length}
+                        </Text>
+                        <Text className="text-lg">followers</Text>
+                        <Text className="font-semibold text-lg text-accent">
+                          {following.length}
+                        </Text>
+                        <Text className="text-lg">following</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                  <PressableAnimated
+                    className={''}
+                    onPress={openStory}>
+                      <Text className="text-lg"> </Text>
+                      <Text className="text-base">Tip Now</Text>
+                      <MaterialCommunityIcons
+                        name="ethereum"
+                        size={14}
+                        color={colorScheme === "dark" ? "white" : "black"} // Adjust color based on colorScheme
+                      />
+                  </PressableAnimated>
+                </View>
           </View>
         </>}
 
@@ -220,11 +227,6 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 40,
-    padding: 12,
-    flex: 1,
-  },
   verticallySpaced: {
     paddingTop: 4,
     paddingBottom: 4,

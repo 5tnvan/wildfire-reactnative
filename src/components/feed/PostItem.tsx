@@ -65,7 +65,7 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
   }, [isPlaying]);
 
   return (
-    <View className="bg-zinc-900 mb-3 rounded-2xl">
+    <View className={`mb-1 rounded-2xl`}>
       {/* HEADER */}
       <View className="bg-transparent flex-row items-center px-3 py-4 rounded-2xl">
           <Text className="ml-2 font-semibold text-base">@{item.profile.username}</Text>
@@ -103,23 +103,23 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
         )}
         
         {/* MUTE BUTTON */}
-        <Pressable onPress={toggleMute} style={styles.muteButton}>
-          <Image source={isMuted ? mute : unmute} style={styles.icon} />
+        <Pressable onPress={toggleMute} className="absolute bottom-0 left-0 p-4 ">
+          <Image source={isMuted ? mute : unmute} className="w-6 h-6" />
         </Pressable>
       </View>
 
       {/* ACTIONS */}
-      <View className="flex-row bg-transparent gap-2 p-2 self-end ">
-          <View className="py-1 px-2 rounded-full flex-row items-center bg-zinc-900/70">
-            <SimpleLineIcons name="fire" size={24} color="white" />
+      <View className="flex-row bg-transparent gap-3 p-2 self-end ">
+          <View className="">
+            <SimpleLineIcons name="fire" size={24} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
             {/* <Text className="ml-1">1.2k</Text> */}
           </View>
-          <View className="py-1 px-2 rounded-full flex-row items-center bg-zinc-900/70">
-            <MaterialCommunityIcons name="comment-processing-outline" size={26} color="white" />
+          <View className="">
+            <MaterialCommunityIcons name="comment-processing-outline" size={26} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
             {/* <Text className="ml-1">333</Text> */}
           </View>
-          <View className="py-1 px-2 rounded-full flex-row items-center bg-zinc-900/70">
-            <Entypo name="slideshare" size={24} color="white" />
+          <View className="">
+            <Entypo name="slideshare" size={24} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
             {/* <Text className="ml-1">124</Text> */}
           </View>
         </View>
@@ -131,17 +131,6 @@ const styles = StyleSheet.create({
   video: {
     width: '100%',
     height: '100%',
-  },
-  muteButton: {
-    position: 'absolute',
-    bottom: 5,
-    left: 5,
-    padding: 10,
-    borderRadius: 5,
-  },
-  icon: {
-    width: 20,
-    height: 20,
   },
   overlay: {
     position: 'absolute',

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, Dimensions, Pressable, Linking } from 'react-native';
+import { StyleSheet, View, Text, FlatList, Dimensions, Pressable, Linking, useColorScheme } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Avatar } from '../avatars/avatar';
 import { calculateSum } from '../../utils/calculateSum';
@@ -23,6 +23,8 @@ const cardData = [
 export default function StatCarousel() {
     const router = useRouter();
     const isFocused = useIsFocused(); // Get focused state
+    const colorScheme = useColorScheme();
+    
 
     //CONSUME PROVIDERS
     const { profile } = useAuthUser();
@@ -74,7 +76,7 @@ export default function StatCarousel() {
             data={cardData}
             horizontal
             showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => <Item id={item.id} title={item.title} stat={item.stat} cta={item.cta} icon={item.icon} avatar={item.avatar} profile={profile} onPress={handleCta} />}
+            renderItem={({ item }) => <Item id={item.id} title={item.title} stat={item.stat} cta={item.cta} icon={item.icon} avatar={item.avatar} profile={profile} onPress={handleCta} colorScheme={colorScheme} />}
             snapToInterval={CARD_WIDTH + MARGIN_LEFT + MARGIN_RIGHT} // Calculate the size for a card including marginLeft and marginRight
             decelerationRate="fast" // Make the scrolling feel snappier
             contentContainerStyle={styles.container}
@@ -92,15 +94,16 @@ type Props = {
     avatar: any,
     profile: any,
     onPress: any,
+    colorScheme: any,
 };
 
-const Item = ({ id, title, stat, cta, icon, avatar, profile, onPress }: Props) => (
-    <Pressable style={styles.card} className='flex-row' onPress={() => onPress(id)}>
+const Item = ({ id, title, stat, cta, icon, avatar, profile, onPress, colorScheme }: Props) => (
+    <Pressable style={styles.card} className={`${colorScheme == 'dark' ? 'bg-zinc-900' : 'bg-white'} flex-row`} onPress={() => onPress(id)}>
         <View className=''>
-            <Text className='text-lg font-medium mb-1'>{title}</Text>
-            <Text className={`text-4xl font-bold ${id == 1 ? 'text-accent' : 'text-secondary'} mb-2`}>{stat}</Text>
+            <Text className={`${colorScheme == 'dark' ? 'text-white' : 'text-black'} text-lg font-medium mb-1`}>{title}</Text>
+            <Text className={`text-4xl font-bold ${colorScheme == 'dark' ? 'text-white' : 'text-black'} mb-2`}>{stat}</Text>
             <View className='bg-accent px-5 py-1 rounded-full'>
-                <Text className='font-semibold'>{cta}</Text>
+                <Text className='font-medium'>{cta}</Text>
             </View>
         </View>
         <View className='grow items-end'>
@@ -117,11 +120,9 @@ const Item = ({ id, title, stat, cta, icon, avatar, profile, onPress }: Props) =
 
 const styles = StyleSheet.create({
     container: {
-        // backgroundColor: '#444FFF',
         height: CARD_HEIGHT
     },
     card: {
-        backgroundColor: '#fff',
         borderRadius: 10,
         width: CARD_WIDTH,
         marginLeft: MARGIN_LEFT,

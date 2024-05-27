@@ -1,6 +1,5 @@
 import { Modal, Pressable, ScrollView, useColorScheme } from 'react-native';
 import { Text, View } from "@/src/components/Themed";
-import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { PressableAnimated } from '../pressables/PressableAnimated';
 import { supabase } from '@/src/lib/supabase';
@@ -26,12 +25,12 @@ export function SettingsModal({ visible, data, onClose }: Props) {
             onRequestClose={handleReset}
         >
             <View className="">
-                <View className='flex-row justify-between items-center bg-zinc-900 px-2 py-4'>
+                <View className='flex-row justify-between items-center px-2 py-4'>
                     <Ionicons
                         onPress={handleReset}
                         name="chevron-back"
                         size={22}
-                        color="white"
+                        color={colorScheme == 'dark' ? 'white' : 'grey'}
                     />
                     <Text className='text-lg font-medium self-center'>Settings</Text>
                     <Text className='text-lg font-medium self-center'>{`     `} </Text>

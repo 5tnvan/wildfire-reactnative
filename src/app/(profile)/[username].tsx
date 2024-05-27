@@ -1,5 +1,5 @@
 import { View, Image, Pressable, useColorScheme, StyleSheet, useWindowDimensions, Modal } from 'react-native';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from '../../components/Themed';
 import { useUser } from '@/src/hooks/useUser';
@@ -25,6 +25,7 @@ import { InfoWithEmoji } from '@/src/components/InfoWithEmoji';
 export default function ProfileUsernameScreen() {
 
   const isFocused = useIsFocused(); // Get focused state
+  const router = useRouter();
   const colorScheme = useColorScheme();
   const { width } = useWindowDimensions();
   const { username } = useLocalSearchParams();
@@ -92,85 +93,92 @@ export default function ProfileUsernameScreen() {
             headerRight: () => (
               <View>
                 {followed ?
-                <PressableAnimated className="py-1 px-3 flex-row justify-center" onPress={() => setFollowsModalVisible(true)}>
-                  <Text>Following ✓</Text>
-                </PressableAnimated> : <PressableAnimated className="bg-accent py-1 px-3 flex-row justify-center" onPress={() => setFollowsModalVisible(true)}>
-                  <Text className='text-black font-medium'>Follow</Text>
-                </PressableAnimated>}
+                  <PressableAnimated className="py-1 px-3 flex-row justify-center" onPress={() => setFollowsModalVisible(true)}>
+                    <Text>Following ✓</Text>
+                  </PressableAnimated> : <PressableAnimated className="bg-accent py-1 px-3 flex-row justify-center" onPress={() => setFollowsModalVisible(true)}>
+                    <Text className='text-black font-medium'>Follow</Text>
+                  </PressableAnimated>}
               </View>
             )
           }} />
           {/* FOLLOWS MODAL */}
-          <FollowsModal visible={followsModalVisible} data={user} onClose={() => setFollowsModalVisible(false)}/>
+          <FollowsModal visible={followsModalVisible} data={user} onClose={() => setFollowsModalVisible(false)} />
+          {/* CONTAINER FOR MAIN CONTENT*/}
+          <View className="flex-1 flex-col justify-between">
 
-          {/* SPINNING CAROUSEL */}
-          {feed?.length > 0 ? 
-            <View style={styles.container}>
-            <Animated.FlatList
-              onScroll={onScroll}
-              ListHeaderComponent={<View />}
-              ListHeaderComponentStyle={{ width: SPACER }}
-              ListFooterComponent={<View />}
-              ListFooterComponentStyle={{ width: SPACER }}
-              data={feed}
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={item => item.id + item.name}
-              renderItem={({ item, index }) => {
-                return (
-                  <Item
-                    item={item}
-                    index={index}
-                    x={x}
-                    width={ITEM_WIDTH}
-                    height={ITEM_HEIGHT}
-                    marginHorizontal={MARGin_HORIZONTAL}
-                    fullWidth={ITEM_FULL_WIDTH}
-                    onPress={handleItemPress}
+            {/* BLANK */}
+            {feed && feed.length === 0 &&
+              <View className="flex-row justify-center items-center grow ">
+                <PressableAnimated onPress={() => console.log("clicked")}>🤫 User hasn't posted yet</PressableAnimated>
+              </View>}
+
+            {/* SPINNING CAROUSEL */}
+            {feed && feed.length > 0 &&
+              <>
+                <View style={styles.container}>
+                  <Animated.FlatList
+                    onScroll={onScroll}
+                    ListHeaderComponent={<View />}
+                    ListHeaderComponentStyle={{ width: SPACER }}
+                    ListFooterComponent={<View />}
+                    ListFooterComponentStyle={{ width: SPACER }}
+                    data={feed}
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={item => item.id + item.name}
+                    renderItem={({ item, index }) => {
+                      return (
+                        <Item
+                          item={item}
+                          index={index}
+                          x={x}
+                          width={ITEM_WIDTH}
+                          height={ITEM_HEIGHT}
+                          marginHorizontal={MARGin_HORIZONTAL}
+                          fullWidth={ITEM_FULL_WIDTH}
+                          onPress={handleItemPress}
+                        />
+                      );
+                    }}
+                    horizontal
+                    scrollEventThrottle={16}
+                    decelerationRate="fast"
+                    snapToInterval={ITEM_FULL_WIDTH}
                   />
-                );
-              }}
-              horizontal
-              scrollEventThrottle={16}
-              decelerationRate="fast"
-              snapToInterval={ITEM_FULL_WIDTH}
-            />
-          </View>
-          :
-          <PressableAnimated onPress={() => alert("dfd")}><Text>djshjds</Text></PressableAnimated>
-          // <PressableAnimated className='flex-1 justify-end pb-10 px-9' onPress={() => alert("yoyo")}><InfoWithEmoji emoji={'🤫'} text={`User hasn't posted yet`} /><Text>fsdf</Text></PressableAnimated>
-          }
-          
-          {/* USER INTRO */}
-          <View className={`${colorScheme == "dark" ? "bg-zinc-900" : "bg-white"} w-full items-center justify-center p-10`}>
-            <View className='absolute' style={{ top: -30 }}>
-              <Avatar
-                avatar_url={user.avatar_url}
-                username={user.username}
-                size="lg"
-                ring={true}
-              ></Avatar>
-            </View>
-            <Text className='font-medium text-lg text-accent'>@{user.username}</Text>
-            <Pressable className="flex-row gap-1 mb-3">
-              <Text className="font-semibold text-lg text-accent">
-                {followers?.length}
-              </Text>
-              <Text className="text-lg">followers</Text>
-              {/* <Text className="font-semibold text-lg text-accent">
+                </View>
+              </>}
+
+            {/* USER BOTTOM INFO */}
+            <View className={`${colorScheme == "dark" ? "bg-zinc-900" : "bg-white"} w-full items-center justify-center p-10`}>
+              <View className='absolute' style={{ top: -30 }}>
+                <Avatar
+                  avatar_url={user.avatar_url}
+                  username={user.username}
+                  size="lg"
+                  ring={true}
+                ></Avatar>
+              </View>
+              <Text className='font-medium text-lg text-accent'>@{user.username}</Text>
+              <Pressable className="flex-row gap-1 mb-3">
+                <Text className="font-semibold text-lg text-accent">
+                  {followers?.length}
+                </Text>
+                <Text className="text-lg">followers</Text>
+                {/* <Text className="font-semibold text-lg text-accent">
             {following?.length}
           </Text>
           <Text className="text-lg">following</Text> */}
-            </Pressable>
-            <PressableAnimated
-              onPress={() => alert("djhdjs")}>
-              <Text className="text-lg"> </Text>
-              <Text className="text-base">Tip Now</Text>
-              <MaterialCommunityIcons
-                name="ethereum"
-                size={17}
-                color={colorScheme === "dark" ? "white" : "black"} // Adjust color based on colorScheme
-              />
-            </PressableAnimated>
+              </Pressable>
+              <PressableAnimated
+                onPress={() => alert("djhdjs")}>
+                <Text className="text-lg"> </Text>
+                <Text className="text-base">Tip Now</Text>
+                <MaterialCommunityIcons
+                  name="ethereum"
+                  size={17}
+                  color={colorScheme === "dark" ? "white" : "black"} // Adjust color based on colorScheme
+                />
+              </PressableAnimated>
+            </View>
           </View>
         </>}
     </>

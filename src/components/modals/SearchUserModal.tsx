@@ -1,4 +1,4 @@
-import { Modal, Pressable, ScrollView, useColorScheme } from 'react-native';
+import { Modal, Pressable, ScrollView, TouchableOpacity, useColorScheme } from 'react-native';
 import { Text, View } from "@/src/components/Themed";
 import { Input } from 'react-native-elements';
 import { useEffect, useState } from 'react';
@@ -39,12 +39,12 @@ export function SearchUserModal({ visible, onClose }: Props) {
             onRequestClose={handleReset}
         >
             <View className="">
-                <View className='flex-row justify-between items-center bg-zinc-900 px-2 py-4'>
+                <View className={`flex-row justify-between items-center px-2 py-4`}>
                     <Ionicons
                         onPress={handleReset}
                         name="chevron-back"
                         size={22}
-                        color="white"
+                        color={colorScheme == 'dark' ? 'white' : 'black'}
                     />
                     <Text className='text-lg font-medium self-center'>Search a user</Text>
                     <Text className='text-lg font-medium self-center'>{`     `} </Text>
@@ -59,9 +59,9 @@ export function SearchUserModal({ visible, onClose }: Props) {
                         className={`${colorScheme == 'dark' ? 'text-gray-200' : 'text-gray-800'}`}
                     />
                 </View>
-                <ScrollView className="flex flex-col gap-2 h-full">
+                <ScrollView className="flex flex-col gap-2 h-full px-2">
                     {profiles && profiles.map((profile: any) => (
-                        <Pressable
+                        <TouchableOpacity
                             key={profile.id}
                             onPress={() =>{ 
                                 handleReset();
@@ -71,11 +71,11 @@ export function SearchUserModal({ visible, onClose }: Props) {
                         >
                             <View className={`flex-row items-center pl-1 ${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-neutral'}`}>
                                 <Avatar avatar_url={profile.avatar_url} username={profile.username} size={'md'} ring={true} />
-                                <Text className="text-white text-base ml-4">{profile.username}</Text>
+                                <Text className="text-base ml-4">{profile.username}</Text>
                             </View>
                             
-                            <Entypo name="chevron-right" size={24} color="white" />
-                        </Pressable>
+                            <Entypo name="chevron-right" size={24} color={colorScheme == 'dark' ? 'white' : 'grey'} />
+                        </TouchableOpacity>
                     ))}
                 </ScrollView>
             </View>

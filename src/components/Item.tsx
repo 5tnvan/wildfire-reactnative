@@ -69,9 +69,9 @@ const Item = ({
           />
         </View>
         {/* BOTTOM */}
-        <View className='absolute bottom-0 w-full bg-zinc-100 flex-row justify-between items-center px-4 py-2'>
+        <View className={`absolute bottom-0 w-full bg-white flex-row justify-between items-center px-4 py-2`}>
           <View>
-            {item.country && <Text className='text-black font-semibold'>{item.country?.name}</Text>}
+            {item.country && <Text className={`text-black font-semibold`}>{item.country?.name}</Text>}
             <Text className='text-black'><TimeAgo timestamp={item.created_at}></TimeAgo> ago</Text>
           </View>
           <View><Image source={require('../../assets/images/wildfire-logo-lit.png')} resizeMode="contain" className='w-12' /></View>

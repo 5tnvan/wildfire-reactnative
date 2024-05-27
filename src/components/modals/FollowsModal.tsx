@@ -34,18 +34,18 @@ export function FollowsModal({ visible, data, onClose }: Props) {
             onRequestClose={handleReset}
         >
             <View className="">
-                <View className='flex-row justify-between items-center bg-zinc-900 px-2 py-4'>
+                <View className='flex-row justify-between items-center px-2 py-4'>
                     <Ionicons
                         onPress={handleReset}
                         name="chevron-back"
                         size={22}
-                        color="white"
+                        color={colorScheme == 'dark' ? 'white' : 'black'}
                     />
                     <Text className='text-lg font-medium self-center'>@{data.username}</Text>
                     <Text className='text-lg font-medium self-center'>{`     `} </Text>
                 </View>
                 <View className="justify-center items-center h-full">
-                    <PressableAnimated><Text>Unfollow</Text></PressableAnimated>
+                    <PressableAnimated onPress={() => alert()}><Text>Unfollow</Text></PressableAnimated>
                 </View>
 
             </View>
