@@ -1,20 +1,16 @@
-import { Modal, Pressable, ScrollView, TextInput, TouchableOpacity, useColorScheme } from 'react-native';
+import { KeyboardAvoidingView, Modal, Pressable, ScrollView, TextInput, TouchableOpacity, useColorScheme } from 'react-native';
 import { Text, View } from "@/src/components/Themed";
-import { Input } from 'react-native-elements';
 import { useEffect, useState } from 'react';
-import { fetchCountriesMatchingWith } from '@/src/utils/fetch/fetchCountries';
-import { Entypo, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
-import { PressableAnimated } from '../pressables/PressableAnimated';
+import { Entypo, Ionicons, SimpleLineIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { supabase } from '@/src/lib/supabase';
 import { Avatar } from '../avatars/avatar';
 import { useIsFocused } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { Image } from 'react-native';
 import FormatNumber from '../FormatNumber';
-import { useAuth } from '@/src/services/providers/AuthProvider';
-import { useUser } from '@/src/hooks/useUser';
 import { useAuthUser } from '@/src/services/providers/AuthUserProvider';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { TimeAgo } from '../TimeAgo';
 
 type Props = {
     visible: any,
@@ -27,29 +23,26 @@ export function CommentsModal({ visible, data, onClose }: Props) {
     const isFocused = useIsFocused(); // Get focused state
     const router = useRouter();
     const { profile } = useAuthUser();
-    const [fires, setFires] = useState<any>();
+    const [comments, setComments] = useState<any>();
     const [comment, setComment] = useState('');
 
     console.log("mothehrhr", JSON.stringify(data, null, 2))
-    console.log("fires", fires)
-
-
 
     const handleReset = () => {
         onClose();
     }
 
+    const fetch = async () => {
+        const { data: res } = await supabase
+            .from("3sec_comments")
+            .select("id, comment, created_at, profile:user_id(id, username, avatar_url)")
+            .eq("video_id", data.id)
+            .order('created_at', { ascending: false })
+        setComments(res);
+    }
+
     // HANDLE WHEN IN FOCUSED
     useEffect(() => {
-        const fetch = async () => {
-
-            // const { data: res } = await supabase
-            //     .from("3sec_fires")
-            //     .select("id, profile:user_id(id, username, avatar_url)")
-            //     .eq("video_id", data.id)
-            // setFires(res);
-        }
-
         if (isFocused) fetch();
     }, [isFocused]);
 
@@ -57,16 +50,14 @@ export function CommentsModal({ visible, data, onClose }: Props) {
         if (comment.trim()) {
             // Insert the comment to supabase
             const { data: res, error } = await supabase
-                .from('comments')
-                .insert([{ video_id: data.id, user_id: profile.id, content: comment }])
-            
+                .from('3sec_comments')
+                .insert({ video_id: data.id, user_id: profile.id, comment: comment })
+
             if (error) {
                 console.error("Error submitting comment:", error);
             } else {
-                // Clear the input after submission
-                setComment('');
-                // Optionally, refetch the comments to update the list
-                // fetchComments();
+                setComment(''); // Clear the input after submission
+                fetch();
             }
         }
     };
@@ -78,73 +69,84 @@ export function CommentsModal({ visible, data, onClose }: Props) {
             visible={visible}
             onRequestClose={handleReset}
         >
-            <View className="h-full">
-                <View className='flex-row justify-between items-center px-2 py-4'>
-                    <Ionicons
-                        onPress={handleReset}
-                        name="chevron-back"
-                        size={22}
-                        color={colorScheme == 'dark' ? 'white' : 'black'}
-                    />
-                    <Text className='text-lg font-medium self-center'>Comments</Text>
-                    <Text className='text-lg font-medium self-center'>{`     `} </Text>
-                </View>
-                {/* VIDEO THUMBNAIL */}
-                <View className='justify-center items-center'>
-                    <Image
-                        source={{ uri: data.thumbnail }}
-                        resizeMode="cover"
-                        style={{ width: 120, height: 200 }}
-                        className='rounded-2xl mb-5'
-                    />
-                    <Pressable className="flex-row items-center mb-5">
-                        <SimpleLineIcons name="fire" size={24} color="red" />
-                        <Text className="ml-1 font-medium text-base"><FormatNumber number={fires?.length} /></Text>
-                    </Pressable>
-                </View>
+            <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+                <View className="h-full">
+                    <View className='flex-row justify-between items-center px-2 py-4'>
+                        <Ionicons
+                            onPress={handleReset}
+                            name="chevron-back"
+                            size={22}
+                            color={colorScheme == 'dark' ? 'white' : 'black'}
+                        />
+                        <Text className='text-lg font-medium self-center'>Comments</Text>
+                        <Text className='text-lg font-medium self-center'>{`     `} </Text>
+                    </View>
+                    {/* VIDEO THUMBNAIL */}
+                    <View className='justify-center items-center'>
+                        <Image
+                            source={{ uri: data.thumbnail }}
+                            resizeMode="cover"
+                            style={{ width: 120, height: 200 }}
+                            className='rounded-2xl mb-5'
+                        />
+                        <Pressable className="flex-row items-center mb-5">
+                            <MaterialCommunityIcons name="comment-processing-outline" size={28} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
+                            <Text className="ml-1 font-medium text-base"><FormatNumber number={comments?.length} /></Text>
+                        </Pressable>
+                    </View>
 
-                <ScrollView className="px-2">
-
-                    {/* {fires?.map((item: any, index: any) => (
-                        <TouchableOpacity
-                            key={item.id}
-                            onPress={() => {
-                                handleReset();
-                                router.push("/(profile)/" + item.profile.username)
-                            }}
-                            className={`flex-row items-center justify-between ${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-neutral'} rounded-full w-full px-4 py-2 mb-2`}
-                        >
-                            <View className={`flex-row items-center pl-1 ${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-neutral'}`}>
+                    <ScrollView className="px-2">
+                        {comments?.map((item: any, index: any) => (
+                            <TouchableOpacity
+                                key={item.id}
+                                onPress={() => {
+                                    handleReset();
+                                    router.push("/(profile)/" + item.profile.username)
+                                }}
+                                className={`flex-row justify-between rounded-lg w-full px-4 py-2 mb-2`}
+                            >
+                                {/* AVATAR */}
                                 <Avatar avatar_url={item.profile.avatar_url} username={item.profile.username} size={'sm'} ring={true} />
-                                <Text className="text-base ml-4">{item.profile.username}</Text>
-                            </View>
+                                {/* TIME, COMMENTS */}
+                                <Pressable className={`flex-col grow ml-2`}>
+                                    <View className='flex-row justify-between'>
+                                        <Text className="text-base font-semibold">{item.profile.username}</Text>
+                                        <Text className='text-base'><TimeAgo timestamp={item.created_at}></TimeAgo></Text>
+                                    </View>
+                                    <Text className='mt-2 text-base'>{item.comment}</Text>
+                                </Pressable>
+                                {/* ARROW */}
+                                {/* <Pressable className='flex-row items-top'><Entypo name="chevron-right" size={18} color={colorScheme == 'dark' ? 'white' : 'grey'} /></Pressable> */}
 
-                            <Entypo name="chevron-right" size={24} color={colorScheme == 'dark' ? 'white' : 'grey'} />
-                        </TouchableOpacity>
-                    ))} */}
-                </ScrollView>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
 
-                {/* COMMENT INPUT */}
-                <SafeAreaView className='absolute bottom-0 w-full px-4 pb-4'>
+                    {/* COMMENT INPUT */}
+                    <SafeAreaView className='absolute bottom-5 w-full px-4 pb-4'>
                         <View className='flex-row items-center bg-zinc-100 dark:bg-zinc-800 rounded-full px-4 py-2'>
                             <Avatar avatar_url={profile.avatar_url} username={profile.username} size={'sm'} ring={true} />
                             <TextInput
-                                style={{ flex: 1, marginLeft: 10 }}
+                                style={{
+                                    flex: 1,
+                                    marginLeft: 10,
+                                    color: colorScheme === 'dark' ? 'white' : 'black',
+                                    maxHeight: 60,
+                                }}
                                 placeholder="Add a comment..."
-                                placeholderTextColor={colorScheme == 'dark' ? '#ccc' : '#999'}
+                                placeholderTextColor={colorScheme === 'dark' ? '#ccc' : '#999'}
                                 value={comment}
                                 onChangeText={setComment}
-                                onSubmitEditing={handleCommentSubmit}
-                                returnKeyType="send"
+                                multiline
+                                returnKeyType="default"
                             />
                             <Pressable onPress={handleCommentSubmit}>
-                                <Ionicons name="send" size={24} color={colorScheme == 'dark' ? 'white' : 'black'} />
+                                <MaterialCommunityIcons name="send-circle" size={32} color="grey" />
                             </Pressable>
                         </View>
                     </SafeAreaView>
-
-            </View>
+                </View>
+            </KeyboardAvoidingView>
         </Modal>
-
     );
 }

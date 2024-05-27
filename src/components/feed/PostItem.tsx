@@ -145,14 +145,14 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
       </View>
 
       {/* ACTIONS */}
-      <View className="flex-row bg-transparent gap-3 p-2 self-end">
+      <View className="flex-row bg-transparent gap-4 py-2 px-4 self-end">
         <Pressable onPress={handleLikePress} className="flex-row items-center">
-          <SimpleLineIcons name="fire" size={24} color={item.liked || temporaryLiked ? "red" : `${colorScheme == 'dark' ? "white" : 'black'}`} />
-          {likeCount > 0 && <Text className="ml-1 font-medium text-base"><FormatNumber number={likeCount} /></Text>}
+          <SimpleLineIcons name="fire" size={26} color={item.liked || temporaryLiked ? "red" : `${colorScheme == 'dark' ? "white" : 'black'}`} />
+          {likeCount > 0 && <Text className="ml-1 font-medium text-lg"><FormatNumber number={likeCount} /></Text>}
         </Pressable>
-        <Pressable onPress={handleCommentPress}>
-          <MaterialCommunityIcons name="comment-processing-outline" size={26} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
-          {commentCount > 0 && <Text className="ml-1 font-medium text-base"><FormatNumber number={commentCount} /></Text>}
+        <Pressable onPress={handleCommentPress} className="flex-row items-center">
+          <MaterialCommunityIcons name="comment-processing-outline" size={28} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
+          {commentCount > 0 && <Text className="ml-1 font-medium text-lg"><FormatNumber number={commentCount} /></Text>}
         </Pressable>
         {/* <View>
           <Entypo name="slideshare" size={24} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
