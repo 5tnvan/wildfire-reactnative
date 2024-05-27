@@ -257,7 +257,7 @@ const CameraScreen = () => {
     try {
       const response = await axios(options);
       console.log('Upload response:', response.data);
-      const { error } = await supabase.from("1sec").insert({ 
+      const { error } = await supabase.from("3sec").insert({ 
         user_id: user?.id, 
         video_url: pullZoneVideoUrl,
         thumbnail_url: pullZoneThumbUrl,

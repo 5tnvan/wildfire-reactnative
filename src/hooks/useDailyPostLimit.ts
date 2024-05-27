@@ -37,7 +37,7 @@ export const useDailyPostLimit = () => {
 
     // Fetch last video posts
     const { data: posts, error: postsError } = await supabase
-      .from('1sec')
+      .from('3sec')
       .select('id, created_at')
       .eq('user_id', user.user?.id)
       .order('created_at', { ascending: false })

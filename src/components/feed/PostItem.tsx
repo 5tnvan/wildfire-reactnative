@@ -6,18 +6,21 @@ import Video from "react-native-video";
 import { TimeAgo } from "../TimeAgo";
 import { Avatar } from "../avatars/avatar";
 import { mute, unmute } from '../../utils/exportedFunction';
+import { supabase } from "@/src/lib/supabase";
+import { useAuth } from "@/src/services/providers/AuthProvider";
+import FormatNumber from "../FormatNumber";
+import { FiresModal } from "../modals/FiresModal";
+import { CommentsModal } from "../modals/CommentsModal";
 
 export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
   const colorScheme = useColorScheme();
   const videoRef = useRef<any>(null);
   const [paused, setPaused] = useState(false);
 
-  // console.log("post item", item.id)
-  // console.log("post isPlaying", isPlaying)
-  // console.log("post isMuted", isMuted)
-  // console.log("----------------")
+  //COSUME PROVIDERS
+  const { user } = useAuth();
 
-  // FADE-IN ANIM
+  // WATCH AGAIN FADE-IN ANIM
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
   const fadeIn = () => {
     Animated.timing(fadeAnim, {
@@ -32,7 +35,7 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
     setRepeatCount(0); // Reset the repeat count
     setPaused(false); // Set paused state to false to resume the video
     fadeAnim.setValue(0); // Reset the opacity animation value
-    if(videoRef.current) videoRef.current.resume();
+    if (videoRef.current) videoRef.current.resume();
   };
 
   //AFTER X PLAY REPEAT, PAUSE VIDEO
@@ -64,13 +67,44 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
     }
   }, [isPlaying]);
 
+  //HANDLE LIKE PRESS
+  const [likeCount, setLikeCount] = useState(item["3sec_fires"][0].count);
+  const [temporaryLiked, setTemporaryLiked] = useState(false);
+  const [firesModalVisible, setFiresModalVisible] = useState(false); //fires modal
+
+  const handleLikePress = async () => {
+    //if liked already, a modal will appear
+    if (item.liked || temporaryLiked) {
+      setFiresModalVisible(true);
+    } else {
+      // Insert like to supabase
+      const { data, error } = await supabase.from("3sec_fires").insert({
+        video_id: item.id,
+        user_id: user?.id,
+        fire: true,
+      });
+      if (!error) {
+        setTemporaryLiked(true); // Set temporary like state
+        setLikeCount((prevCount: any) => prevCount + 1); // Increment like count
+      }
+    }
+  };
+
+  //HANDLE COMMENT PRESS
+  const [commentModalVisible, setCommentModalVisible] = useState(false); //fires modal
+  const [commentCount, setCommentCount] = useState(item["3sec_comments"][0].count);
+
+  const handleCommentPress = async () => {
+    setCommentModalVisible(true);
+  };
+
   return (
     <View className={`mb-1 rounded-2xl`}>
       {/* HEADER */}
       <View className="bg-transparent flex-row items-center px-3 py-4 rounded-2xl">
-          <Text className="ml-2 font-semibold text-base">@{item.profile.username}</Text>
-          <Text className="ml-1 text-base"><TimeAgo timestamp={item.created_at}></TimeAgo></Text>
-        </View>
+        <Text className="ml-2 font-semibold text-base">@{item.profile.username}</Text>
+        <Text className="ml-1 text-base"><TimeAgo timestamp={item.created_at}></TimeAgo></Text>
+      </View>
       {/* VIDEO */}
       <View className="w-full h-[500px] relative mb-1">
         <Video
@@ -85,12 +119,14 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
         />
 
         {/* AVATAR */}
-        <View className="absolute bg-transparent p-3"><Avatar
+        <View className="absolute bg-transparent p-3">
+          <Avatar
             avatar_url={item.profile.avatar_url}
             username={item.profile.username}
             size={"md"}
             ring={true}
-          ></Avatar></View>
+          ></Avatar>
+        </View>
 
         {/* PAUSED */}
         {paused && (
@@ -101,7 +137,7 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
             </Pressable>
           </Animated.View>
         )}
-        
+
         {/* MUTE BUTTON */}
         <Pressable onPress={toggleMute} className="absolute bottom-0 left-0 p-4 ">
           <Image source={isMuted ? mute : unmute} className="w-6 h-6" />
@@ -109,20 +145,27 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
       </View>
 
       {/* ACTIONS */}
-      <View className="flex-row bg-transparent gap-3 p-2 self-end ">
-          <View className="">
-            <SimpleLineIcons name="fire" size={24} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
-            {/* <Text className="ml-1">1.2k</Text> */}
-          </View>
-          <View className="">
-            <MaterialCommunityIcons name="comment-processing-outline" size={26} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
-            {/* <Text className="ml-1">333</Text> */}
-          </View>
-          <View className="">
-            <Entypo name="slideshare" size={24} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
-            {/* <Text className="ml-1">124</Text> */}
-          </View>
-        </View>
+      <View className="flex-row bg-transparent gap-3 p-2 self-end">
+        <Pressable onPress={handleLikePress} className="flex-row items-center">
+          <SimpleLineIcons name="fire" size={24} color={item.liked || temporaryLiked ? "red" : `${colorScheme == 'dark' ? "white" : 'black'}`} />
+          {likeCount > 0 && <Text className="ml-1 font-medium text-base"><FormatNumber number={likeCount} /></Text>}
+        </Pressable>
+        <Pressable onPress={handleCommentPress}>
+          <MaterialCommunityIcons name="comment-processing-outline" size={26} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
+          {commentCount > 0 && <Text className="ml-1 font-medium text-base"><FormatNumber number={commentCount} /></Text>}
+        </Pressable>
+        {/* <View>
+          <Entypo name="slideshare" size={24} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
+          <Text className="ml-1">124</Text>
+        </View> */}
+      </View>
+
+      {/* FIRES MODAL */}
+      {firesModalVisible && <FiresModal visible={firesModalVisible} data={{id: item.id, thumbnail: item.thumbnail_url}} onClose={() => setFiresModalVisible(false)} />}
+
+      {/* FIRES MODAL */}
+      {commentModalVisible && <CommentsModal visible={commentModalVisible} data={{id: item.id, thumbnail: item.thumbnail_url}} onClose={() => setCommentModalVisible(false)} />}
+      
     </View>
   );
 }

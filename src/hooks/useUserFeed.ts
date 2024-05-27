@@ -20,7 +20,7 @@ export const useUserFeed = (user_id: any) => {
   const init = async () => {
     setIsLoading(true);
     const { data } = await supabase
-      .from("1sec")
+      .from("3sec")
       .select(
         "id, video_url, thumbnail_url, created_at, views, country:country_id(id, name), profile:user_id(id, username, avatar_url)"
       )
@@ -61,7 +61,7 @@ export const useUserFeedByUsername = (username: any) => {
 
     if (data) {
       const { data: feed } = await supabase
-        .from("1sec")
+        .from("3sec")
         .select(
           "id, video_url, thumbnail_url, created_at, views, country:country_id(id, name), profile:user_id(id, username, avatar_url)"
         )

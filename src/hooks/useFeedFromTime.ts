@@ -28,7 +28,7 @@ export const useFeedFromTime = () => {
 
   const fetchFeed = async (startTime: Date, endTime: Date) => {
     const { data, error } = await supabase
-      .from('1sec_random_view')
+      .from('3sec_random_view')
       .select('id, video_url, thumbnail_url, created_at, profile:user_id(id, username, avatar_url)')
       .gte('created_at', endTime.toISOString())
       .lt('created_at', startTime.toISOString())

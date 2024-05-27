@@ -43,7 +43,7 @@ export const useFeed = () => {
     const { from, to } = getRange(page, range);
 
     const { data, error } = await supabase
-      .from('1sec_desc_view')
+      .from('3sec_desc_view')
       .select('id, video_url, created_at, views, country:country_id(id, name), profile:user_id(id, username, avatar_url)')
       .range(from, to)
 
