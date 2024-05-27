@@ -1,22 +1,25 @@
-import { Pressable } from 'react-native';
+import { Pressable, TouchableOpacity } from 'react-native';
 import { Text, Image } from 'react-native';
 import FormatNumber from '../FormatNumber';
 import { SimpleLineIcons } from '@expo/vector-icons';
+import { PressableAnimated } from './PressableAnimated';
 
 type Props = {
   amount: number;
+  liked: boolean;
+  onPress: any;
 };
 
-export function PressableFire({ amount } : Props) {
+export function PressableFire({ amount, liked, onPress } : Props) {
   return (
-    <Pressable
-      className='flex-row items-center'
+    <TouchableOpacity
+      className='flex-row items-center justify-evenly'
       onPress={() => {
-        alert("fire");
+        onPress()
       }}
     >
-      <SimpleLineIcons name="fire" size={24} color="white" />
-      <Text className='font-medium text-base text-white ml-1'><FormatNumber number={amount} /></Text>
-    </Pressable>
+      <SimpleLineIcons name="fire" size={22} color={liked ? 'red' : 'white'} />
+      {amount > 0 && <Text className='font-medium text-base text-white ml-1'><FormatNumber number={amount} /></Text>}
+    </TouchableOpacity>
   );
 }

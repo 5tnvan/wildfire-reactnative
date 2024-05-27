@@ -42,9 +42,11 @@ export const useFeed = () => {
     setIsLoading(true);
     const { from, to } = getRange(page, range);
 
+    const user = await fetchUser();
+
     const { data, error } = await supabase
       .from('3sec_desc_view')
-      .select('id, video_url, created_at, views, country:country_id(id, name), profile:user_id(id, username, avatar_url)')
+      .select('id, thumbnail_url, video_url, created_at, views, country:country_id(id, name), profile:user_id(id, username, avatar_url), 3sec_fires(count), 3sec_comments(count)')
       .range(from, to)
 
       if (error) {
@@ -52,11 +54,26 @@ export const useFeed = () => {
       } else {
         // console.log("data", JSON.stringify(data, null, 2));
 
+        // Check if each post is liked by the user
+        const likedPostsPromises = data.map(async (post: any) => {
+          const { data: liked, error } = await supabase
+            .from("3sec_fires")
+            .select()
+            .eq("user_id", user.user?.id)
+            .eq("video_id", post.id)
+            .single();
+
+          return { ...post, liked: !!liked }; // Add a property 'liked' to each post indicating whether it's liked by the user
+        });
+
+        // Wait for all promises to resolve
+        const masterData = await Promise.all(likedPostsPromises);
+
         if (data.length < range) {
           setHasMore(false); // No more data to fetch
         }
 
-        setFeed((existingFeed) => [...existingFeed, ...data]);
+        setFeed((existingFeed) => [...existingFeed, ...masterData]);
       }
     setIsLoading(false);
   };

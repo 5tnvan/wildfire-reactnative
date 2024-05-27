@@ -38,8 +38,6 @@ export default function ProfileUsernameScreen() {
   const { followed, followers, following } = useUserFollows(username);
   const { feed, refetch } = useUserFeedByUsername(username);
 
-  console.log("feed", feed)
-
   //SPINNING CAROUSELL ANIMATION 
   const x = useSharedValue(0);
   const ITEM_WIDTH = 250;

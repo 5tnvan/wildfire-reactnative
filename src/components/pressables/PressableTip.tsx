@@ -2,12 +2,12 @@ import { Pressable } from 'react-native';
 import { Text, Image } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 
-export function PressableTip() {
+export function PressableTip({ onPress } : any) {
   return (
     <Pressable
-      className='flex-row items-center'
+      className='flex-row items-center justify-evenly'
       onPress={() => {
-        alert("skort");
+        onPress()
       }}
     >
       <FontAwesome5 name="bitcoin" size={18} color="white" />
