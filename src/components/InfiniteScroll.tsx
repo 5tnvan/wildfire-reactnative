@@ -193,13 +193,16 @@ const Item = ({ item, isPlaying }: any) => {
 
   const handleManualPause = () => {
     console.log("status?.isPlaying", status?.isPlaying)
-    if (status?.isPlaying) {
-      video.current.pauseAsync();
-      setPaused(true); // Set paused state to true
-    } else {
-      video.current.playAsync();
-      setPaused(false); // Set paused state to false
+    if(!threePlayPaused) {
+      if (status?.isPlaying) {
+        video.current.pauseAsync();
+        setPaused(true); // Set paused state to true
+      } else {
+        video.current.playAsync();
+        setPaused(false); // Set paused state to false
+      }
     }
+    
   };
 
   //HANDLE LIKE PRESS
@@ -255,6 +258,14 @@ const Item = ({ item, isPlaying }: any) => {
             onPlaybackStatusUpdate={status => handlePlaybackStatusUpdate(status)}
           />
         </View>
+        {threePlayPaused && (
+        <Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
+          <Pressable className="bg-zinc-100/70 p-3 rounded-full flex-row" onPress={handleWatchAgain}>
+            <FontAwesome name="eye" size={24} color="black" />
+            <Text className="text-black text-base ml-1">Watch again</Text>
+          </Pressable>
+        </Animated.View>
+      )}
         {/* PLAY & TOP ICON */}
         {paused && ( // Conditionally render the play icon overlay when video is paused
           <View style={styles.playIconContainer} className='gap-2'>
@@ -284,6 +295,7 @@ const Item = ({ item, isPlaying }: any) => {
             }
 
           </View>
+          
           <View className='flex-row items-center mt-2 mb-5 grow justify-between'>
             <View className='bg-secondary/70 rounded-full px-4 py-1 grow mr-1'>
               <PressableComment amount={commentCount} onPress={handleCommentPress} />
@@ -300,25 +312,18 @@ const Item = ({ item, isPlaying }: any) => {
           </View>
         </LinearGradient>
       </Pressable>
-      {threePlayPaused && (
-        <Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
-          <Pressable className="bg-zinc-100/70 p-3 rounded-full flex-row" onPress={handleWatchAgain}>
-            <FontAwesome name="eye" size={24} color="black" />
-            <Text className="text-black text-base ml-1">Watch again</Text>
-          </Pressable>
-        </Animated.View>
-      )}
+      
       {/* FIRES MODAL */}
       {firesModalVisible && <FiresModal visible={firesModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url }} onClose={() => {
         setFiresModalVisible(false);
-        if (video.current && isPlaying) {
+        if (video.current && !threePlayPaused && !paused) {
           video.current.playAsync();
         }
       }} />}
 
       {/* FIRES MODAL */}
       {commentModalVisible && <CommentsModal visible={commentModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url }} onClose={() => {
-        if (video.current && isPlaying) {
+        if (video.current && !threePlayPaused && !paused) {
           video.current.playAsync();
         }
         setCommentModalVisible(false)}
