@@ -14,7 +14,7 @@ export default function DiscoverScreen() {
   const [selectedItemId, setSelectedItemId] = useState('1');
   const [searchUserModalVisible, setSearchUserModalVisible] = useState(false); //follows modal
 
-  const handlePress = (id: any) => {
+  const handleSelectCarousel = (id: any) => {
     setSelectedItemId(id);
   }
 
@@ -22,8 +22,6 @@ export default function DiscoverScreen() {
     switch (selectedItemId) {
       case '1':
         return <FeedCarouselByTime />;
-      // case '2':
-      //   return null;
       case '2':
         return <FeedCarouselByCountry />;
       default:
@@ -33,17 +31,24 @@ export default function DiscoverScreen() {
 
   return (
     <SafeAreaView className="">
-      {/* HEADER */}
+
+      {/* HEADER: Discover */}
       <View className='flex-row justify-between items-center'>
         <Text className='text-2xl px-3 py-5 font-semibold'>Discover</Text>
         <PressableAnimated className='pr-4 bg-transparent' onPress={() => setSearchUserModalVisible(true)}><FontAwesome5 name="search" size={24} color={colorScheme == 'dark' ? 'white' : 'black'} /></PressableAnimated>
       </View>
-      {/* SEARCH */}
+
+      {/* SearchUserModal */}
       <SearchUserModal visible={searchUserModalVisible} onClose={() => setSearchUserModalVisible(false)} />
+
+      {/* DiscoverCarousel */}
       <View className='mb-2'>
-        <DiscoverCarousel handlePress={handlePress} />
+        <DiscoverCarousel handlePress={handleSelectCarousel} />
       </View>
+
+      {/* RenderSelectedCarousel */}
       {renderSelectedCarousel()}
+
     </SafeAreaView>
   );
 }

@@ -23,8 +23,6 @@ export function FollowsModal({ visible, data, onClose }: Props) {
     const colorScheme = useColorScheme();
     const { user: authUser } = useAuth();
 
-    console.log(JSON.stringify(data.followers, null, 2))
-
     const handleReset = () => {
         onClose();
     }

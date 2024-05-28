@@ -29,7 +29,7 @@ export const useFeedFromTime = () => {
   const fetchFeed = async (startTime: Date, endTime: Date) => {
     const { data, error } = await supabase
       .from('3sec_random_view')
-      .select('id, video_url, thumbnail_url, created_at, profile:user_id(id, username, avatar_url)')
+      .select('id, video_url, thumbnail_url, created_at, country:country_id(name), profile:user_id(id, username, avatar_url)')
       .gte('created_at', endTime.toISOString())
       .lt('created_at', startTime.toISOString())
       .limit(3)
@@ -48,15 +48,22 @@ export const useFeedFromTime = () => {
     startOf24HoursAgo.setHours(startOf24HoursAgo.getHours() - 24);
 
     const endOf48HoursAgo = new Date(startOf24HoursAgo);
-    endOf48HoursAgo.setHours(endOf48HoursAgo.getHours() - 48);
+    const startOf48HoursAgo = new Date(now);
+    startOf48HoursAgo.setHours(startOf48HoursAgo.getHours() - 48);
 
-    const startOf48HoursAgo = new Date(startOf24HoursAgo);
     const startOfWeekAgo = new Date(now);
     startOfWeekAgo.setHours(startOfWeekAgo.getHours() - 168);
 
     let feed24 = await fetchFeed(now, startOf24HoursAgo);
     let feed48 = await fetchFeed(startOf24HoursAgo, startOf48HoursAgo);
     let feedWeek = await fetchFeed(startOf48HoursAgo, startOfWeekAgo);
+
+    console.log("feed24 from", now)
+    console.log("feed24 to", startOf24HoursAgo)
+    console.log("feed48 from", startOf24HoursAgo)
+    console.log("feed48 to", startOf48HoursAgo)
+    console.log("feedWeek from", startOf48HoursAgo)
+    console.log("feedWeek to", startOfWeekAgo)
 
     const combinedFeeds = [];
 
