@@ -97,6 +97,7 @@ export default function ProfileUsernameScreen() {
           {/* HEADER */}
           <Stack.Screen options={{
             headerShown: true,
+            presentation: 'card',
             headerBackTitle: 'Back',
             title: '@' + usernameAsTitle ?? '',
             headerRight: () => (
@@ -110,6 +111,9 @@ export default function ProfileUsernameScreen() {
                     <Text className='text-black font-medium'>Follow</Text>
                   </PressableAnimated>}
               </View>
+            ),
+            headerLeft: () => (
+              <Pressable className='' onPress={() => router.back()}><Text>Back</Text></Pressable>
             )
           }} />
           {/* FOLLOWS MODAL */}

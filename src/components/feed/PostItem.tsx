@@ -11,8 +11,10 @@ import { useAuth } from "@/src/services/providers/AuthProvider";
 import FormatNumber from "../FormatNumber";
 import { FiresModal } from "../modals/FiresModal";
 import { CommentsModal } from "../modals/CommentsModal";
+import { useRouter } from "expo-router";
 
 export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
+  const router = useRouter();
   const colorScheme = useColorScheme();
   const videoRef = useRef<any>(null);
 
@@ -111,10 +113,10 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
   return (
     <View className={`mb-1 rounded-2xl`}>
       {/* HEADER */}
-      <View className="bg-transparent flex-row items-center px-3 py-4 rounded-2xl">
+      <Pressable className="bg-transparent flex-row items-center px-3 py-4 rounded-2xl" onPress={() => router.push("/(profile)/" + item.profile.username)}>
         <Text className="ml-2 font-semibold text-base">@{item.profile.username}</Text>
         <Text className="ml-1 text-base"><TimeAgo timestamp={item.created_at}></TimeAgo></Text>
-      </View>
+      </Pressable>
       {/* VIDEO */}
       <View className="w-full h-[500px] relative mb-1">
         <Video

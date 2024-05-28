@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { View, Text, Dimensions, FlatList, StyleSheet, Pressable, ActivityIndicator, Animated } from 'react-native';
+import { View, Text, Dimensions, FlatList, StyleSheet, Pressable, ActivityIndicator, Animated, TouchableOpacity, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -264,7 +264,7 @@ const Item = ({ item, isPlaying }: any) => {
         {/* BOTTOM */}
         <LinearGradient className='absolute bottom-0 p-3 w-full' colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 1)']}>
           <View className='flex-col items-center justify-between'>
-            <View className='flex-row items-center' >
+            <View className='flex-row items-center'>
               <PressableAvatarWithUsername avatar_url={item.profile.avatar_url} username={item.profile.username} />
               <Text className='ml-1 text-lg text-white mr-2'>
                 <TimeAgo timestamp={item.created_at}></TimeAgo>
@@ -282,7 +282,7 @@ const Item = ({ item, isPlaying }: any) => {
               <PressableComment amount={commentCount} onPress={handleCommentPress} />
             </View>
             <View className='bg-secondary/70 flew-row rounded-full px-4 py-2 grow mr-1'>
-              <PressableTip onPress={() => router.push("/(profile)/" + item.profile.username)} />
+              <PressableTip onPress={() => Linking.openURL("https://www.wildpay.app/" + item.profile.username)} />
             </View>
             <View className='bg-secondary/70 flew-row rounded-full px-4 py-1 grow mr-0'>
               <PressableFire liked={{ liked: item.liked, temporaryLiked: temporaryLiked }} amount={likeCount} onPress={handleLikePress} />
