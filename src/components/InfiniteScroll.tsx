@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { View, Text, Dimensions, FlatList, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, Dimensions, FlatList, StyleSheet, Pressable, ActivityIndicator, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -114,27 +114,17 @@ export default function InfiniteScroll() {
 }
 
 const Item = ({ item, isPlaying }: any) => {
+
   const router = useRouter();
   const video = React.useRef<any>(null);
-  const [status, setStatus] = useState<any>(null);
 
   //COSUME PROVIDERS
   const { user } = useAuth();
 
-  // HANDLE MANUAL PAUSE
-  const [paused, setPaused] = useState(false);
-
-  const handleManualPause = () => {
-    if (status?.isPlaying) {
-      video.current.pauseAsync();
-      setPaused(true); // Set paused state to true
-    } else {
-      video.current.playAsync();
-      setPaused(false); // Set paused state to false
-    }
-  };
+  
 
   //CHECK IF VIDEO IS BEING VIEWED
+  //Handles play/pause based on isPlaying prop
   useEffect(() => {
     if (!video.current) return;
 
@@ -147,6 +137,71 @@ const Item = ({ item, isPlaying }: any) => {
     }
   }, [isPlaying]);
 
+  
+
+  //AFTER 3rd PLAY REPEAT, PAUSE VIDEO
+  const [status, setStatus] = useState<any>(null);
+  const [repeatCount, setRepeatCount] = useState(0);
+  const [threePlayPaused, setThreePlayPaused] = useState(false);
+  const handlePlaybackStatusUpdate = (status: any) => {
+    if (status.didJustFinish && status.isLooping) {
+      setRepeatCount(prevCount => {
+        if (prevCount < 2) {
+          return prevCount + 1;
+        } else {
+          video.current.pauseAsync();
+          video.current.setPositionAsync(0);
+          setThreePlayPaused(true);
+          fadeIn();
+          return 0;
+        }
+      });
+    }
+    setStatus(status);
+  };
+
+  // HANDLE WATCH AGAIN
+  const handleWatchAgain = () => {
+    setRepeatCount(0);
+    setThreePlayPaused(false);
+    fadeAnim.setValue(0);
+    if (video.current) {
+      video.current.playAsync();
+    }
+  };
+  const fadeAnim = useRef(new Animated.Value(0)).current; // WATCH AGAIN FADE-IN ANIM
+  const fadeIn = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  //WHEN VIDEO IS IN VIEW AGAIN, RESET
+  // Resets repeat count and visibility of watch again button when item becomes active
+  useEffect(() => {
+    if (isPlaying) {
+      setRepeatCount(0);
+      setThreePlayPaused(false);
+      fadeAnim.setValue(0);
+    }
+  }, [isPlaying]);
+
+  // HANDLE MANUAL PAUSE
+  const [paused, setPaused] = useState(false);
+
+  const handleManualPause = () => {
+    console.log("status?.isPlaying", status?.isPlaying)
+    if (status?.isPlaying) {
+      video.current.pauseAsync();
+      setPaused(true); // Set paused state to true
+    } else {
+      video.current.playAsync();
+      setPaused(false); // Set paused state to false
+    }
+  };
+
   //HANDLE LIKE PRESS
   const [likeCount, setLikeCount] = useState(item["3sec_fires"][0].count);
   const [temporaryLiked, setTemporaryLiked] = useState(false);
@@ -156,6 +211,9 @@ const Item = ({ item, isPlaying }: any) => {
     //if liked already, a modal will appear
     if (item.liked || temporaryLiked) {
       setFiresModalVisible(true);
+      if (video.current) {
+        video.current.pauseAsync();
+      }
     } else {
       // Insert like to supabase
       const { data, error } = await supabase.from("3sec_fires").insert({
@@ -176,6 +234,10 @@ const Item = ({ item, isPlaying }: any) => {
 
   const handleCommentPress = async () => {
     setCommentModalVisible(true);
+    // Pause the video when comment modal is opened
+    if (video.current) {
+      video.current.pauseAsync();
+    }
   };
 
   return (
@@ -190,7 +252,7 @@ const Item = ({ item, isPlaying }: any) => {
             style={styles.video}
             isLooping
             useNativeControls={false}
-            onPlaybackStatusUpdate={status => setStatus(() => status)}
+            onPlaybackStatusUpdate={status => handlePlaybackStatusUpdate(status)}
           />
         </View>
         {/* PLAY & TOP ICON */}
@@ -224,7 +286,7 @@ const Item = ({ item, isPlaying }: any) => {
           </View>
           <View className='flex-row items-center mt-2 mb-5 grow justify-between'>
             <View className='bg-secondary/70 rounded-full px-4 py-1 grow mr-1'>
-              <PressableComment amount={item["3sec_comments"][0].count} onPress={handleCommentPress} />
+              <PressableComment amount={commentCount} onPress={handleCommentPress} />
             </View>
             {/* <View className='bg-secondary/70 flex-row rounded-full px-4 py-1'>
             <PressableShare amount={100} />
@@ -233,17 +295,34 @@ const Item = ({ item, isPlaying }: any) => {
               <PressableTip onPress={() => router.push("/(profile)/" + item.profile.username)} />
             </View>
             <View className='bg-secondary/70 flew-row rounded-full px-4 py-1 grow mr-0'>
-              <PressableFire liked={item.liked} amount={item["3sec_fires"][0].count} onPress={handleLikePress} />
+              <PressableFire liked={{liked: item.liked, temporaryLiked: temporaryLiked}} amount={likeCount} onPress={handleLikePress} />
             </View>
           </View>
         </LinearGradient>
       </Pressable>
+      {threePlayPaused && (
+        <Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
+          <Pressable className="bg-zinc-100/70 p-3 rounded-full flex-row" onPress={handleWatchAgain}>
+            <FontAwesome name="eye" size={24} color="black" />
+            <Text className="text-black text-base ml-1">Watch again</Text>
+          </Pressable>
+        </Animated.View>
+      )}
+      {/* FIRES MODAL */}
+      {firesModalVisible && <FiresModal visible={firesModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url }} onClose={() => {
+        setFiresModalVisible(false);
+        if (video.current && isPlaying) {
+          video.current.playAsync();
+        }
+      }} />}
 
       {/* FIRES MODAL */}
-      {firesModalVisible && <FiresModal visible={firesModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url }} onClose={() => setFiresModalVisible(false)} />}
-
-      {/* FIRES MODAL */}
-      {commentModalVisible && <CommentsModal visible={commentModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url }} onClose={() => setCommentModalVisible(false)} />}
+      {commentModalVisible && <CommentsModal visible={commentModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url }} onClose={() => {
+        if (video.current && isPlaying) {
+          video.current.playAsync();
+        }
+        setCommentModalVisible(false)}
+        } />}
     </>
   );
 }
@@ -263,6 +342,16 @@ const styles = StyleSheet.create({
   },
   playIconContainer: {
     ...StyleSheet.absoluteFillObject, // Position the play icon container absolutely within the video container
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -26,13 +26,10 @@ export function CommentsModal({ visible, data, onClose }: Props) {
     const [comments, setComments] = useState<any>();
     const [comment, setComment] = useState('');
 
-    console.log("mothehrhr", JSON.stringify(data, null, 2))
+    console.log("COMMENTS MODAL")
 
-    const handleReset = () => {
-        onClose();
-    }
-
-    const fetch = async () => {
+    const fetchComments = async () => {
+        console.log("fetch comments")
         const { data: res } = await supabase
             .from("3sec_comments")
             .select("id, comment, created_at, profile:user_id(id, username, avatar_url)")
@@ -43,8 +40,12 @@ export function CommentsModal({ visible, data, onClose }: Props) {
 
     // HANDLE WHEN IN FOCUSED
     useEffect(() => {
-        if (isFocused) fetch();
+        if (isFocused) fetchComments();
     }, [isFocused]);
+
+    const handleReset = () => {
+        onClose();
+    }
 
     const handleCommentSubmit = async () => {
         if (comment.trim()) {
@@ -57,7 +58,7 @@ export function CommentsModal({ visible, data, onClose }: Props) {
                 console.error("Error submitting comment:", error);
             } else {
                 setComment(''); // Clear the input after submission
-                fetch();
+                fetchComments();
             }
         }
     };

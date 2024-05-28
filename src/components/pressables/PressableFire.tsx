@@ -6,7 +6,7 @@ import { PressableAnimated } from './PressableAnimated';
 
 type Props = {
   amount: number;
-  liked: boolean;
+  liked: any;
   onPress: any;
 };
 
@@ -18,7 +18,7 @@ export function PressableFire({ amount, liked, onPress } : Props) {
         onPress()
       }}
     >
-      <SimpleLineIcons name="fire" size={22} color={liked ? 'red' : 'white'} />
+      <SimpleLineIcons name="fire" size={22} color={liked.liked || liked.temporaryLiked ? 'red' : 'white'} />
       {amount > 0 && <Text className='font-medium text-base text-white ml-1'><FormatNumber number={amount} /></Text>}
     </TouchableOpacity>
   );

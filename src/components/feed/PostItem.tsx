@@ -15,33 +15,15 @@ import { CommentsModal } from "../modals/CommentsModal";
 export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
   const colorScheme = useColorScheme();
   const videoRef = useRef<any>(null);
-  const [paused, setPaused] = useState(false);
 
   //COSUME PROVIDERS
   const { user } = useAuth();
 
-  // WATCH AGAIN FADE-IN ANIM
-  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-  const fadeIn = () => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 500,
-      useNativeDriver: true
-    }).start();
-  };
-
-  // WATCH AGAIN
-  const handleWatchAgain = () => {
-    setRepeatCount(0); // Reset the repeat count
-    setPaused(false); // Set paused state to false to resume the video
-    fadeAnim.setValue(0); // Reset the opacity animation value
-    if (videoRef.current) videoRef.current.resume();
-  };
-
-  //AFTER X PLAY REPEAT, PAUSE VIDEO
+  //AFTER 3rd PLAY REPEAT, PAUSE VIDEO
+  const [threePlayPaused, setThreePlayPaused] = useState(false);
   const [repeatCount, setRepeatCount] = useState(0);
 
-  const handleVideoEnd = () => {
+  const handleThreePlayRepeat = () => {
     setRepeatCount(prevCount => {
       if (prevCount < 2) {
         return prevCount + 1;
@@ -50,7 +32,7 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
         if (videoRef.current) {
           videoRef.current.seek(0);
           videoRef.current.pause();
-          setPaused(true);
+          setThreePlayPaused(true);
           fadeIn();
         }
         return prevCount;
@@ -58,11 +40,30 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
     });
   };
 
+    // HANDLE WATCH AGAIN
+    const handleWatchAgain = () => {
+      setRepeatCount(0); // Reset the repeat count
+      setThreePlayPaused(false); // Set paused state to false to resume the video
+      fadeAnim.setValue(0); // Reset the opacity animation value
+      if (videoRef.current) videoRef.current.resume();
+    };
+    // WATCH AGAIN FADE-IN ANIM
+    const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+    const fadeIn = () => {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true
+      }).start();
+    };
+
+  //CHECK IF VIDEO IS BEING VIEWED
+  //--
   //WHEN VIDEO IS IN VIEW AGAIN, RESET
   useEffect(() => {
     if (isPlaying) {
       setRepeatCount(0);
-      setPaused(false);
+      setThreePlayPaused(false);
       fadeAnim.setValue(0); // Reset opacity to 0
     }
   }, [isPlaying]);
@@ -98,6 +99,15 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
     setCommentModalVisible(true);
   };
 
+  // Pause video when modals are opened
+  useEffect(() => {
+    if (firesModalVisible || commentModalVisible) {
+      videoRef.current.pause();
+    } else if ((!firesModalVisible || !commentModalVisible) && !threePlayPaused) {
+      videoRef.current.resume();
+    }
+  }, [firesModalVisible, commentModalVisible]);
+
   return (
     <View className={`mb-1 rounded-2xl`}>
       {/* HEADER */}
@@ -115,7 +125,7 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
           repeat={true}
           volume={isMuted ? 0 : 1}
           paused={!isPlaying}
-          onEnd={handleVideoEnd}
+          onEnd={handleThreePlayRepeat}
         />
 
         {/* AVATAR */}
@@ -129,7 +139,7 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
         </View>
 
         {/* PAUSED */}
-        {paused && (
+        {threePlayPaused && (
           <Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
             <Pressable className="bg-zinc-100/70 p-3 rounded-full flex-row" onPress={handleWatchAgain}>
               <FontAwesome name="eye" size={24} color="black" />

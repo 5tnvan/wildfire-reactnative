@@ -13,8 +13,6 @@ export default function Posts({ setIsScrolling }: any) {
   // FETCH DIRECTLY
   const { isLoading, feed: userFollowingFeed, fetchMore, refetch } = useUserFollowingFeed();
 
-  console.log("userFollowingFeed", JSON.stringify(userFollowingFeed, null, 2));
-
   // FIGURE OUT WHICH VIDEO IS IN USER'S VIEW TO PLAY
   const [playingIndex, setPlayingIndex] = useState<any>(null);
   const viewabilityConfig = { itemVisiblePercentThreshold: 50 };

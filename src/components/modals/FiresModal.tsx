@@ -24,10 +24,7 @@ export function FiresModal({ visible, data, onClose }: Props) {
     const router = useRouter();
     const [fires, setFires] = useState<any>();
 
-    console.log("mothehrhr", JSON.stringify(data, null, 2))
-    console.log("fires", fires)
-
-
+    console.log("FIRES MODAL")
 
     const handleReset = () => {
         onClose();
@@ -35,16 +32,17 @@ export function FiresModal({ visible, data, onClose }: Props) {
 
     // HANDLE WHEN IN FOCUSED
     useEffect(() => {
-        const fetch = async () => {
-
+        const fetchProfiles = async () => {
             const { data: res } = await supabase
                 .from("3sec_fires")
                 .select("id, profile:user_id(id, username, avatar_url)")
                 .eq("video_id", data.id)
             setFires(res);
         }
-
-        if (isFocused) fetch();
+        if (isFocused) {
+            fetchProfiles();
+            console.log("fetchProfiles")
+        }
     }, [isFocused]);
 
     return (
