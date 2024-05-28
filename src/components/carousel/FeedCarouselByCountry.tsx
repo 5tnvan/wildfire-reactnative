@@ -18,6 +18,7 @@ export default function FeedCarouselByCountry() {
 
     // SET UP MASTER FEED
     const { feed: masterFeed, refetch } = useFeedFromCountry(3);
+    console.log("masterFeed by country", JSON.stringify(masterFeed, null, 2));
 
     // FIGURE OUT WHICH VIDEO IS PLAYING
     const [playingIndex, setPlayingIndex] = useState<any>(null);
@@ -63,7 +64,7 @@ export default function FeedCarouselByCountry() {
                     animationType="slide"
                     presentationStyle="pageSheet"
                 >
-                    <StoryComponent data={storyFeed} onFinishStory={closeStory} />
+                    <StoryComponent data={{feed: storyFeed}} onFinishStory={closeStory} />
                 </Modal>
             )}
             {masterFeed &&

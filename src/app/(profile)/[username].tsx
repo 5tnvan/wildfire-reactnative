@@ -21,6 +21,7 @@ import StoryComponent from '@/src/components/StoryComponent';
 import { Ionicons } from '@expo/vector-icons';
 import { FollowsModal } from '@/src/components/modals/FollowsModal';
 import { InfoWithEmoji } from '@/src/components/InfoWithEmoji';
+import { useAuth } from '@/src/services/providers/AuthProvider';
 
 export default function ProfileUsernameScreen() {
 
@@ -30,13 +31,23 @@ export default function ProfileUsernameScreen() {
   const { width } = useWindowDimensions();
   const { username } = useLocalSearchParams();
   const usernameAsTitle = Array.isArray(username) ? username[0] : username;
-  const [followsModalVisible, setFollowsModalVisible] = useState(false); //follows modal
   const [storyIndex, setStoryIndex] = useState<any>(null);
 
   //CONSUME PROVIDERS
+  const { user: authUser } = useAuth();
   const { user } = useUser(username);
-  const { followed, followers, following } = useUserFollows(username);
-  const { feed, refetch } = useUserFeedByUsername(username);
+  const { followed, followers, following, refetch: refetchFollows} = useUserFollows(username);
+  const { feed } = useUserFeedByUsername(username);
+
+  //HANDLE FOLLOWS MODAL
+  const [followsModalVisible, setFollowsModalVisible] = useState(false); //follows modal
+
+  const handleFollow = async () => {
+    const { error } = await supabase
+      .from("followers")
+      .insert({ follower_id: authUser?.id, following_id: user.id });
+    if (!error) refetchFollows();
+  }
 
   //SPINNING CAROUSELL ANIMATION 
   const x = useSharedValue(0);
@@ -52,6 +63,12 @@ export default function ProfileUsernameScreen() {
     },
   });
 
+  //HANDLE PRESS STORY ITEM
+  const handleStoryPress = (index: number) => {
+    setStoryIndex(index);
+    openStory();
+  };
+
   //OPEN CLOSE STORY MODAL 
   const [insideModal, setInsideModal] = useState(false);
   function openModal() { setInsideModal(true); }
@@ -59,13 +76,7 @@ export default function ProfileUsernameScreen() {
 
   const [insideStory, setInsideStory] = useState(false);
   function openStory() { setInsideStory(true); openModal(); }
-  function closeStory() { setInsideStory(false); closeModal() }
-
-  //HANDLE PRESS ITEM
-  const handleItemPress = (index: number) => {
-    setStoryIndex(index);
-    openStory();
-  };
+  function closeStory() { refetchFollows(); setInsideStory(false); closeModal() }
 
   if (!user) return <><Text>User not found</Text></>
 
@@ -79,7 +90,7 @@ export default function ProfileUsernameScreen() {
           animationType="slide"
           presentationStyle="pageSheet"
         >
-          <StoryComponent data={feed} storyIndex={storyIndex} onFinishStory={closeStory} />
+          <StoryComponent data={{ authUser: authUser, user: user, feed: feed, followed: followed }} storyIndex={storyIndex} onFinishStory={closeStory} />
         </Modal>
         :
         <>
@@ -91,16 +102,18 @@ export default function ProfileUsernameScreen() {
             headerRight: () => (
               <View>
                 {followed ?
-                  <PressableAnimated className="py-1 px-3 flex-row justify-center" onPress={() => setFollowsModalVisible(true)}>
-                    <Text>Following ✓</Text>
-                  </PressableAnimated> : <PressableAnimated className="bg-accent py-1 px-3 flex-row justify-center" onPress={() => setFollowsModalVisible(true)}>
+                  <PressableAnimated className="py-1 px-3 flex-row items-center" onPress={() => setFollowsModalVisible(true)}>
+                    <Text className='mr-1'>Following </Text>
+                    <View><Ionicons name="checkmark-circle-outline" size={16} color={colorScheme == 'dark' ? 'white' : 'black' } /></View>
+                  </PressableAnimated> :
+                  <PressableAnimated className="bg-accent py-1 px-3 flex-row justify-center" onPress={handleFollow}>
                     <Text className='text-black font-medium'>Follow</Text>
                   </PressableAnimated>}
               </View>
             )
           }} />
           {/* FOLLOWS MODAL */}
-          <FollowsModal visible={followsModalVisible} data={user} onClose={() => setFollowsModalVisible(false)} />
+          <FollowsModal visible={followsModalVisible} data={{ user: user, followers: followers }} onClose={() => {setFollowsModalVisible(false); refetchFollows()}} />
           {/* CONTAINER FOR MAIN CONTENT*/}
           <View className="flex-1 flex-col justify-between">
 
@@ -133,7 +146,7 @@ export default function ProfileUsernameScreen() {
                           height={ITEM_HEIGHT}
                           marginHorizontal={MARGin_HORIZONTAL}
                           fullWidth={ITEM_FULL_WIDTH}
-                          onPress={handleItemPress}
+                          onPress={handleStoryPress}
                         />
                       );
                     }}

@@ -9,7 +9,7 @@ import { fetchUser } from "../utils/fetch/fetchUser";
 
 /**
  * useUserFollows HOOK
- * Use this to get auth's user followers and following 
+ * Use this to get ANY user's followers and following by username
  **/
 export const useUserFollows = (username: any) => {
   const [isLoading, setIsLoading] = useState(true);

@@ -8,12 +8,14 @@ type AuthUserFollowsContext = {
     isLoading: boolean | null;
     followers: any;
     following: any;
+    refetch: () => void;
 };
 
 const AuthUserFollowsContext = createContext<AuthUserFollowsContext>({
     isLoading: null,
     followers: null,
     following: null,
+    refetch: () => {},
 });
 
 export default function AuthUserFollowsProvider({ children }: PropsWithChildren) {
@@ -21,6 +23,11 @@ export default function AuthUserFollowsProvider({ children }: PropsWithChildren)
     const [session, setSession] = useState<Session | null>(null);
     const [followers, setFollowers] = useState<any>();
     const [following, setFollowing] = useState<any>();
+    const [triggerRefetch, setTriggerRefetch] = useState(false);
+
+    const refetch = () => {
+        setTriggerRefetch((prev) => !prev);
+      };
 
     /**
      * SUPABASE CALL
@@ -51,14 +58,15 @@ export default function AuthUserFollowsProvider({ children }: PropsWithChildren)
             });
             setIsLoading(false);
         }
-    }, [session])
+    }, [session, triggerRefetch])
 
     return (
         <AuthUserFollowsContext.Provider
             value={{
                 isLoading,
                 followers,
-                following
+                following,
+                refetch
             }}
         >
             {children}

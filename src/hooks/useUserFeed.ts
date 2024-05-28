@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import * as VideoThumbnails from "expo-video-thumbnails";
+import { fetchFollowed } from "../utils/fetch/fetchFollowed";
+import { fetchUser } from "../utils/fetch/fetchUser";
 
 /**
  * useUserFeed HOOK
@@ -26,6 +28,15 @@ export const useUserFeed = (user_id: any) => {
       )
       .eq("user_id", user_id)
       .order("created_at", { ascending: false });
+
+      //check if auth user follows this user
+    // const authUser = await fetchUser();
+    // if (authUser) {
+    //   const followed = fetchFollowed(authUser.user?.id, user_id);
+    // }
+
+    //add it to 
+    
 
     setFeed(data);
     setIsLoading(false);

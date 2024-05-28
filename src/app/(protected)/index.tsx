@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useAuthUserFollows } from '@/src/services/providers/AuthUserFollowsProvider';
 import { useIsFocused } from '@react-navigation/native';
@@ -9,8 +9,16 @@ import Posts from '../../components/feed/Posts';
 
 export default function IndexScreen() {
   const isFocused = useIsFocused();
-  const { isLoading: isLoadingFollows, followers, following } = useAuthUserFollows();
+  const { following, refetch: refetchFollows } = useAuthUserFollows();
   const [isScrolling, setIsScrolling] = useState(false);
+
+  //REFETCH DATA WHEN SCREEN IS FOCUSED 
+  useEffect(() => {
+    if (isFocused) {
+      console.log("refetching index")
+      refetchFollows();
+    }
+  }, [isFocused]);
 
   return (
     <>

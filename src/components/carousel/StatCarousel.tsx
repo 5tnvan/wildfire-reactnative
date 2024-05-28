@@ -63,7 +63,7 @@ export default function StatCarousel() {
                 console.log('View all levels button pressed');
                 break;
             case '3':
-                Linking.openURL('https://www.wildpay.app');
+                Linking.openURL('https://www.wildpay.app/' + profile.username);
                 break;
             default:
                 console.log('Button pressed');

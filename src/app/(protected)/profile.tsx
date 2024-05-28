@@ -6,6 +6,8 @@ import {
   Modal,
   useColorScheme,
   useWindowDimensions,
+  Linking,
+  TouchableOpacity,
 } from "react-native";
 import { useAuthUser } from "../../services/providers/AuthUserProvider";
 import { Text } from "../../components/Themed";
@@ -25,6 +27,8 @@ import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Stack, useRouter } from "expo-router";
 import { PressableAnimated } from "@/src/components/pressables/PressableAnimated";
 import { SettingsModal } from "@/src/components/modals/SettingsModal";
+import { FollowersModal } from "@/src/components/modals/FollowersModal";
+import { FollowingModal } from "@/src/components/modals/FolllowingModal";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -32,16 +36,16 @@ export default function ProfileScreen() {
   const colorScheme = useColorScheme();
   const { width } = useWindowDimensions();
   const [storyIndex, setStoryIndex] = useState<any>(null);
-  const [settingsModalVisible, setSettingsModalVisible] = useState(false); //settings modal
 
   //CONSUME PROVIDERS
   const { isLoading: isLoadingUser, profile } = useAuthUser();
-  const { isLoading: isLoadingFollows, followers, following } = useAuthUserFollows();
-  const { feed, refetch } = useUserFeed(profile.id);
+  const { isLoading: isLoadingFollows, followers, following, refetch: refetchFollows } = useAuthUserFollows();
 
   //FETCH DIRECTLY 
-  const incomingRes = useIncomingTransactions(profile.wallet_id);
-  const outgoingRes = useOutgoingTransactions(profile.wallet_id);
+  const { feed, refetch: refetchFeed } = useUserFeed(profile.id);
+
+  //HANDLE SETTINGS MODAL
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
 
   //SPINNING CAROUSELL ANIMATION 
   const x = useSharedValue(0);
@@ -57,6 +61,12 @@ export default function ProfileScreen() {
     },
   });
 
+  //HANDLE STORY PRESS
+  const handleStoryPress = (index: number) => {
+    setStoryIndex(index);
+    openStory();
+  };
+
   //OPEN CLOSE STORY MODAL 
   const [insideModal, setInsideModal] = useState(false);
   function openModal() { setInsideModal(true); }
@@ -66,19 +76,20 @@ export default function ProfileScreen() {
   function openStory() { setInsideStory(true); openModal(); }
   function closeStory() { setInsideStory(false); closeModal() }
 
+  // HANDLE FOLLOWS MODAL
+  const [followersModalVisible, setFollowersModalVisible] = useState(false);
+  const [followingModalVisible, setFollowingModalVisible] = useState(false);
+
   //REFETCH DATA WHEN SCREEN IS FOCUSED 
   useEffect(() => {
     if (isFocused) {
-      console.log("refetching profile feed")
-      refetch();
+      console.log("refetching profile")
+      refetchFeed();
+      refetchFollows();
     }
   }, [isFocused]);
 
-  //HANDLE PRESS ITEM
-  const handleItemPress = (index: number) => {
-    setStoryIndex(index);
-    openStory();
-  };
+  console.log("feed", JSON.stringify(feed, null, 2))
 
   return (
     <>
@@ -90,7 +101,7 @@ export default function ProfileScreen() {
           animationType="slide"
           presentationStyle="pageSheet"
         >
-          <StoryComponent data={feed} storyIndex={storyIndex} onFinishStory={closeStory} />
+          <StoryComponent data={{feed: feed, followed: null}} storyIndex={storyIndex} onFinishStory={closeStory} />
         </Modal>
         :
         <>
@@ -108,7 +119,7 @@ export default function ProfileScreen() {
           {/* CONTAINER FOR MAIN CONTENT*/}
           <View className="flex-1 flex-col justify-between">
 
-            {/* BLANK */}
+            {/* START YOUR FIRST POST */}
             {feed && feed.length === 0 && 
             <View className="flex-row justify-center items-center grow ">
               <PressableAnimated onPress={() => router.push("/create")}>🥳 Start your first post</PressableAnimated>
@@ -137,7 +148,7 @@ export default function ProfileScreen() {
                           height={ITEM_HEIGHT}
                           marginHorizontal={MARGIN_HORIZONTAL}
                           fullWidth={ITEM_FULL_WIDTH}
-                          onPress={handleItemPress}
+                          onPress={handleStoryPress}
                         />
                       );
                     }}
@@ -150,6 +161,7 @@ export default function ProfileScreen() {
 
                 {/* USER BOTTOM INFO */}
                 <View className={`${colorScheme == "dark" ? "bg-zinc-900" : "bg-white"} w-full items-center justify-center p-8`}>
+                  {/* AVATAR */}
                   <View className='absolute' style={{ top: -30 }}>
                     <Avatar
                       avatar_url={profile.avatar_url}
@@ -158,27 +170,32 @@ export default function ProfileScreen() {
                       ring={true}
                     ></Avatar>
                   </View>  
+                  {/* FOLLOWERS FOLLOWING */}
                   <View className="flex-row items-center mb-3">
-                    <View className="ml-2">
-                      <View className="flex-row items-center">
-                      </View>
-                      <Pressable
-                        className="flex-row gap-1"
-                      >
+                      <TouchableOpacity className="flex-row gap-1 mr-1" onPress={() => setFollowersModalVisible(true)}>
                         <Text className="font-semibold text-lg text-accent">
                           {followers.length}
                         </Text>
                         <Text className="text-lg">followers</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        className="flex-row gap-1"
+                        onPress={() => setFollowingModalVisible(true)}
+                      >
                         <Text className="font-semibold text-lg text-accent">
                           {following.length}
                         </Text>
                         <Text className="text-lg">following</Text>
-                      </Pressable>
-                    </View>
+                      </TouchableOpacity>
                   </View>
+                  {/* FOLLOWERS MODAL */}
+                  <FollowersModal visible={followersModalVisible} data={{ user: profile, followers: followers }} onClose={() => setFollowersModalVisible(false)} />
+                  {/* FOLLOWING MODAL */}
+                  <FollowingModal visible={followingModalVisible} data={{ user: profile, following: following }} onClose={() => setFollowingModalVisible(false)} />
+                  {/* TIP NOW */}
                   <PressableAnimated
                     className={''}
-                    onPress={openStory}>
+                    onPress={() => (Linking.openURL('https://www.wildpay.app/' + profile.username))}>
                       <Text className="text-lg"> </Text>
                       <Text className="text-base">Tip Now</Text>
                       <MaterialCommunityIcons
@@ -190,38 +207,6 @@ export default function ProfileScreen() {
                 </View>
           </View>
         </>}
-
-      {/* <Modal
-        visible={isModalVisible}
-        onRequestClose={() => setIsModalVisible(false)}
-        animationType="slide"
-        presentationStyle="pageSheet"
-      >
-        <View className="bg-slate-500 grow">
-          <Text className="text-black">hihi</Text>
-          <Pressable
-            className="flex-row gap-1"
-            onPress={() => setIsModalVisible(false)}
-          >
-            <Text className="font-semibold">{followers.length}</Text>
-            <Text>Close</Text>
-            <Text className="font-semibold">{following.length}</Text>
-            <Text>Close</Text>
-          </Pressable>
-          <Text>Followers</Text>
-          <FlatList
-            data={followers}
-            renderItem={({ item }) => <Text>{item.follower.username}</Text>}
-            keyExtractor={(item, index) => index.toString()}
-          />
-          <Text>Following</Text>
-          <FlatList
-            data={following}
-            renderItem={({ item }) => <Text>{item.following.username}</Text>}
-            keyExtractor={(item, index) => index.toString()}
-          />
-        </View>
-      </Modal> */}
     </>
   );
 }

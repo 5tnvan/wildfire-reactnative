@@ -18,12 +18,10 @@ type Props = {
     onClose: any,
 };
 
-export function FollowsModal({ visible, data, onClose }: Props) {
+export function FollowersModal({ visible, data, onClose }: Props) {
     const router = useRouter();
     const colorScheme = useColorScheme();
     const { user: authUser } = useAuth();
-
-    console.log(JSON.stringify(data.followers, null, 2))
 
     const handleReset = () => {
         onClose();
@@ -64,8 +62,8 @@ export function FollowsModal({ visible, data, onClose }: Props) {
                         color={colorScheme == 'dark' ? 'white' : 'black'}
                         style = {{paddingHorizontal: 10}}
                     />
-                    <Text className='text-lg font-medium'>@{data.user.username}</Text>
-                    <Pressable className='text-base' onPress={handleUnfollow}><Text>Unfollow</Text></Pressable>
+                    <Text className='text-lg font-medium'>@{data.user?.username}</Text>
+                    <Text>{`            `}</Text>
                 </View>
                 {/* SCROLLVIEW */}
                 <ScrollView className="flex-col gap-2 px-2 h-full">

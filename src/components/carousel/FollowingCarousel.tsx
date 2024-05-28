@@ -8,21 +8,6 @@ const CARD_WIDTH = Dimensions.get('window').width * 0.13;
 const MARGIN_LEFT = 0;
 const MARGIN_RIGHT = 0;
 
-
-type Props = {
-    id: any,
-    profile: any;
-    colorScheme: any;
-    onPress: any;
-  };
-
-const Item = ({ id, profile, colorScheme, onPress } : Props) => (
-    <Pressable style={styles.card} className='items-center' onPress={() => onPress(profile.username)}>
-        <Avatar avatar_url={profile.avatar_url} username={profile.username} size={'md'} ring={true}></Avatar>
-        {/* <Text numberOfLines={1} ellipsizeMode='tail' className={`${colorScheme == "dark" ? "text-white" : "text-black"}`}>{profile.username}</Text> */}
-    </Pressable>
-);
-
 export default function FollowingCarousel({ data } : any) {
     const colorScheme = useColorScheme();
     const router = useRouter();
@@ -47,6 +32,20 @@ export default function FollowingCarousel({ data } : any) {
         />
     );
 };
+
+type Props = {
+    id: any,
+    profile: any;
+    colorScheme: any;
+    onPress: any;
+  };
+
+const Item = ({ id, profile, colorScheme, onPress } : Props) => (
+    <Pressable style={styles.card} className='items-center' onPress={() => onPress(profile.username)}>
+        <Avatar avatar_url={profile.avatar_url} username={profile.username} size={'md'} ring={true}></Avatar>
+        {/* <Text numberOfLines={1} ellipsizeMode='tail' className={`${colorScheme == "dark" ? "text-white" : "text-black"}`}>{profile.username}</Text> */}
+    </Pressable>
+);
 
 const styles = StyleSheet.create({
     container: {
