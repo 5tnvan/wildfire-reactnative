@@ -12,6 +12,10 @@ import FormatNumber from "../FormatNumber";
 import { FiresModal } from "../modals/FiresModal";
 import { CommentsModal } from "../modals/CommentsModal";
 import { useRouter } from "expo-router";
+import { increment_views, insert_views, watched } from "@/src/utils/incrementViews";
+import { fetchViewCount } from "@/src/utils/fetch/fetchViewCount";
+import { calculateTotalViews } from "@/src/utils/calculateTotalViews";
+import { PressableAnimated } from "../pressables/PressableAnimated";
 
 export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
   const router = useRouter();
@@ -25,6 +29,23 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
   const [threePlayPaused, setThreePlayPaused] = useState(false);
   const [repeatCount, setRepeatCount] = useState(0);
 
+  const getViews = async () => {
+    const res = await fetchViewCount(item.id);
+    console.log("getViews", JSON.stringify(res, null, 2));
+    if(res?.length) { 
+      return calculateTotalViews(res); 
+    } else {
+      return 0
+    }
+  }
+
+  const [totalViews, setTotalViews] = useState<any>(null);
+  const handleGetViews = async () => {
+    const res = await getViews();
+    setTotalViews(res);
+  }
+
+  // HANDLE AFTER 3RD PLAY
   const handleThreePlayRepeat = () => {
     setRepeatCount(prevCount => {
       if (prevCount < 2) {
@@ -43,7 +64,25 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
   };
 
     // HANDLE WATCH AGAIN
-    const handleWatchAgain = () => {
+    const handleWatchAgain = async () => {
+
+      //check if user watched it
+      const res = await watched(item.id, user?.id);
+
+      //increment views
+      if (res) {
+        increment_views(item.id, user?.id)
+        console.log("+1")
+      } else {
+        const error = await insert_views(item.id, user?.id)
+        console.log("insert first view")
+        if (!error) {
+          increment_views(item.id, user?.id)
+          console.log("+1")
+        }
+      }
+
+      console.log("isPlaying 3");
       setRepeatCount(0); // Reset the repeat count
       setThreePlayPaused(false); // Set paused state to false to resume the video
       fadeAnim.setValue(0); // Reset the opacity animation value
@@ -64,6 +103,7 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
   //WHEN VIDEO IS IN VIEW AGAIN, RESET
   useEffect(() => {
     if (isPlaying) {
+      console.log("isPlaying 2");
       setRepeatCount(0);
       setThreePlayPaused(false);
       fadeAnim.setValue(0); // Reset opacity to 0
@@ -113,12 +153,23 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
   return (
     <View className={`mb-1 rounded-2xl`}>
       {/* HEADER */}
-      <Pressable className="bg-transparent flex-row items-center px-3 py-4 rounded-2xl" onPress={() => router.push("/(profile)/" + item.profile.username)}>
-        <Text className="ml-2 font-semibold text-base">@{item.profile.username}</Text>
-        <Text className="ml-1 text-base"><TimeAgo timestamp={item.created_at}></TimeAgo></Text>
-      </Pressable>
+      <View className="flex-row justify-between items-center p-4">
+        <Pressable className="flex-row items-center" onPress={() => router.push("/(profile)/" + item.profile.username)}>
+          <Text className="font-semibold text-base">@{item.profile.username}</Text>
+          <Text className="ml-1 text-base"><TimeAgo timestamp={item.created_at}></TimeAgo></Text>
+        </Pressable>
+        <View>
+        {item.country &&
+                <View className={`${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-zinc-100'} flex-row items-center py-1 px-3 rounded-full`}>
+                  <FontAwesome name="location-arrow" size={14} color={colorScheme == 'dark' ? 'white' : 'black'} />
+                  <Text className='text-base ml-1'>{item.country.name}</Text>
+                </View>
+              }
+        </View>
+      </View>
+      
       {/* VIDEO */}
-      <View className="w-full h-[500px] relative mb-1">
+      <View className="w-full h-[500px] relative">
         <Video
           ref={videoRef}
           source={{ uri: item.video_url }}
@@ -131,14 +182,14 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
         />
 
         {/* AVATAR */}
-        <View className="absolute bg-transparent p-3">
+        <TouchableOpacity className="absolute p-3" onPress={() => router.push("/(profile)/" + item.profile.username)}>
           <Avatar
             avatar_url={item.profile.avatar_url}
             username={item.profile.username}
             size={"md"}
             ring={true}
           ></Avatar>
-        </View>
+        </TouchableOpacity>
 
         {/* PAUSED */}
         {threePlayPaused && (
@@ -157,20 +208,28 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
       </View>
 
       {/* ACTIONS */}
-      <View className="flex-row bg-transparent gap-4 py-2 px-4 self-end">
-        <Pressable onPress={handleLikePress} className="flex-row items-center">
-          <SimpleLineIcons name="fire" size={26} color={item.liked || temporaryLiked ? "red" : `${colorScheme == 'dark' ? "white" : 'black'}`} />
-          {likeCount > 0 && <Text className="ml-1 font-medium text-lg"><FormatNumber number={likeCount} /></Text>}
-        </Pressable>
-        <Pressable onPress={handleCommentPress} className="flex-row items-center">
-          <MaterialCommunityIcons name="comment-processing-outline" size={28} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
-          {commentCount > 0 && <Text className="ml-1 font-medium text-lg"><FormatNumber number={commentCount} /></Text>}
-        </Pressable>
-        {/* <View>
+      <View className="flex-row justify-between p-4">
+        <TouchableOpacity className={`flex-row gap-1 items-center rounded-full px-2 ${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-zinc-100'}`} onPress={() => handleGetViews()}>
+          <FontAwesome name="eye" size={18} color={colorScheme == 'dark' ? 'white' : 'black'} />
+          <Text className="text-base">{totalViews && <FormatNumber number={totalViews} />}</Text>
+        </TouchableOpacity>
+        <View className="flex-row gap-4 self-end">
+          <Pressable onPress={handleLikePress} className="flex-row items-center">
+            <SimpleLineIcons name="fire" size={26} color={item.liked || temporaryLiked ? "red" : `${colorScheme == 'dark' ? "white" : 'black'}`} />
+            {likeCount > 0 && <Text className="ml-1 font-medium text-lg"><FormatNumber number={likeCount} /></Text>}
+          </Pressable>
+          <Pressable onPress={handleCommentPress} className="flex-row items-center">
+            <MaterialCommunityIcons name="message-reply-text-outline" size={28} color={`${colorScheme == 'dark' ? "white" : '#333'}`} />
+            {commentCount > 0 && <Text className="ml-1 font-medium text-lg"><FormatNumber number={commentCount} /></Text>}
+          </Pressable>
+          
+          {/* <View>
           <Entypo name="slideshare" size={24} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
           <Text className="ml-1">124</Text>
         </View> */}
+        </View>
       </View>
+      
 
       {/* FIRES MODAL */}
       {firesModalVisible && <FiresModal visible={firesModalVisible} data={{id: item.id, thumbnail: item.thumbnail_url}} onClose={() => setFiresModalVisible(false)} />}
@@ -198,3 +257,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+

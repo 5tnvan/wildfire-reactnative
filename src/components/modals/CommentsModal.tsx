@@ -91,7 +91,7 @@ export function CommentsModal({ visible, data, onClose }: Props) {
                             className='rounded-2xl mb-5'
                         />
                         <Pressable className="flex-row items-center mb-5">
-                            <MaterialCommunityIcons name="comment-processing-outline" size={28} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
+                            <MaterialCommunityIcons name="message-reply-text-outline" size={28} color={`${colorScheme == 'dark' ? "white" : '#333'}`} />
                             <Text className="ml-1 font-medium text-base"><FormatNumber number={comments?.length} /></Text>
                         </Pressable>
                     </View>

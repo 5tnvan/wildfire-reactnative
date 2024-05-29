@@ -18,7 +18,7 @@ export function PressableComment({ amount, onPress } : Props) {
         onPress();
       }}
     >
-      <MaterialCommunityIcons name="comment-processing-outline" size={26} color="white" />
+      <MaterialCommunityIcons name="message-reply-text-outline" size={26} color="white" />
       {amount > 0 && <Text className='font-medium text-base text-white ml-1'><FormatNumber number={amount} /></Text>}
     </TouchableOpacity>
   );
