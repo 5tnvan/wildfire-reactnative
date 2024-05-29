@@ -26,6 +26,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../lib/supabase';
 import { increment_views, insert_views, watched } from '../utils/views/incrementViews';
 import { useAuth } from '../services/providers/AuthProvider';
+import { router } from 'expo-router';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 type Props = {
   data: any;
@@ -39,7 +41,7 @@ export default function StoryComponent({ data, storyIndex, onFinishStory }: Prop
 
   //COSUME PROVIDERS
   const { user } = useAuth();
-  
+
   const [currentStoryIndex, setCurrentStoryIndex] = useState(storyIndex || 0);
   const currentStory = data.feed[currentStoryIndex];
   const progressAnim = useRef(new Animated.Value(0)).current;
@@ -232,30 +234,31 @@ export default function StoryComponent({ data, storyIndex, onFinishStory }: Prop
             </View>
           </SafeAreaView>
           <SafeAreaView className='absolute bottom-0 flex-row justify-between items-center w-full'>
-          <LinearGradient className='absolute bottom-0 p-20 w-full' colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 1)']}></LinearGradient>
-            <View className='flex-row items-center ml-3'>
+            <LinearGradient className='absolute bottom-0 p-20 w-full' colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 1)']}></LinearGradient>
+            <Pressable className='flex-row items-center ml-3' onPress={() => router.push("/(profile/)" + currentStory.profile.username)}>
               <Avatar avatar_url={currentStory.profile.avatar_url} username={currentStory.profile.username} size={'md'} ring={true} />
               <Text className='ml-2 mr-1 font-bold text-white text-base' style={styles.shadow}>{currentStory.profile.username}</Text>
               <Text className='text-white mr-1 text-base'><TimeAgo timestamp={currentStory.created_at}></TimeAgo></Text>
-              {currentStory.country &&
-                <View className='flex-row items-center rounded-full px-2 py-0'>
-                  <FontAwesome name="location-arrow" size={14} color="white" />
-                  <Text className='text-white ml-1 text-base' style={styles.shadow}>{currentStory.country.name}</Text>
-                </View>
-              }
-            </View>
-            {data.followed != null && 
-            <View className='mr-3'>
-              {
-                data.followed || temporaryFollowed ? 
-                <View className='bg-zinc-900/10 border rounded-xl border-white px-2 py-1'><Text className='text-white text-base' style={styles.shadow}>Following</Text></View>
-                  : 
-                <TouchableOpacity className='bg-zinc-900/10 border rounded-xl border-white px-2 py-1' onPress={handleFollow}><Text className='text-white text-base' style={styles.shadow}>Follow</Text></TouchableOpacity>
-              }
-              
-            </View>}
-            
-            
+              {data.followed != null &&
+                <View className='ml-1'>
+                  {
+                    data.followed || temporaryFollowed ?
+                      <View className='flex-row items-center bg-zinc-900/10 border rounded-xl border-white px-2 py-1'>
+                        <Text className='text-white mr-1' style={styles.shadow}>Following</Text>
+                        <FontAwesome5 name="check-circle" size={12} color="white" />
+                      </View>
+                      :
+                      <TouchableOpacity className='bg-zinc-900/10 border rounded-xl border-white px-2 py-1' onPress={handleFollow}><Text className='text-white text-base' style={styles.shadow}>Follow</Text></TouchableOpacity>
+                  }
+
+                </View>}
+            </Pressable>
+            {currentStory.country &&
+              <View className='flex-row items-center rounded-full mr-3 bg-zinc-900/60 px-2 py-1'>
+                <FontAwesome name="location-arrow" size={14} color="white" />
+                <Text className='text-white ml-1 text-base' style={styles.shadow}>{currentStory.country.name}</Text>
+              </View>
+            }
           </SafeAreaView>
         </View>
       </Pressable>
@@ -267,8 +270,8 @@ const styles = StyleSheet.create({
   shadow: {
     shadowColor: '#fff',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 2,
+    shadowOpacity: 0.8,
+    shadowRadius: 1,
     elevation: 5, // For Android
   },
 

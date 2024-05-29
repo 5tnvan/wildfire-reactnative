@@ -25,11 +25,12 @@ export function LevelsModal({ visible, onClose }: any) {
 
     useEffect(() => {
         const fetch = async () => {
-            setLevel1(profile.levels.find((item: any) => item.level === 1));
-            setLevel2(profile.levels.find((item: any) => item.level === 2));
-            setLevel3(profile.levels.find((item: any) => item.level === 3));
-            setLevel4(profile.levels.find((item: any) => item.level === 4));
-            setLevel5(profile.levels.find((item: any) => item.level === 5));
+            console.log("refetch ")
+            setLevel1(profile?.levels.find((item: any) => item.level === 1));
+            setLevel2(profile?.levels.find((item: any) => item.level === 2));
+            setLevel3(profile?.levels.find((item: any) => item.level === 3));
+            setLevel4(profile?.levels.find((item: any) => item.level === 4));
+            setLevel5(profile?.levels.find((item: any) => item.level === 5));
         };
         fetch();
     }, [profile?.levels]);
@@ -87,8 +88,10 @@ export function LevelsModal({ visible, onClose }: any) {
                             </View>
                         </View>
                         :
-                        <View className='mb-4 bg-slate-300 rounded-full' style={{ height: 400 }}>
-                            <Text>?</Text>
+                        <View className='mb-4'>
+                            <View className='bg-zinc-300 rounded-lg' style={{ height: 200 }}>
+                                <View className='self-center m-auto bg-zinc-400 p-3 rounded-full font-medium text-xl'><Text className='text-base'>Locked</Text></View>
+                            </View>
                         </View>
                     }
 

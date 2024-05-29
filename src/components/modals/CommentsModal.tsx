@@ -70,8 +70,8 @@ export function CommentsModal({ visible, data, onClose }: Props) {
             visible={visible}
             onRequestClose={handleReset}
         >
-            <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
-                <View className="h-full">
+            <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }} className={colorScheme == 'dark' ? 'bg-zinc-900' : 'bg-white'}>
+                <View className="flex-1 ">
                     <View className='flex-row justify-between items-center px-2 py-4'>
                         <Ionicons
                             onPress={handleReset}
@@ -92,7 +92,12 @@ export function CommentsModal({ visible, data, onClose }: Props) {
                         />
                         <Pressable className="flex-row items-center mb-5">
                             <MaterialCommunityIcons name="message-reply-text-outline" size={28} color={`${colorScheme == 'dark' ? "white" : '#333'}`} />
-                            <Text className="ml-1 font-medium text-base"><FormatNumber number={comments?.length} /></Text>
+                            {comments?.length > 0 && 
+                                <Text className="ml-1 font-medium text-base"><FormatNumber number={comments.length} /></Text>
+                            }
+                            {comments?.length == 0 && 
+                                <Text className="ml-1 font-medium text-base">Be first to comment</Text>
+                            }
                         </Pressable>
                     </View>
 
@@ -104,7 +109,7 @@ export function CommentsModal({ visible, data, onClose }: Props) {
                                     handleReset();
                                     router.push("/(profile)/" + item.profile.username)
                                 }}
-                                className={`flex-row justify-between rounded-lg w-full px-4 py-2 mb-2`}
+                                className={`flex-row justify-between rounded-lg w-full px-2 py-2 mb-2`}
                             >
                                 {/* AVATAR */}
                                 <Avatar avatar_url={item.profile.avatar_url} username={item.profile.username} size={'sm'} ring={true} />
@@ -112,7 +117,7 @@ export function CommentsModal({ visible, data, onClose }: Props) {
                                 <Pressable className={`flex-col grow ml-2`}>
                                     <View className='flex-row justify-between'>
                                         <Text className="text-base font-semibold">{item.profile.username}</Text>
-                                        <Text className='text-base'><TimeAgo timestamp={item.created_at}></TimeAgo></Text>
+                                        <Text className=''><TimeAgo timestamp={item.created_at}></TimeAgo></Text>
                                     </View>
                                     <Text className='mt-2 text-base'>{item.comment}</Text>
                                 </Pressable>
@@ -123,8 +128,10 @@ export function CommentsModal({ visible, data, onClose }: Props) {
                         ))}
                     </ScrollView>
 
-                    {/* COMMENT INPUT */}
-                    <SafeAreaView className='absolute bottom-5 w-full px-4 pb-4'>
+                    
+                </View>
+                {/* COMMENT INPUT */}
+                <SafeAreaView className='fixed bottom-5 w-full px-4'>
                         <View className='flex-row items-center bg-zinc-100 dark:bg-zinc-800 rounded-full px-4 py-2'>
                             <Avatar avatar_url={profile.avatar_url} username={profile.username} size={'sm'} ring={true} />
                             <TextInput
@@ -146,7 +153,6 @@ export function CommentsModal({ visible, data, onClose }: Props) {
                             </Pressable>
                         </View>
                     </SafeAreaView>
-                </View>
             </KeyboardAvoidingView>
         </Modal>
     );

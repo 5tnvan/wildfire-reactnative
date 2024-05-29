@@ -52,7 +52,7 @@ export function FiresModal({ visible, data, onClose }: Props) {
             visible={visible}
             onRequestClose={handleReset}
         >
-            <View className="h-full">
+            <View className="flex-1">
                 <View className='flex-row justify-between items-center px-2 py-4'>
                     <Ionicons
                         onPress={handleReset}

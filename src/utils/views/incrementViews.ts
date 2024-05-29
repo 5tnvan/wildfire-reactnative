@@ -23,7 +23,11 @@ export const watched = async (video_id: any, user_id: any) => {
       .from("3sec_views")
       .insert({ video_id: video_id, user_id: user_id})
 
-      if(error) console.log("error insert views", error);
+      if(error) {
+        console.log("video_id", video_id);
+        console.log("user_id", user_id);
+        console.log("error insert views", error);
+      }
 
       return error;
   };

@@ -52,7 +52,7 @@ export function FollowersModal({ visible, data, onClose }: Props) {
             visible={visible}
             onRequestClose={handleReset}
         >
-            <View className="">
+            <View className="flex-1">
                 {/* HEADER */}
                 <View className='flex-row justify-between items-center px-2 py-4'>
                     <Ionicons
