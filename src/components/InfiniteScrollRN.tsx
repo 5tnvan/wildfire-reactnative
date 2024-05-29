@@ -168,7 +168,6 @@ const Item = ({ item, isPlaying }: any) => {
   useEffect(() => {
     if (isPlaying) {
       handleIncrementViews();
-      console.log("isPlaying 4")
       setRepeatCount(0);
       setThreePlayPaused(false);
       fadeAnim.setValue(0);
@@ -179,11 +178,8 @@ const Item = ({ item, isPlaying }: any) => {
   const [paused, setPaused] = useState(false);
 
   const handleManualPause = () => {
-    console.log("isPlaying", isPlaying)
-    console.log("paused", paused)
     if (!threePlayPaused) {
       if (isPlaying && !paused) {
-        console.log("im here")
         video.current.pause();
         setPaused(true);
       } else {

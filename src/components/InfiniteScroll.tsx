@@ -50,7 +50,6 @@ export default function InfiniteScroll() {
 
   // HANDLE END REACHED
   const handleEndReached = () => {
-    console.log("end reached");
     if (!isLoading) {
       fetchMore();
     }
@@ -192,7 +191,6 @@ const Item = ({ item, isPlaying }: any) => {
   const [paused, setPaused] = useState(false);
 
   const handleManualPause = () => {
-    console.log("status?.isPlaying", status?.isPlaying)
     if(!threePlayPaused) {
       if (status?.isPlaying) {
         video.current.pauseAsync();

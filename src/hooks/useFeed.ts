@@ -8,7 +8,6 @@ import { fetchUser } from "../utils/fetch/fetchUser";
 const getRange = (page: number, range: number) => {
   const from = page * range;
   const to = from + range - 1;
-  console.log("page, from, to", page, from, to);
   return { from, to };
 };
 

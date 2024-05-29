@@ -33,8 +33,6 @@ export const useDailyPostLimit = () => {
       .eq('user_id', user.user?.id)
       .single();
 
-    console.log("levelData", levelData);
-
     // Fetch last video posts
     const { data: posts, error: postsError } = await supabase
       .from('3sec')
@@ -48,8 +46,6 @@ export const useDailyPostLimit = () => {
       setIsLoading(false);
       return;
     }
-
-    console.log("posts", posts);
 
     setPosts(posts);
 

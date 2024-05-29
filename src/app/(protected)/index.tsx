@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, StyleSheet, Animated } from 'react-native';
 import { useAuthUserFollows } from '@/src/services/providers/AuthUserFollowsProvider';
 import { useIsFocused } from '@react-navigation/native';
 import StatCarousel from '@/src/components/carousel/StatCarousel';
@@ -11,8 +11,9 @@ export default function IndexScreen() {
   const isFocused = useIsFocused();
   const { following, refetch: refetchFollows } = useAuthUserFollows();
   const [isScrolling, setIsScrolling] = useState(false);
+  const headerHeightAnim = useRef(new Animated.Value(150)).current; // Initial value for header height
 
-  //REFETCH DATA WHEN SCREEN IS FOCUSED 
+  // Re-fetch data when screen is focused 
   useEffect(() => {
     if (isFocused) {
       console.log("refetching index")
@@ -20,29 +21,31 @@ export default function IndexScreen() {
     }
   }, [isFocused]);
 
+  // Animate the header height when isScrolling changes
+  useEffect(() => {
+    const targetHeight = isScrolling ? 0 : 150; // Collapsed and expanded header height
+    Animated.timing(headerHeightAnim, {
+      toValue: targetHeight,
+      duration: 300, // Duration of the animation
+      useNativeDriver: false, // We're not using the native driver since height isn't a supported property
+    }).start();
+  }, [isScrolling]);
+
   return (
-    <>
+    <View className='flex-1'>
       {/* HEADER */}
       <Header />
 
       {/* STAT */}
-      
-        <View className='mb-2'>
-          <FollowingCarousel data={following} />
-          {!isScrolling && (
-          <StatCarousel />)}
-        </View>
-      
+      <View className=''>
+        <FollowingCarousel data={following} />
+        <Animated.View style={{ height: headerHeightAnim }}>
+          <StatCarousel />
+        </Animated.View>
+      </View>
 
       {/* FEED */}
       <Posts setIsScrolling={setIsScrolling} following={following} />
-    </>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'black',
-  },
-});

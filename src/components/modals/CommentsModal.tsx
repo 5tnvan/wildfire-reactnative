@@ -26,8 +26,6 @@ export function CommentsModal({ visible, data, onClose }: Props) {
     const [comments, setComments] = useState<any>();
     const [comment, setComment] = useState('');
 
-    console.log("COMMENTS MODAL")
-
     const fetchComments = async () => {
         console.log("fetch comments")
         const { data: res } = await supabase
