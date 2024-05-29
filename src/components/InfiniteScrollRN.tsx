@@ -80,13 +80,13 @@ export default function InfiniteScrollRN() {
         )}
         pagingEnabled
         horizontal={false}
-        showsVerticalScrollIndicator={true}
+        showsVerticalScrollIndicator={false}
         viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
         refreshing={refreshing} // Set the refreshing state
         onRefresh={handleRefresh} // Handle refresh
         onEndReached={handleEndReached}
-        onEndReachedThreshold={0.1}
-        ListFooterComponent={() => (isLoading ? <ActivityIndicator size="large" color="#0000ff" /> : null)}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={() => (isLoading ? <ActivityIndicator size="small" color="#000" /> : null)}
       />
 
       {/* BACK BUTTON */}

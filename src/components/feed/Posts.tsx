@@ -86,14 +86,15 @@ export default function Posts({ setIsScrolling, following }: any) {
             toggleMute={handleToggleMute}
           />
         )}
+        showsVerticalScrollIndicator={false}
         viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
         refreshing={refreshing}
         onRefresh={handleRefresh}
         onEndReached={handleEndReached}
-        onEndReachedThreshold={0.1} // Adjust the threshold as needed
+        onEndReachedThreshold={0.9} // Adjust the threshold as needed
         ListFooterComponent={() => (isLoading ? <ActivityIndicator size="large" color="#000" /> : null)}
         onScroll={handleScroll}
-        scrollEventThrottle={16}
+        scrollEventThrottle={6}
       />}
     </>
   );

@@ -18,6 +18,7 @@ import { calculateTotalViews } from "@/src/utils/views/calculateTotalViews";
 import { getTotalViews } from "@/src/utils/views/getTotalViews";
 
 export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
+
   const router = useRouter();
   const colorScheme = useColorScheme();
   const videoRef = useRef<any>(null);
@@ -88,6 +89,11 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
   //WHEN VIDEO IS PLAYING
   useEffect(() => {
     if (isPlaying) {
+
+
+      console.log("video playing", item.id)
+
+
       // increment views by +1
       handleIncrementViews();
       // reset
