@@ -35,7 +35,7 @@ export default function IndexScreen() {
       
 
       {/* FEED */}
-      <Posts setIsScrolling={setIsScrolling} />
+      <Posts setIsScrolling={setIsScrolling} following={following} />
     </>
   );
 }

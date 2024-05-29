@@ -90,7 +90,6 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
     if (isPlaying) {
       // increment views by +1
       handleIncrementViews();
-      console.log("isPlaying 2");
       // reset
       setRepeatCount(0);
       setThreePlayPaused(false);

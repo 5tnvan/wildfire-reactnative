@@ -6,7 +6,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { PressableAnimated } from '../pressables/PressableAnimated';
 import { useRouter } from 'expo-router';
 
-export default function Posts({ setIsScrolling }: any) {
+export default function Posts({ setIsScrolling, following }: any) {
   const isFocused = useIsFocused();
   const router = useRouter();
 
@@ -54,6 +54,8 @@ export default function Posts({ setIsScrolling }: any) {
     setRefreshing(false);
   };
 
+  console.log("playingIndex", playingIndex);
+  console.log("following", following);
   // PAUSE ALL VIDEOS WHEN NOT IN FOCUS
   useEffect(() => {
     if (!isFocused) {
@@ -64,11 +66,15 @@ export default function Posts({ setIsScrolling }: any) {
 
   return (
     <>
-    {userFollowingFeed && userFollowingFeed.length == 0 && !isLoading &&
+    {following && following.length == 0 && userFollowingFeed && userFollowingFeed.length == 0 && !isLoading &&
     <View className="flex-row justify-center items-center grow ">
       <PressableAnimated onPress={() => router.push("/discover")}>🥳 Start following someone</PressableAnimated>
     </View>
-    
+    }
+    {following && following.length > 0 && userFollowingFeed && userFollowingFeed.length == 0 && !isLoading &&
+    <View className="flex-row justify-center items-center grow ">
+      <PressableAnimated onPress={() => handleRefresh()}>🎉 Start feed</PressableAnimated>
+    </View>
     }
     {userFollowingFeed && userFollowingFeed.length > 0 && 
       <FlatList
