@@ -53,8 +53,6 @@ const Item = ({
 
   const colorScheme = useColorScheme();
 
-  console.log("item", item)
-
   //GET VIDEO VIEWS
   const [totalViews, setTotalViews] = useState<any>(null);
   const handleGetViews = async () => {

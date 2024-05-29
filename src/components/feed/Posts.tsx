@@ -64,7 +64,7 @@ export default function Posts({ setIsScrolling }: any) {
 
   return (
     <>
-    {userFollowingFeed && userFollowingFeed.length == 0 &&
+    {userFollowingFeed && userFollowingFeed.length == 0 && !isLoading &&
     <View className="flex-row justify-center items-center grow ">
       <PressableAnimated onPress={() => router.push("/discover")}>🥳 Start following someone</PressableAnimated>
     </View>

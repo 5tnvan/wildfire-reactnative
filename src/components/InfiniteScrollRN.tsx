@@ -25,6 +25,8 @@ import { useIsFocused } from '@react-navigation/native';
 import { FiresModal } from './modals/FiresModal';
 import { CommentsModal } from './modals/CommentsModal';
 import { useAuth } from '../services/providers/AuthProvider';
+import { getTotalViews } from '../utils/views/getTotalViews';
+import { increment_views, insert_views, watched } from '../utils/views/incrementViews';
 
 export default function InfiniteScrollRN() {
   const router = useRouter();
@@ -142,6 +144,9 @@ const Item = ({ item, isPlaying }: any) => {
 
   // HANDLE WATCH AGAIN
   const handleWatchAgain = () => {
+    //incrementviews
+    handleIncrementViews()
+    //reset
     setRepeatCount(0);
     setThreePlayPaused(false);
     fadeAnim.setValue(0);
@@ -162,6 +167,8 @@ const Item = ({ item, isPlaying }: any) => {
   // Resets repeat count and visibility of watch again button when item becomes active
   useEffect(() => {
     if (isPlaying) {
+      handleIncrementViews();
+      console.log("isPlaying 4")
       setRepeatCount(0);
       setThreePlayPaused(false);
       fadeAnim.setValue(0);
@@ -225,6 +232,24 @@ const Item = ({ item, isPlaying }: any) => {
     }
   };
 
+  //GET VIDEO VIEWS
+  const [totalViews, setTotalViews] = useState<any>(null);
+  const handleGetViews = async () => {
+    const res = await getTotalViews(item.id);
+    setTotalViews(res);
+  }
+
+  //HANDLE INCREMENT VIEWS
+  const handleIncrementViews = async () => {
+    const _watched = await watched(item.id, user?.id);
+    if (_watched) {
+      increment_views(item.id, user?.id)
+    } else {
+      const error = await insert_views(item.id, user?.id)
+      if (!error) increment_views(item.id, user?.id)
+    }
+  }
+
   return (
     <>
       <Pressable onPress={handleManualPause}>
@@ -256,10 +281,11 @@ const Item = ({ item, isPlaying }: any) => {
           </View>
         )}
         {/* TOP */}
-        <SafeAreaView className='absolute'>
-          <View className="flex-row items-center justify-end w-full px-3">
-            <ViewCount amount={70} />
-          </View>
+        <SafeAreaView className='absolute right-3'>
+        <TouchableOpacity className={`flex-row items-center rounded-full bg-white/70`} onPress={() => handleGetViews()}>
+              <View className='px-2 py-1'><FontAwesome name="eye" size={18} color="black" /></View>
+              {totalViews && <Text className='text-lg mr-2'><FormatNumber number={totalViews} /></Text>}
+            </TouchableOpacity>
         </SafeAreaView>
         {/* BOTTOM */}
         <LinearGradient className='absolute bottom-0 p-3 w-full' colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 1)']}>

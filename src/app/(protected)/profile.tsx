@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
   Linking,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useAuthUser } from "../../services/providers/AuthUserProvider";
 import { Text } from "../../components/Themed";
@@ -42,7 +43,7 @@ export default function ProfileScreen() {
   const { isLoading: isLoadingFollows, followers, following, refetch: refetchFollows } = useAuthUserFollows();
 
   //FETCH DIRECTLY 
-  const { feed, refetch: refetchFeed } = useUserFeed(profile.id);
+  const { isLoading: isLoadingFeed, feed, refetch: refetchFeed } = useUserFeed(profile.id);
   // console.log("feed", feed[0]);
 
   //HANDLE SETTINGS MODAL
@@ -118,14 +119,19 @@ export default function ProfileScreen() {
           {/* CONTAINER FOR MAIN CONTENT*/}
           <View className="flex-1 flex-col justify-between">
 
+            {/* LOADING FEED */}
+            {isLoadingFeed && <View className="flex-row justify-center items-center grow ">
+              <ActivityIndicator />
+            </View>}
+
             {/* START YOUR FIRST POST */}
-            {feed && feed.length === 0 && 
+            {!isLoadingFeed && feed && feed.length === 0 && 
             <View className="flex-row justify-center items-center grow ">
               <PressableAnimated onPress={() => router.push("/create")}>🥳 Start your first post</PressableAnimated>
             </View>}
 
             {/* SPINNING CAROUSEL */}
-            {feed && feed.length > 0 &&
+            {!isLoadingFeed && feed && feed.length > 0 &&
               <>
                 <View className='flex-1 pt-10'>
                   <Animated.FlatList

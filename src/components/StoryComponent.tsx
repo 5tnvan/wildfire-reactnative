@@ -60,7 +60,7 @@ export default function StoryComponent({ data, storyIndex, onFinishStory }: Prop
       }
     }
 
-    console.log("isPlaying now")
+    console.log("isPlaying", story.id) //last one always plays twice
     handleIncrementViews();
 
     return (

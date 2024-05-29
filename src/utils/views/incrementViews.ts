@@ -15,8 +15,6 @@ export const watched = async (video_id: any, user_id: any) => {
       .eq("video_id", video_id)
       .eq("user_id", user_id)
 
-      console.log("count", count)
-
       return count !== null && count > 0;
   };
 

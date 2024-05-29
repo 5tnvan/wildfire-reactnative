@@ -13,7 +13,7 @@ import { fetchUser } from "../utils/fetch/fetchUser";
  **/
 export const useUserFollows = (username: any) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [followed, setFollowed] = useState(false);
+  const [followed, setFollowed] = useState<any>(null);
   const [followers, setFollowers] = useState<any>();
   const [following, setFollowing] = useState<any>();
   const [triggerRefetch, setTriggerRefetch] = useState(false);

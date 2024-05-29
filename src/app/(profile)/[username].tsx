@@ -1,4 +1,4 @@
-import { View, Image, Pressable, useColorScheme, StyleSheet, useWindowDimensions, Modal } from 'react-native';
+import { View, Image, Pressable, useColorScheme, StyleSheet, useWindowDimensions, Modal, ActivityIndicator } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from '../../components/Themed';
@@ -30,14 +30,14 @@ export default function ProfileUsernameScreen() {
   const colorScheme = useColorScheme();
   const { width } = useWindowDimensions();
   const { username } = useLocalSearchParams();
-  const usernameAsTitle = Array.isArray(username) ? username[0] : username;
   const [storyIndex, setStoryIndex] = useState<any>(null);
 
   //CONSUME PROVIDERS
   const { user: authUser } = useAuth();
   const { user } = useUser(username);
   const { followed, followers, following, refetch: refetchFollows} = useUserFollows(username);
-  const { feed } = useUserFeedByUsername(username);
+  const { isLoading: isLoadingFeed, feed } = useUserFeedByUsername(username);
+
 
   //HANDLE FOLLOWS MODAL
   const [followsModalVisible, setFollowsModalVisible] = useState(false); //follows modal
@@ -99,21 +99,21 @@ export default function ProfileUsernameScreen() {
             headerShown: true,
             presentation: 'card',
             headerBackTitle: 'Back',
-            title: '@' + usernameAsTitle ?? '',
+            title: '@' + username,
             headerRight: () => (
               <View>
-                {followed ?
+                {followed != null && followed &&
                   <PressableAnimated className="py-1 px-3 flex-row items-center" onPress={() => setFollowsModalVisible(true)}>
                     <Text className='mr-1'>Following </Text>
-                    <View><Ionicons name="checkmark-circle-outline" size={16} color={colorScheme == 'dark' ? 'white' : 'black' } /></View>
-                  </PressableAnimated> :
+                    <View><Ionicons name="checkmark-circle-outline" size={16} color={colorScheme == 'dark' ? 'white' : 'black'} /></View>
+                  </PressableAnimated>
+                }
+                {followed != null && !followed &&
                   <PressableAnimated className="bg-accent py-1 px-3 flex-row justify-center" onPress={handleFollow}>
                     <Text className='text-black font-medium'>Follow</Text>
-                  </PressableAnimated>}
+                  </PressableAnimated>
+                }
               </View>
-            ),
-            headerLeft: () => (
-              <Pressable className='' onPress={() => router.back()}><Text>Back</Text></Pressable>
             )
           }} />
           {/* FOLLOWS MODAL */}
@@ -121,14 +121,19 @@ export default function ProfileUsernameScreen() {
           {/* CONTAINER FOR MAIN CONTENT*/}
           <View className="flex-1 flex-col justify-between">
 
-            {/* BLANK */}
-            {feed && feed.length === 0 &&
+            {/* LOADING FEED */}
+            {isLoadingFeed && <View className="flex-row justify-center items-center grow ">
+                <ActivityIndicator />
+              </View>}
+
+            {/* NO FEED */}
+            {!isLoadingFeed && feed && feed.length === 0 &&
               <View className="flex-row justify-center items-center grow ">
                 <PressableAnimated onPress={() => console.log("clicked")}>🤫 User hasn't posted yet</PressableAnimated>
               </View>}
 
-            {/* SPINNING CAROUSEL */}
-            {feed && feed.length > 0 &&
+            {/* SPINNING CAROUSEL FEED */}
+            {!isLoadingFeed && feed && feed.length > 0 &&
               <>
                 <View style={styles.container}>
                   <Animated.FlatList
