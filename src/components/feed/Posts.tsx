@@ -55,7 +55,6 @@ export default function Posts({ setIsScrolling, following }: any) {
   };
 
   console.log("playingIndex", playingIndex);
-  console.log("following", following);
   // PAUSE ALL VIDEOS WHEN NOT IN FOCUS
   useEffect(() => {
     if (!isFocused) {

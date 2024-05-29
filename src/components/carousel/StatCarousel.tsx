@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, FlatList, Dimensions, Pressable, Linking, useColorScheme } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Avatar } from '../avatars/avatar';
@@ -8,6 +8,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { useAuthUser } from '@/src/services/providers/AuthUserProvider';
 import { useIncomingTransactions } from '@/src/hooks/useIncomingTransactions';
 import { useUserFeed } from '@/src/hooks/useUserFeed';
+import { LevelsModal } from '../modals/LevelsModal';
 
 const CARD_WIDTH = Dimensions.get('window').width * 0.6;
 const CARD_HEIGHT = 145
@@ -25,7 +26,6 @@ export default function StatCarousel() {
     const isFocused = useIsFocused(); // Get focused state
     const colorScheme = useColorScheme();
     
-
     //CONSUME PROVIDERS
     const { profile } = useAuthUser();
 
@@ -51,6 +51,9 @@ export default function StatCarousel() {
     cardData[0].stat = levelName;
     cardData[1].stat = balance;
 
+    //HANDLE FOLLOWS MODAL
+    const [levelsModalVisible, setLevelsModalVisible] = useState(false); //levels modal
+
     /**
      * HANDLE PRESS EVENT
      */
@@ -60,7 +63,7 @@ export default function StatCarousel() {
                 router.push("/create")
                 break;
             case '2':
-                console.log('View all levels button pressed');
+                setLevelsModalVisible(true);
                 break;
             case '3':
                 Linking.openURL('https://www.wildpay.app/' + profile.username);
@@ -72,6 +75,7 @@ export default function StatCarousel() {
 
 
     return (
+        <>
         <FlatList
             data={cardData}
             horizontal
@@ -82,6 +86,9 @@ export default function StatCarousel() {
             contentContainerStyle={styles.container}
             snapToAlignment="start" // Snap to the start of the card
         />
+        <LevelsModal visible={levelsModalVisible} onClose={() => setLevelsModalVisible(false)} />
+        </>
+        
     );
 };
 
