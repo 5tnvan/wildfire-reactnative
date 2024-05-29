@@ -12,10 +12,10 @@ import FormatNumber from "../FormatNumber";
 import { FiresModal } from "../modals/FiresModal";
 import { CommentsModal } from "../modals/CommentsModal";
 import { useRouter } from "expo-router";
-import { increment_views, insert_views, watched } from "@/src/utils/incrementViews";
+import { increment_views, insert_views, watched } from "@/src/utils/views/incrementViews";
 import { fetchViewCount } from "@/src/utils/fetch/fetchViewCount";
-import { calculateTotalViews } from "@/src/utils/calculateTotalViews";
-import { PressableAnimated } from "../pressables/PressableAnimated";
+import { calculateTotalViews } from "@/src/utils/views/calculateTotalViews";
+import { getTotalViews } from "@/src/utils/views/getTotalViews";
 
 export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
   const router = useRouter();
@@ -29,20 +29,22 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
   const [threePlayPaused, setThreePlayPaused] = useState(false);
   const [repeatCount, setRepeatCount] = useState(0);
 
-  const getViews = async () => {
-    const res = await fetchViewCount(item.id);
-    console.log("getViews", JSON.stringify(res, null, 2));
-    if(res?.length) { 
-      return calculateTotalViews(res); 
-    } else {
-      return 0
-    }
-  }
-
+  //GET VIDEO VIEWS
   const [totalViews, setTotalViews] = useState<any>(null);
   const handleGetViews = async () => {
-    const res = await getViews();
+    const res = await getTotalViews(item.id);
     setTotalViews(res);
+  }
+
+  //HANDLE INCREMENT VIEWS
+  const handleIncrementViews = async () => {
+    const _watched = await watched(item.id, user?.id);
+    if (_watched) {
+      increment_views(item.id, user?.id)
+    } else {
+      const error = await insert_views(item.id, user?.id)
+      if (!error) increment_views(item.id, user?.id)
+    }
   }
 
   // HANDLE AFTER 3RD PLAY
@@ -63,47 +65,33 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
     });
   };
 
-    // HANDLE WATCH AGAIN
-    const handleWatchAgain = async () => {
+  // HANDLE WATCH AGAIN
+  const handleWatchAgain = async () => {
+    // increment views by +1
+    handleIncrementViews();
+    //reset
+    setRepeatCount(0); // Reset the repeat count
+    setThreePlayPaused(false); // Set paused state to false to resume the video
+    fadeAnim.setValue(0); // Reset the opacity animation value
+    if (videoRef.current) videoRef.current.resume();
+  };
+  // WATCH AGAIN FADE-IN ANIM
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+  const fadeIn = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true
+    }).start();
+  };
 
-      //check if user watched it
-      const res = await watched(item.id, user?.id);
-
-      //increment views
-      if (res) {
-        increment_views(item.id, user?.id)
-        console.log("+1")
-      } else {
-        const error = await insert_views(item.id, user?.id)
-        console.log("insert first view")
-        if (!error) {
-          increment_views(item.id, user?.id)
-          console.log("+1")
-        }
-      }
-
-      console.log("isPlaying 3");
-      setRepeatCount(0); // Reset the repeat count
-      setThreePlayPaused(false); // Set paused state to false to resume the video
-      fadeAnim.setValue(0); // Reset the opacity animation value
-      if (videoRef.current) videoRef.current.resume();
-    };
-    // WATCH AGAIN FADE-IN ANIM
-    const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-    const fadeIn = () => {
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true
-      }).start();
-    };
-
-  //CHECK IF VIDEO IS BEING VIEWED
-  //--
-  //WHEN VIDEO IS IN VIEW AGAIN, RESET
+  //WHEN VIDEO IS PLAYING
   useEffect(() => {
     if (isPlaying) {
+      // increment views by +1
+      handleIncrementViews();
       console.log("isPlaying 2");
+      // reset
       setRepeatCount(0);
       setThreePlayPaused(false);
       fadeAnim.setValue(0); // Reset opacity to 0
@@ -116,9 +104,8 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
   const [firesModalVisible, setFiresModalVisible] = useState(false); //fires modal
 
   const handleLikePress = async () => {
-    //if liked already, a modal will appear
-    if (item.liked || temporaryLiked) {
-      setFiresModalVisible(true);
+    if (item.liked || temporaryLiked) { //if liked already, a modal will appear
+      setFiresModalVisible(true); 
     } else {
       // Insert like to supabase
       const { data, error } = await supabase.from("3sec_fires").insert({
@@ -141,7 +128,7 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
     setCommentModalVisible(true);
   };
 
-  // Pause video when modals are opened
+  //PAUSE VIDEOS WHEN MODALS ARE OPEN
   useEffect(() => {
     if (firesModalVisible || commentModalVisible) {
       videoRef.current.pause();
@@ -159,15 +146,15 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
           <Text className="ml-1 text-base"><TimeAgo timestamp={item.created_at}></TimeAgo></Text>
         </Pressable>
         <View>
-        {item.country &&
-                <View className={`${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-zinc-100'} flex-row items-center py-1 px-3 rounded-full`}>
-                  <FontAwesome name="location-arrow" size={14} color={colorScheme == 'dark' ? 'white' : 'black'} />
-                  <Text className='text-base ml-1'>{item.country.name}</Text>
-                </View>
-              }
+          {item.country &&
+            <View className={`${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-zinc-100'} flex-row items-center py-1 px-3 rounded-full`}>
+              <FontAwesome name="location-arrow" size={14} color={colorScheme == 'dark' ? 'white' : 'black'} />
+              <Text className='text-base ml-1'>{item.country.name}</Text>
+            </View>
+          }
         </View>
       </View>
-      
+
       {/* VIDEO */}
       <View className="w-full h-[500px] relative">
         <Video
@@ -222,21 +209,21 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
             <MaterialCommunityIcons name="message-reply-text-outline" size={28} color={`${colorScheme == 'dark' ? "white" : '#333'}`} />
             {commentCount > 0 && <Text className="ml-1 font-medium text-lg"><FormatNumber number={commentCount} /></Text>}
           </Pressable>
-          
+
           {/* <View>
           <Entypo name="slideshare" size={24} color={`${colorScheme == 'dark' ? "white" : 'black'}`} />
           <Text className="ml-1">124</Text>
         </View> */}
         </View>
       </View>
-      
+
 
       {/* FIRES MODAL */}
-      {firesModalVisible && <FiresModal visible={firesModalVisible} data={{id: item.id, thumbnail: item.thumbnail_url}} onClose={() => setFiresModalVisible(false)} />}
+      {firesModalVisible && <FiresModal visible={firesModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url }} onClose={() => setFiresModalVisible(false)} />}
 
       {/* FIRES MODAL */}
-      {commentModalVisible && <CommentsModal visible={commentModalVisible} data={{id: item.id, thumbnail: item.thumbnail_url}} onClose={() => setCommentModalVisible(false)} />}
-      
+      {commentModalVisible && <CommentsModal visible={commentModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url }} onClose={() => setCommentModalVisible(false)} />}
+
     </View>
   );
 }

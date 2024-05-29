@@ -43,6 +43,7 @@ export default function ProfileScreen() {
 
   //FETCH DIRECTLY 
   const { feed, refetch: refetchFeed } = useUserFeed(profile.id);
+  // console.log("feed", feed[0]);
 
   //HANDLE SETTINGS MODAL
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
@@ -88,8 +89,6 @@ export default function ProfileScreen() {
       refetchFollows();
     }
   }, [isFocused]);
-
-  console.log("feed", JSON.stringify(feed, null, 2))
 
   return (
     <>

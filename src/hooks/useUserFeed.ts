@@ -24,7 +24,7 @@ export const useUserFeed = (user_id: any) => {
     const { data } = await supabase
       .from("3sec")
       .select(
-        "id, video_url, thumbnail_url, created_at, views, country:country_id(id, name), profile:user_id(id, username, avatar_url)"
+        "id, video_url, thumbnail_url, created_at, views, country:country_id(id, name), profile:user_id(id, username, avatar_url), 3sec_views(view_count)"
       )
       .eq("user_id", user_id)
       .order("created_at", { ascending: false });

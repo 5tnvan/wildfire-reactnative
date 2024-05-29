@@ -24,6 +24,8 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { TimeAgo } from './TimeAgo';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../lib/supabase';
+import { increment_views, insert_views, watched } from '../utils/views/incrementViews';
+import { useAuth } from '../services/providers/AuthProvider';
 
 type Props = {
   data: any;
@@ -34,6 +36,10 @@ type Props = {
 const { width } = Dimensions.get('window');
 
 export default function StoryComponent({ data, storyIndex, onFinishStory }: Props) {
+
+  //COSUME PROVIDERS
+  const { user } = useAuth();
+  
   const [currentStoryIndex, setCurrentStoryIndex] = useState(storyIndex || 0);
   const currentStory = data.feed[currentStoryIndex];
   const progressAnim = useRef(new Animated.Value(0)).current;
@@ -43,6 +49,20 @@ export default function StoryComponent({ data, storyIndex, onFinishStory }: Prop
   const [wentBack, setWentBack] = useState(0);
 
   const renderStoryContent = (story: any) => {
+
+    const handleIncrementViews = async () => {
+      const _watched = await watched(story.id, user?.id);
+      if (_watched) {
+        increment_views(story.id, user?.id)
+      } else {
+        const error = await insert_views(story.id, user?.id)
+        if (!error) increment_views(story.id, user?.id)
+      }
+    }
+
+    console.log("isPlaying now")
+    handleIncrementViews();
+
     return (
       <Video
         source={{ uri: story.video_url }}
@@ -177,7 +197,10 @@ export default function StoryComponent({ data, storyIndex, onFinishStory }: Prop
         onPressOut={handlePressOut}
         style={styles.container}>
         <View style={styles.container} className='bg-white flex-1'>
+
+          {/* STORY VIDEO */}
           {renderStoryContent(currentStory)}
+
           <SafeAreaView>
             <View style={styles.progressBarContainer}>
               {data.feed.map((story: any, index: any) => (

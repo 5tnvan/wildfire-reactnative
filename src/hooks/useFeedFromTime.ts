@@ -58,13 +58,6 @@ export const useFeedFromTime = () => {
     let feed48 = await fetchFeed(startOf24HoursAgo, startOf48HoursAgo);
     let feedWeek = await fetchFeed(startOf48HoursAgo, startOfWeekAgo);
 
-    console.log("feed24 from", now)
-    console.log("feed24 to", startOf24HoursAgo)
-    console.log("feed48 from", startOf24HoursAgo)
-    console.log("feed48 to", startOf48HoursAgo)
-    console.log("feedWeek from", startOf48HoursAgo)
-    console.log("feedWeek to", startOfWeekAgo)
-
     const combinedFeeds = [];
 
     // Shuffle the feeds before combining

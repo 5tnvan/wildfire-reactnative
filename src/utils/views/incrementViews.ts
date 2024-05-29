@@ -23,7 +23,7 @@ export const watched = async (video_id: any, user_id: any) => {
   export const insert_views = async (video_id: any, user_id: any) => {
     const { error } = await supabase
       .from("3sec_views")
-      .insert({ video_id: video_id, user_id: user_id, view_count: 1})
+      .insert({ video_id: video_id, user_id: user_id})
 
       if(error) console.log("error insert views", error);
 

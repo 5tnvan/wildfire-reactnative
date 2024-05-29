@@ -1,5 +1,5 @@
 import { Image, Pressable, StyleSheet, TouchableHighlight, TouchableOpacity, View, useColorScheme } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import Animated, {
   Extrapolation,
   SharedValue,
@@ -9,6 +9,8 @@ import Animated, {
 import { TimeAgo } from './TimeAgo';
 import { Text } from "../components/Themed";
 import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
+import { getTotalViews } from '../utils/views/getTotalViews';
+import FormatNumber from './FormatNumber';
 
 type Props = {
   item: any;
@@ -51,6 +53,16 @@ const Item = ({
 
   const colorScheme = useColorScheme();
 
+  console.log("item", item)
+
+  //GET VIDEO VIEWS
+  const [totalViews, setTotalViews] = useState<any>(null);
+  const handleGetViews = async () => {
+    const res = await getTotalViews(item.id);
+    setTotalViews(res);
+  }
+  handleGetViews();
+
   return (
     <Pressable onPress={() => onPress(index)}>
       <Animated.View
@@ -68,6 +80,14 @@ const Item = ({
             className='flex-1'
           />
         </View>
+        {/* VIEWS */}
+        {totalViews && 
+        <View className='flex-row items-center absolute top-0 right-0 px-3 py-1 m-3 rounded-full bg-white/60'>
+          <View className='mr-1'><FontAwesome name="eye" size={14} color="black" /></View>
+          <FormatNumber number={totalViews}/>
+        </View>
+        }
+        
         {/* BOTTOM */}
         <View className={`absolute bottom-0 w-full bg-white flex-row justify-between items-center px-4 py-2`}>
           <View>
