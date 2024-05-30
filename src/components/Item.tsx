@@ -79,12 +79,12 @@ const Item = ({
           />
         </View>
         {/* VIEWS */}
-        {totalViews && 
+        
         <View className='flex-row items-center absolute top-0 right-0 px-3 py-1 m-3 rounded-full bg-white/60'>
           <View className='mr-1'><FontAwesome name="eye" size={14} color="black" /></View>
-          <FormatNumber number={totalViews}/>
+          <Text className='text-black'>{totalViews && totalViews > 0 ?  <FormatNumber number={totalViews}/> : '0'}</Text>
         </View>
-        }
+        
         
         {/* BOTTOM */}
         <View className={`absolute bottom-0 w-full bg-white flex-row justify-between items-center px-4 py-2`}>
