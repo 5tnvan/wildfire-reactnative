@@ -18,8 +18,12 @@ import BunnyAPI from '@/src/constants/BunnyAPI';
 import { Buffer } from 'buffer';
 import { supabase } from '@/src/lib/supabase';
 import { useAuth } from '@/src/services/providers/AuthProvider';
+import { FFmpegKit, ReturnCode } from 'ffmpeg-kit-react-native';
+import * as FileSystem from 'expo-file-system';
 
 const CameraScreen = () => {
+
+  
 
   const router = useRouter();
   const colorScheme = useColorScheme();
@@ -66,12 +70,12 @@ const CameraScreen = () => {
     setFacingType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
   }
 
+  console.log("camerarollvid", cameraRollVideo);
+
   const handlePickCamRollVideo = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({ // No permissions request is necessary for launching the image library
       mediaTypes: ImagePicker.MediaTypeOptions.Videos,
       allowsEditing: true,
-      aspect: [9, 16],
-      quality: 1,
       selectionLimit: 1,
       videoMaxDuration: 3,
       exif: true,
@@ -80,7 +84,12 @@ const CameraScreen = () => {
     console.log(result);
 
     if (!result.canceled) {
-      setCameraRollVideo(result.assets[0].uri);
+      const compressVidUri = await compressVideo(result.assets[0].uri)
+      
+      if (compressVidUri != null) {
+        const convertedVidUri = await convertUriFormat(compressVidUri);
+        if (convertedVidUri) setCameraRollVideo(convertedVidUri);
+      }
     }
   };
 
@@ -145,10 +154,10 @@ const CameraScreen = () => {
     //setModalVisible(false);
   };
 
-  const generateThumbnail = async (video_url: any) => {
+  const generateThumbnail = async (videoUri: any) => {
     try {
       const { uri } = await VideoThumbnails.getThumbnailAsync(
-        video_url,
+        videoUri,
         { time: 15000 }
       );
       return uri;
@@ -157,14 +166,70 @@ const CameraScreen = () => {
       return null;
     }
   };
+
+  const convertUriFormat = async (videoUri: string) => {
+    try {
+      // Get the file name from the original video URI
+      const fileName = videoUri.split('/').pop();
+      if (!fileName) return null;
+  
+      // Define the destination directory
+      const destinationUri = `${FileSystem.cacheDirectory}ImagePicker/${fileName}`;
+  
+      // Copy the video file to the destination directory
+      await FileSystem.copyAsync({
+        from: videoUri,
+        to: destinationUri,
+      });
+  
+      return destinationUri;
+    } catch (error) {
+      console.error("Video format conversion error:", error);
+      return null;
+    }
+  };
+
+  const compressVideo = async (videoUri:any) => {
+    const compressedVideoPath = `${RNFS.CachesDirectoryPath}/comp_video.mp4`;
+
+    const compressedVideoExists = await RNFS.exists(compressedVideoPath);
+    if (compressedVideoExists) await RNFS.unlink(compressedVideoPath);
+
+    try {
+      // const session = await FFmpegKit.execute(`-i "${videoUri}" -vf "scale=-2:720,setsar=1:1" -c:v h264 -b:v 20000k -c:a aac -b:a 128k -ac 2 "${compressedVideoPath}"`);
+
+      const session = await FFmpegKit.execute(`-i "${videoUri}" -c:v h264 -b:v 8000k -c:a aac -b:a 128k -ac 2 -filter:a loudnorm "${compressedVideoPath}"`);
+
+      const returnCode = await session.getReturnCode();
+  
+      if (ReturnCode.isSuccess(returnCode)) {
+        // SUCCESS
+        console.log("Compression success", compressedVideoPath);
+        return compressedVideoPath;
+      } else if (ReturnCode.isCancel(returnCode)) {
+        // CANCEL
+        console.log("Compression canceled");
+        return null;
+      } else {
+        // ERROR
+        console.log("Compression error");
+        return null;
+      }
+    } catch (error) {
+      // Catch any errors that occur during FFmpeg execution
+      console.error("FFmpeg execution error:", error);
+      return null;
+    }
+  };
+
   const handlePublishing = async () => {
 
     console.log("publishing");
 
-    if(limit) {
-      alert("You've reached your 24hrs posting limit. Try again later.")
-      return;
-    }
+    // if(limit) {
+    //   alert("You've reached your 24hrs posting limit. Try again later.")
+    //   return;
+    // }
 
     setIsUploading(true);
     const now = new Date().getTime();
@@ -350,7 +415,7 @@ const CameraScreen = () => {
       {/* CAM ROL VIDEO RESULT */}
       {cameraRollVideo && (
         <>
-          <View className='bg-black'>
+          <View className=''>
             <Video
               className='w-full h-full'
               source={{
@@ -360,9 +425,16 @@ const CameraScreen = () => {
               isLooping
               shouldPlay
             />
+            <Ionicons
+              onPress={() => setCameraRollVideo(undefined)}
+              name="chevron-back"
+              size={28}
+              color="white"
+              style={{ position: 'absolute', top: 20, left: 10 }}
+            />
             <View className='absolute bottom-3 flex-row w-full items-center px-3'>
               <Pressable className='flex-row justify-between grow py-3 px-3 items-center rounded-full bg-white mt-3 mr-3' onPress={() => setModalVisible(true)}>
-                <View><FontAwesome name="location-arrow" size={14} color="black" /></View>
+                <View><FontAwesome name="location-arrow" size={14} color="white" /></View>
                 <Text className='text-base font-semibold'>{locationName}</Text>
                 <View></View>
               </Pressable>
