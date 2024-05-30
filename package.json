@@ -50,7 +50,9 @@
     "react-native-vision-camera": "^4.0.3",
     "react-native-web": "~0.19.6",
     "viem": "^2.10.5",
-    "expo-camera": "~15.0.10"
+    "expo-camera": "~15.0.10",
+    "expo-updates": "~0.25.15",
+    "expo-dev-client": "~4.0.15"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
