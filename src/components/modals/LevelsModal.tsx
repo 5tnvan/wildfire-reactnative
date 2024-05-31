@@ -25,7 +25,6 @@ export function LevelsModal({ visible, onClose }: any) {
 
     useEffect(() => {
         const fetch = async () => {
-            console.log("refetch ")
             setLevel1(profile?.levels.find((item: any) => item.level === 1));
             setLevel2(profile?.levels.find((item: any) => item.level === 2));
             setLevel3(profile?.levels.find((item: any) => item.level === 3));

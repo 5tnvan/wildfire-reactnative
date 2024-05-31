@@ -1,12 +1,12 @@
-import { StyleSheet, Image, useColorScheme } from "react-native";
+import { StyleSheet, Image, useColorScheme, View } from "react-native";
 import React from 'react';
-import { Text, View } from "../Themed";
+import { Text } from "../Themed";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Header() {
   const colorScheme = useColorScheme();
   return (
-    <SafeAreaView className="px-2">
+    <SafeAreaView style={styles.safeArea}>
       <Image
         source={require("../../../assets/images/wildfire-logo-lit.png")}
         style={styles.logo}
@@ -16,6 +16,11 @@ export default function Header() {
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    height: 50,
+    marginHorizontal: 10,
+    marginBottom: 10,
+  },
   logo: {
     width: 75,
     height: 50,

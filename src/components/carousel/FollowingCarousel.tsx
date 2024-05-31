@@ -50,7 +50,7 @@ const Item = ({ id, profile, colorScheme, onPress } : Props) => (
 const styles = StyleSheet.create({
     container: {
         height: 'auto',
-        paddingVertical: 10
+        paddingBottom: 10
     },
     card: {
         width: CARD_WIDTH,

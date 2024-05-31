@@ -16,7 +16,7 @@ export default function IndexScreen() {
   // Re-fetch data when screen is focused 
   useEffect(() => {
     if (isFocused) {
-      console.log("refetching index")
+      console.log("IN FOCUS: home page")
       refetchFollows();
     }
   }, [isFocused]);

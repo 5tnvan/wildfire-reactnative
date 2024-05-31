@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ActivityIndicator, FlatList, Pressable, View, Text } from 'react-native';
 import PostItem from './PostItem';
 import { useUserFollowingFeed } from "@/src/hooks/useUserFollowingFeed";
@@ -11,7 +11,7 @@ export default function Posts({ setIsScrolling, following }: any) {
   const router = useRouter();
 
   // FETCH DIRECTLY
-  const { isLoading, feed: userFollowingFeed, fetchMore, refetch } = useUserFollowingFeed();
+  const { isLoading: isLoadingFeed, feed: userFollowingFeed, fetchMore, refetch } = useUserFollowingFeed();
 
   // FIGURE OUT WHICH VIDEO IS IN USER'S VIEW TO PLAY
   const [playingIndex, setPlayingIndex] = useState<any>(null);
@@ -22,6 +22,8 @@ export default function Posts({ setIsScrolling, following }: any) {
     }
   };
   const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
+
+  console.log("playingIndex", playingIndex);
 
   // HANDLE SCROLL
   const handleScroll = (event: any) => {
@@ -40,7 +42,8 @@ export default function Posts({ setIsScrolling, following }: any) {
   // HANDLE END REACHED
   const handleEndReached = () => {
     console.log("end reached");
-    if (!isLoading) {
+    if (!isLoadingFeed) {
+      console.log("end reached: fetch more");
       fetchMore();
     }
   };
@@ -54,47 +57,62 @@ export default function Posts({ setIsScrolling, following }: any) {
     setRefreshing(false);
   };
 
-  console.log("playingIndex", playingIndex);
+  
   // PAUSE ALL VIDEOS WHEN NOT IN FOCUS
   useEffect(() => {
     if (!isFocused) {
       setPlayingIndex(null);
     }
+    console.log("IN FOCUS: posts");
   }, [isFocused]);
+
+  const [isGreen, setIsGreen] = useState(false);
+  function changeColor() {
+    console.log("changed color");
+    setIsGreen(!isGreen);
+  }
+
+  const renderItem = useCallback(({ item , index } : any) => (
+    <PostItem
+      item={item}
+      isPlaying={index === playingIndex}
+      isMuted={isMuted}
+      toggleMute={handleToggleMute}
+    />
+  ), [playingIndex, isMuted, handleToggleMute]);
 
 
   return (
     <>
-    {following && following.length == 0 && userFollowingFeed && userFollowingFeed.length == 0 && !isLoading &&
+    {following && following.length == 0 && userFollowingFeed && userFollowingFeed.length == 0 && !isLoadingFeed &&
     <View className="flex-row justify-center items-center grow ">
       <PressableAnimated onPress={() => router.push("/discover")}>🥳 Start following someone</PressableAnimated>
     </View>
     }
-    {following && following.length > 0 && userFollowingFeed && userFollowingFeed.length == 0 && !isLoading &&
+    {following && following.length > 0 && userFollowingFeed && userFollowingFeed.length == 0 && !isLoadingFeed &&
     <View className="flex-row justify-center items-center grow ">
       <PressableAnimated onPress={() => handleRefresh()}>🎉 Start feed</PressableAnimated>
     </View>
     }
+
+    <Pressable onPress={changeColor}><Text className={`${isGreen ? 'text-green-500' : 'text-black'} `}>Click</Text></Pressable>
+    
+
     {userFollowingFeed && userFollowingFeed.length > 0 && 
       <FlatList
         data={userFollowingFeed}
-        renderItem={({ item, index }) => (
-          <PostItem
-            item={item}
-            isPlaying={index === playingIndex}
-            isMuted={isMuted}
-            toggleMute={handleToggleMute}
-          />
-        )}
+        renderItem={renderItem}
+        // initialNumToRender={2}
+        // windowSize={3}
         showsVerticalScrollIndicator={false}
         viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
         refreshing={refreshing}
         onRefresh={handleRefresh}
         onEndReached={handleEndReached}
-        onEndReachedThreshold={0.9} // Adjust the threshold as needed
-        ListFooterComponent={() => (isLoading ? <ActivityIndicator size="large" color="#000" /> : null)}
+        onEndReachedThreshold={0.5} // Adjust the threshold as needed
+        ListFooterComponent={() => (isLoadingFeed ? <ActivityIndicator size="large" color="#000" /> : null)}
         onScroll={handleScroll}
-        scrollEventThrottle={6}
+        scrollEventThrottle={0}
       />}
     </>
   );

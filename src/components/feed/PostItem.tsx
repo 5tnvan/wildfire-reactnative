@@ -1,5 +1,5 @@
 import { Image, StyleSheet, useColorScheme, TouchableOpacity, Pressable, Animated } from "react-native";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { Text, View } from "../Themed";
 import { SimpleLineIcons, MaterialCommunityIcons, Entypo, FontAwesome } from "@expo/vector-icons";
 import Video from "react-native-video";
@@ -17,7 +17,8 @@ import { fetchViewCount } from "@/src/utils/fetch/fetchViewCount";
 import { calculateTotalViews } from "@/src/utils/views/calculateTotalViews";
 import { getTotalViews } from "@/src/utils/views/getTotalViews";
 
-export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
+function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
+  console.log("rendering", item.id, isPlaying);
 
   const router = useRouter();
   const colorScheme = useColorScheme();
@@ -25,10 +26,6 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
 
   //COSUME PROVIDERS
   const { user } = useAuth();
-
-  //AFTER 3rd PLAY REPEAT, PAUSE VIDEO
-  const [threePlayPaused, setThreePlayPaused] = useState(false);
-  const [repeatCount, setRepeatCount] = useState(0);
 
   //GET VIDEO VIEWS
   const [totalViews, setTotalViews] = useState<any>(null);
@@ -48,30 +45,30 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
     }
   }
 
+  //AFTER 3rd PLAY REPEAT, PAUSE VIDEO
+  const [threePlayPaused, setThreePlayPaused] = useState(false);
+  const repeatCountRef = useRef(0);
+
   // HANDLE AFTER 3RD PLAY
   const handleThreePlayRepeat = () => {
-    setRepeatCount(prevCount => {
-      if (prevCount < 2) {
-        return prevCount + 1;
-      } else {
-        // Pause the video after 3th repeat
-        if (videoRef.current) {
-          videoRef.current.seek(0);
-          videoRef.current.pause();
-          setThreePlayPaused(true);
-          fadeIn();
-        }
-        return prevCount;
+    if (repeatCountRef.current < 2) {
+      repeatCountRef.current += 1;
+    } else {
+      // Pause the video after 3rd repeat
+      if (videoRef.current) {
+        videoRef.current.seek(0);
+        videoRef.current.pause();
+        setThreePlayPaused(true);
+        fadeIn();
       }
-    });
+    }
   };
 
   // HANDLE WATCH AGAIN
   const handleWatchAgain = async () => {
-    // increment views by +1
-    handleIncrementViews();
+    handleIncrementViews(); // increment views by +1
     //reset
-    setRepeatCount(0); // Reset the repeat count
+    repeatCountRef.current = 0; // Reset the repeat count
     setThreePlayPaused(false); // Set paused state to false to resume the video
     fadeAnim.setValue(0); // Reset the opacity animation value
     if (videoRef.current) videoRef.current.resume();
@@ -86,22 +83,6 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
     }).start();
   };
 
-  //WHEN VIDEO IS PLAYING
-  useEffect(() => {
-    if (isPlaying) {
-
-
-      console.log("video playing", item.id)
-
-
-      // increment views by +1
-      handleIncrementViews();
-      // reset
-      setRepeatCount(0);
-      setThreePlayPaused(false);
-      fadeAnim.setValue(0); // Reset opacity to 0
-    }
-  }, [isPlaying]);
 
   //HANDLE LIKE PRESS
   const [likeCount, setLikeCount] = useState(item["3sec_fires"][0].count);
@@ -132,6 +113,22 @@ export default function PostItem({ item, isPlaying, isMuted, toggleMute }: any) 
   const handleCommentPress = async () => {
     setCommentModalVisible(true);
   };
+
+  //WHEN VIDEO IS PLAYING
+  useEffect(() => {
+    if (isPlaying) {
+      // increment views by +1
+      handleIncrementViews();
+      // reset
+      repeatCountRef.current = 0;
+      setThreePlayPaused(false);
+      fadeAnim.setValue(0);
+      //resume
+      videoRef.current.resume();
+    } else {
+      videoRef.current.pause();
+    }
+  }, [isPlaying]);
 
   //PAUSE VIDEOS WHEN MODALS ARE OPEN
   useEffect(() => {
@@ -250,3 +247,7 @@ const styles = StyleSheet.create({
   },
 });
 
+export default memo(PostItem,
+  (prevProps, nextProps) => {
+    return (prevProps.isPlaying === nextProps.isPlaying && prevProps.isMuted === nextProps.isMuted);
+  },)

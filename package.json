@@ -52,7 +52,8 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-video": "^6.0.0",
     "react-native-web": "~0.19.6",
-    "viem": "^2.10.5"
+    "viem": "^2.10.5",
+    "@shopify/flash-list": "1.6.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
