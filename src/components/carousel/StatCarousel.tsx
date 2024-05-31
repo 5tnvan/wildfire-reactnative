@@ -51,7 +51,7 @@ export default function StatCarousel() {
     cardData[0].stat = levelName;
     cardData[1].stat = balance;
 
-    //HANDLE FOLLOWS MODAL
+    //HANDLE LEVELS MODAL
     const [levelsModalVisible, setLevelsModalVisible] = useState(false); //levels modal
 
     /**

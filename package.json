@@ -53,7 +53,8 @@
     "react-native-video": "^6.0.0",
     "react-native-web": "~0.19.6",
     "viem": "^2.10.5",
-    "@shopify/flash-list": "1.6.4"
+    "@shopify/flash-list": "1.6.4",
+    "expo-auth-session": "~5.5.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -8,7 +8,6 @@ import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Button, Pressable, SafeAreaView, StyleSheet, Text, TouchableOpacity, View, useColorScheme } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { PressableAnimated } from '@/src/components/pressables/PressableAnimated';
-import { Video } from 'expo-av';
 import { SetCountryModal } from '@/src/components/modals/SetCountryModal';
 import { useIsFocused } from '@react-navigation/native';
 import * as VideoThumbnails from 'expo-video-thumbnails';
@@ -20,10 +19,9 @@ import { supabase } from '@/src/lib/supabase';
 import { useAuth } from '@/src/services/providers/AuthProvider';
 import { FFmpegKit, ReturnCode } from 'ffmpeg-kit-react-native';
 import * as FileSystem from 'expo-file-system';
+import Video from 'react-native-video';
 
 const CameraScreen = () => {
-
-  
 
   const router = useRouter();
   const colorScheme = useColorScheme();
@@ -48,6 +46,9 @@ const CameraScreen = () => {
   const [isActive, setIsActive] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [counter, setCounter] = useState(0);
+
+  //compression
+  const [isCompressing, setIsCompressing] = useState(false);
   
   //vid res
   const [recordedVideo, setRecordedVideo] = useState<any>(null); //video taken from camera
@@ -70,11 +71,11 @@ const CameraScreen = () => {
     setFacingType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
   }
 
-  console.log("camerarollvid", cameraRollVideo);
+  const [isDurationError, setIsDurationError] = useState(false);
 
   const handlePickCamRollVideo = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({ // No permissions request is necessary for launching the image library
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
       allowsEditing: true,
       selectionLimit: 1,
       videoMaxDuration: 3,
@@ -84,21 +85,28 @@ const CameraScreen = () => {
     console.log(result);
 
     if (!result.canceled) {
+
+      //if duration is more than 3100 and less than 2800 - your video needs to be 3 secs
+
+      if(result.assets[0].duration && (result.assets[0].duration > 3100 || result.assets[0].duration < 2800)){
+        setIsDurationError(true)
+        return;
+      }
+      
       const compressVidUri = await compressVideo(result.assets[0].uri)
       
       if (compressVidUri != null) {
-        const convertedVidUri = await convertUriFormat(compressVidUri);
-        if (convertedVidUri) setCameraRollVideo(convertedVidUri);
+        setCameraRollVideo(compressVidUri);
       }
     }
   };
 
   const handleStartRecording = async () => {
     if (!isRecording) {
-      if (!cameraRef.current) return;
-      setIsRecording(true);
 
-      console.log("recording");
+      if (!cameraRef.current) return;
+
+      setIsRecording(true);
 
       const res = await cameraRef.current.recordAsync({
         maxDuration: 3,
@@ -106,10 +114,15 @@ const CameraScreen = () => {
       });
 
       if (res) {
-        console.log("res?.uri", res?.uri);
-        setRecordedVideo(res?.uri);
+        console.log("video recording res", res)
         setIsRecording(false);
+        const compressVidUri = await compressVideo(res.uri)
+
+        if (compressVidUri != null) {
+          setRecordedVideo(compressVidUri);
+        }
       }
+
     }
   };
 
@@ -158,7 +171,7 @@ const CameraScreen = () => {
     try {
       const { uri } = await VideoThumbnails.getThumbnailAsync(
         videoUri,
-        { time: 15000 }
+        { time: 1500, quality: 7 },
       );
       return uri;
     } catch (e) {
@@ -167,62 +180,37 @@ const CameraScreen = () => {
     }
   };
 
-  const convertUriFormat = async (videoUri: string) => {
-    console.log("videoUri", videoUri)
-    try {
-      // Get the file name from the original video URI
-      const fileName = videoUri.split('/').pop();
-      if (!fileName) return null;
+  const compressVideo = async (videoUri: string) => {
+    
+    setIsCompressing(true);
   
-      // Define the destination directory
-      const destinationUri = `${FileSystem.cacheDirectory}ImagePicker/${fileName}`;
-  
-      // Copy the video file to the destination directory
-      await FileSystem.copyAsync({
-        from: videoUri,
-        to: destinationUri,
-      });
-  
-      return destinationUri;
-    } catch (error) {
-      console.error("Video format conversion error:", error);
-      return null;
-    }
-  };
-
-  const compressVideo = async (videoUri:any) => {
     const timestamp = Date.now();
-    const compressedVideoPath = `${RNFS.CachesDirectoryPath}/comp_video_${timestamp}.mp4`;
-
-    const compressedVideoExists = await RNFS.exists(compressedVideoPath);
-    if (compressedVideoExists) await RNFS.unlink(compressedVideoPath);
-
+    const compressedVideoPath = `${FileSystem.cacheDirectory}comp_video_${timestamp}.mp4`;
+  
     try {
-      // const session = await FFmpegKit.execute(`-i "${videoUri}" -vf "scale=-2:720,setsar=1:1" -c:v h264 -b:v 20000k -c:a aac -b:a 128k -ac 2 "${compressedVideoPath}"`);
-
+  
+      // Execute FFmpeg command
       const session = await FFmpegKit.execute(`-i "${videoUri}" -c:v h264 -b:v 8000k -c:a aac -b:a 128k -ac 2 -filter:a loudnorm "${compressedVideoPath}"`);
-
       const returnCode = await session.getReturnCode();
   
       if (ReturnCode.isSuccess(returnCode)) {
-        // SUCCESS
         console.log("Compression success", compressedVideoPath);
         return compressedVideoPath;
       } else if (ReturnCode.isCancel(returnCode)) {
-        // CANCEL
         console.log("Compression canceled");
         return null;
       } else {
-        // ERROR
         console.log("Compression error");
         return null;
       }
     } catch (error) {
-      // Catch any errors that occur during FFmpeg execution
       console.error("FFmpeg execution error:", error);
       return null;
+    } finally {
+      setIsCompressing(false);
     }
   };
+  
 
   const handlePublishing = async () => {
 
@@ -317,11 +305,18 @@ const CameraScreen = () => {
     }
   };
 
-  // Re-fetch data when screen is focused 
+  // Reset
   useEffect(() => {
     if (isFocused) {
+      console.log(" focused")
       setIsActive(true);
     } else {
+      console.log("not focused")
+      setIsDurationError(false);
+      setCameraRollVideo(undefined);
+      setRecordedVideo(undefined);
+      setLocationId(null)
+      setLocationName('Set location');
       setIsActive(false);
     }
   }, [isFocused]);
@@ -370,6 +365,7 @@ const CameraScreen = () => {
         </CameraView>
 
       {/* RECORDING MODE */}
+
       {isRecording && 
       <SafeAreaView className='absolute top-3 self-center'>
         <View className='flex-row justify-start items-center p-3 rounded-full bg-zinc-700/40 w-24'>
@@ -377,7 +373,8 @@ const CameraScreen = () => {
           <Text className='ml-1 text-white font-semibold'>{formatCounter(counter)}s</Text>
         </View>
       </SafeAreaView>}
-      {!recordedVideo && !cameraRollVideo && (
+
+      {!recordedVideo && !cameraRollVideo && !isCompressing && !isDurationError && (
         <>
         {/* RIGHT CONTROLS */}
           <View
@@ -398,6 +395,7 @@ const CameraScreen = () => {
               onPress={toggleCameraFacing}
             />
           </View>
+
           {/* CAM ROLL CONTROLS */}
           <PressableAnimated className='absolute bottom-10 left-10 w-14 h-16 bg-black/30 rounded-2xl justify-center items-center border border-zinc-400' onPress={handlePickCamRollVideo}>
               <Feather name="film" size={24} color="#CBCBCB" />
@@ -414,7 +412,24 @@ const CameraScreen = () => {
           </Pressable>
         </>
       )}
-      {/* CAM ROL VIDEO RESULT */}
+
+      {/* DURATION ERROR */}
+      {isDurationError && (
+        <View className='absolute flex-1 w-full h-full bg-black justify-center'>
+          <Text className='text-white self-center mb-2'>Your video needs to be 3 secs</Text>
+          <TouchableOpacity onPress={() => setIsDurationError(false)}><Text className='text-accent self-center'>{`<`} Go back</Text></TouchableOpacity>
+        </View>
+      )}
+
+      {/* COMPRESSION */}
+      {isCompressing && (
+        <View className='absolute flex-1 w-full h-full bg-black justify-center'>
+          <Text className='text-white self-center mb-2'>Creating your video...</Text>
+          <ActivityIndicator />
+        </View>
+      )}
+
+      {/* CAM ROLL VIDEO RESULT */}
       {cameraRollVideo && (
         <>
           <View className=''>
@@ -423,29 +438,29 @@ const CameraScreen = () => {
               source={{
                 uri: cameraRollVideo,
               }}
-              useNativeControls={false}
-              isLooping
-              shouldPlay
+              repeat
             />
-            <Ionicons
-              onPress={() => setCameraRollVideo(undefined)}
-              name="chevron-back"
-              size={28}
-              color="white"
-              style={{ position: 'absolute', top: 20, left: 10 }}
-            />
+            <View className='absolute top-2 left-2 p-1 rounded-full bg-white/50 justify-center'>
+              <Ionicons
+                onPress={() => setCameraRollVideo(undefined)}
+                name="chevron-back"
+                size={28}
+                color="black"
+              />
+            </View>
+            
             <View className='absolute bottom-3 flex-row w-full items-center px-3'>
               <Pressable className='flex-row justify-between grow py-3 px-3 items-center rounded-full bg-white mt-3 mr-3' onPress={() => setModalVisible(true)}>
-                <View><FontAwesome name="location-arrow" size={14} color="white" /></View>
+                <View><FontAwesome name="location-arrow" size={14} color="black" /></View>
                 <Text className='text-base font-semibold'>{locationName}</Text>
                 <View></View>
               </Pressable>
-              <Pressable className={`flex-row justify-center grow py-3 px-2 items-center rounded-full ${limit ? 'bg-primary' : 'bg-accent'}  mt-3`} onPress={handlePublishing}>
+              <TouchableOpacity className={`flex-row justify-center grow py-3 px-2 items-center rounded-full ${limit ? 'bg-primary' : 'bg-accent'}  mt-3`} onPress={handlePublishing}>
                 <View></View>
                 <Text className='text-base font-semibold'>Publish</Text>
                 {/* <Ionicons name="chevron-forward" size={22} color="black" /> */}
                 {isUploading && <ActivityIndicator size="small" color="#0000ff" className='ml-1' />}
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </View>
         </>
@@ -460,29 +475,27 @@ const CameraScreen = () => {
               source={{
                 uri: recordedVideo,
               }}
-              useNativeControls={false}
-              isLooping
-              shouldPlay
+              repeat
             />
-            <Ionicons
-              onPress={() => setRecordedVideo(undefined)}
-              name="chevron-back"
-              size={28}
-              color="white"
-              style={{ position: 'absolute', top: 20, left: 10 }}
-            />
+            <View className='absolute top-2 left-2 p-1 rounded-full bg-white/50 self-center'>
+              <Ionicons
+                onPress={() => setRecordedVideo(undefined)}
+                name="chevron-back"
+                size={28}
+                color="black"
+              />
+            </View>
             <View className='absolute bottom-3 flex-row w-full items-center px-3'>
               <Pressable className='flex-row justify-between grow py-3 px-3 items-center rounded-full bg-white mt-3 mr-3' onPress={() => setModalVisible(true)}>
                 <View><FontAwesome name="location-arrow" size={14} color="black" /></View>
                 <Text className='text-base font-semibold'>{locationName}</Text>
                 <View></View>
               </Pressable>
-              <Pressable className='flex-row justify-between grow py-3 px-2 items-center rounded-full bg-accent mt-3' onPress={handlePublishing}>
+              <TouchableOpacity className={`flex-row justify-center grow py-3 px-2 items-center rounded-full ${limit ? 'bg-primary' : 'bg-accent'} mt-3`} onPress={handlePublishing}>
                 <View></View>
                 <Text className='text-base font-semibold'>Publish</Text>
-                <Ionicons name="chevron-forward" size={22} color="black" />
-                {/* {isUploading && <ActivityIndicator size="small" color="#0000ff" className='ml-1' />} */}
-              </Pressable>
+                {isUploading && <ActivityIndicator size="small" color="#0000ff" className='absolute right-2 m-auto' />}
+              </TouchableOpacity>
             </View>
           </View>
         </>

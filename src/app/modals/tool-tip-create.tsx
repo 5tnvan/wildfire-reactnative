@@ -5,14 +5,15 @@ import { Image } from 'react-native';
 import { Text, View } from "@/src/components/Themed";
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuthUser } from "@/src/services/providers/AuthUserProvider";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import { useAuth } from "@/src/services/providers/AuthProvider";
 import { useDailyPostLimit } from "@/src/hooks/useDailyPostLimit";
 import { TimeAgo } from "@/src/components/TimeAgo";
 import StatCarousel from "@/src/components/carousel/StatCarousel";
 import { PressableAnimated } from "@/src/components/pressables/PressableAnimated";
 import { useIsFocused } from "@react-navigation/native";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { LevelsModal } from "@/src/components/modals/LevelsModal";
 
 type Props = {
   iconName: any,
@@ -36,6 +37,9 @@ export default function ModalScreen() {
   console.log("limit", limit);
   console.log("posts", posts);
   console.log("postLeft", postLeft);
+
+  //HANDLE LEVELS MODAL
+  const [levelsModalVisible, setLevelsModalVisible] = useState(false); //levels modal
 
 
   // HANDLE WHEN SCREEN IS IN/OUT OF FOCUS
@@ -66,7 +70,8 @@ export default function ModalScreen() {
           </>
         }
 
-        <PressableAnimated onPress={refetch}><Text className="white">Level Up</Text></PressableAnimated>
+        <PressableAnimated onPress={() => setLevelsModalVisible(true)}><Text className="white">Level Up</Text></PressableAnimated>
+        <LevelsModal visible={levelsModalVisible} onClose={() => setLevelsModalVisible(false)} />
 
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />

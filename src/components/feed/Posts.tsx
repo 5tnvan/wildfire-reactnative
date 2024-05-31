@@ -23,8 +23,6 @@ export default function Posts({ setIsScrolling, following }: any) {
   };
   const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
 
-  //console.log("playingIndex", playingIndex);
-
   // HANDLE SCROLL
   const handleScroll = (event: any) => {
     if (setIsScrolling) {
@@ -57,7 +55,6 @@ export default function Posts({ setIsScrolling, following }: any) {
     setRefreshing(false);
   };
 
-  
   // PAUSE ALL VIDEOS WHEN NOT IN FOCUS
   useEffect(() => {
     if (!isFocused) {
@@ -66,12 +63,7 @@ export default function Posts({ setIsScrolling, following }: any) {
     console.log("IN FOCUS: posts");
   }, [isFocused]);
 
-  const [isGreen, setIsGreen] = useState(false);
-  function changeColor() {
-    console.log("changed color");
-    setIsGreen(!isGreen);
-  }
-
+  //OPTIMIZE FLATLIST
   const renderItem = useCallback(({ item , index } : any) => (
     <PostItem
       item={item}
@@ -93,10 +85,7 @@ export default function Posts({ setIsScrolling, following }: any) {
     <View className="flex-row justify-center items-center grow ">
       <PressableAnimated onPress={() => handleRefresh()}>🎉 Start feed</PressableAnimated>
     </View>
-    }
-
-    <Pressable onPress={changeColor}><Text className={`${isGreen ? 'text-green-500' : 'text-black'} `}>Click</Text></Pressable>
-    
+    }    
 
     {userFollowingFeed && userFollowingFeed.length > 0 && 
       <FlatList

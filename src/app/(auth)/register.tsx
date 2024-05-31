@@ -9,7 +9,8 @@ import {
   ImageBackground,
   StyleSheet,
   useColorScheme,
-  Image
+  Image,
+  TouchableOpacity
 } from "react-native";
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 
@@ -169,6 +170,7 @@ export default function RegisterScreen() {
             value={email}
             placeholder="email@address.com"
             autoCapitalize={"none"}
+            className={colorScheme =="dark" ? 'text-white' : 'text-black'}
           />
         </View>
 
@@ -181,18 +183,19 @@ export default function RegisterScreen() {
             secureTextEntry={true}
             placeholder="Password"
             autoCapitalize={"none"}
+            className={colorScheme =="dark" ? 'text-white' : 'text-black'}
           />
         </View>
 
         <View className="items-center mb-5">
 
-          <Pressable
+          <TouchableOpacity
             className={`w-full items-center justify-center p-3 rounded-full ${loading ? "bg-slate-400" : "bg-accent"}`}
             disabled={loading}
             onPress={() => signUpWithEmail()}
           >
             <Text className="text-lg text-black font-semibold">Register</Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

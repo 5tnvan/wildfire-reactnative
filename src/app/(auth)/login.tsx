@@ -1,4 +1,4 @@
-import { Alert, AppState, Image, Pressable, useColorScheme } from 'react-native';
+import { Alert, AppState, Image, Pressable, TouchableOpacity, useColorScheme } from 'react-native';
 import { Text, View } from "@/src/components/Themed";
 import { LogoWildfireLit } from '../../components/logos/LogoFireLit';
 import 'react-native-url-polyfill/auto'
@@ -73,9 +73,9 @@ export default function LoginScreen() {
           />
         </View>
         <View>
-          <Pressable className={`items-center justify-center p-3 rounded-full ${colorScheme == 'dark' ? 'bg-secondary' : 'bg-neutral'}`} onPress={() => signInWithEmail()}>
+          <TouchableOpacity className={`items-center justify-center p-3 rounded-full ${colorScheme == 'dark' ? 'bg-secondary' : 'bg-neutral'}`} onPress={() => signInWithEmail()}>
             <Text className={`text-lg font-semibold ${colorScheme == 'dark' ? 'text-white' : 'text-black'}`}>Log In</Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
 
       </View>
