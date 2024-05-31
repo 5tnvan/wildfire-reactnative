@@ -23,7 +23,7 @@ export default function Posts({ setIsScrolling, following }: any) {
   };
   const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
 
-  console.log("playingIndex", playingIndex);
+  //console.log("playingIndex", playingIndex);
 
   // HANDLE SCROLL
   const handleScroll = (event: any) => {
