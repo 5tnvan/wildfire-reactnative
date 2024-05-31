@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function Header() {
   const colorScheme = useColorScheme();
   return (
-    <SafeAreaView className="px-2 h-0">
+    <SafeAreaView className="px-2">
       <Image
         source={require("../../../assets/images/wildfire-logo-lit.png")}
         style={styles.logo}

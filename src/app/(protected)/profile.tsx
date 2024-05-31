@@ -179,7 +179,7 @@ export default function ProfileScreen() {
                   <View className="flex-row items-center mb-3">
                       <TouchableOpacity className="flex-row gap-1 mr-1" onPress={() => setFollowersModalVisible(true)}>
                         <Text className="font-semibold text-lg text-accent">
-                          {followers.length}
+                          {followers?.length}
                         </Text>
                         <Text className="text-lg">followers</Text>
                       </TouchableOpacity>
@@ -188,7 +188,7 @@ export default function ProfileScreen() {
                         onPress={() => setFollowingModalVisible(true)}
                       >
                         <Text className="font-semibold text-lg text-accent">
-                          {following.length}
+                          {following?.length}
                         </Text>
                         <Text className="text-lg">following</Text>
                       </TouchableOpacity>

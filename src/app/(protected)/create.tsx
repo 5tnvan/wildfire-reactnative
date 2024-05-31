@@ -74,7 +74,7 @@ const CameraScreen = () => {
 
   const handlePickCamRollVideo = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({ // No permissions request is necessary for launching the image library
-      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       selectionLimit: 1,
       videoMaxDuration: 3,
@@ -168,6 +168,7 @@ const CameraScreen = () => {
   };
 
   const convertUriFormat = async (videoUri: string) => {
+    console.log("videoUri", videoUri)
     try {
       // Get the file name from the original video URI
       const fileName = videoUri.split('/').pop();
@@ -190,7 +191,8 @@ const CameraScreen = () => {
   };
 
   const compressVideo = async (videoUri:any) => {
-    const compressedVideoPath = `${RNFS.CachesDirectoryPath}/comp_video.mp4`;
+    const timestamp = Date.now();
+    const compressedVideoPath = `${RNFS.CachesDirectoryPath}/comp_video_${timestamp}.mp4`;
 
     const compressedVideoExists = await RNFS.exists(compressedVideoPath);
     if (compressedVideoExists) await RNFS.unlink(compressedVideoPath);
@@ -331,9 +333,9 @@ const CameraScreen = () => {
 
   if (!camPerm?.granted && !micPerm?.granted) {
     return (
-      <View className='flex-1 justify-center'>
-        <Text style={{ textAlign: 'center' }}>We need your permission to show the camera</Text>
-        <Button onPress={requestPermission} title="Grant permissions" />
+      <View className='flex-1 justify-center items-center px-10'>
+        <Text style={{ textAlign: 'center', marginBottom: 10 }}>We need your permission to show the camera</Text>
+        <PressableAnimated className='bg-accent' onPress={requestPermission}><Text>Grant permissions</Text></PressableAnimated>
       </View>
     );
   }
