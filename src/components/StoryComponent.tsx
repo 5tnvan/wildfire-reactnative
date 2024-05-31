@@ -49,21 +49,23 @@ export default function StoryComponent({ data, storyIndex, onFinishStory }: Prop
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [wentBack, setWentBack] = useState(0);
+  const [temporaryFollowed, setTemporaryFollowed] = useState(false);
+
+  const handleIncrementViews = async (story: any) => {
+    const _watched = await watched(story.id, user?.id);
+    if (_watched) {
+      increment_views(story.id, user?.id)
+    } else {
+      const error = await insert_views(story.id, user?.id)
+      if (!error) increment_views(story.id, user?.id)
+    }
+  }
 
   const renderStoryContent = (story: any) => {
 
-    const handleIncrementViews = async () => {
-      const _watched = await watched(story.id, user?.id);
-      if (_watched) {
-        increment_views(story.id, user?.id)
-      } else {
-        const error = await insert_views(story.id, user?.id)
-        if (!error) increment_views(story.id, user?.id)
-      }
-    }
+    handleIncrementViews(story);
 
-    console.log("isPlaying", story.id) //last one always plays twice
-    handleIncrementViews();
+    console.log("isPlaying", story.id) //last one always renders twice
 
     return (
       <Video
@@ -169,18 +171,6 @@ export default function StoryComponent({ data, storyIndex, onFinishStory }: Prop
     }
   };
 
-  useEffect(() => {
-    if (!isPaused) {
-      runProgressAnimation();
-    } else {
-      progressAnim.stopAnimation(value => {
-        pausedProgress.current = value;
-      });
-    }
-  }, [currentStoryIndex, isPaused]);
-
-  const [temporaryFollowed, setTemporaryFollowed] = useState(false);
-
   const handleFollow = async () => {
     console.log("data.authUser", data.authUser.id);
     console.log("data.user", data.user.id);
@@ -190,6 +180,17 @@ export default function StoryComponent({ data, storyIndex, onFinishStory }: Prop
       .insert({ follower_id: data.authUser?.id, following_id: data.user.id });
     if (!error) setTemporaryFollowed(true);
   }
+
+  useEffect(() => {
+    if (!isPaused) {
+      runProgressAnimation();
+    } else {
+      progressAnim.stopAnimation(value => {
+        pausedProgress.current = value;
+      });
+    }
+  }, [currentStoryIndex, isPaused]);
+  
 
   return (
     <View style={styles.safeArea}>
@@ -203,6 +204,7 @@ export default function StoryComponent({ data, storyIndex, onFinishStory }: Prop
           {/* STORY VIDEO */}
           {renderStoryContent(currentStory)}
 
+          {/* TOP BAR */}
           <SafeAreaView>
             <View style={styles.progressBarContainer}>
               {data.feed.map((story: any, index: any) => (
@@ -233,8 +235,12 @@ export default function StoryComponent({ data, storyIndex, onFinishStory }: Prop
               </TouchableOpacity>
             </View>
           </SafeAreaView>
+
+          {/* BOTTOM BAR */}
           <SafeAreaView className='absolute bottom-0 flex-row justify-between items-center w-full'>
             <LinearGradient className='absolute bottom-0 p-20 w-full' colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 1)']}></LinearGradient>
+            
+            {/* BOTTOM LEFT */}
             <Pressable className='flex-row items-center ml-3' onPress={() => router.push("/(profile/)" + currentStory.profile.username)}>
               <Avatar avatar_url={currentStory.profile.avatar_url} username={currentStory.profile.username} size={'md'} ring={true} />
               <Text className='ml-2 mr-1 font-bold text-white text-base' style={styles.shadow}>{currentStory.profile.username}</Text>
@@ -253,6 +259,8 @@ export default function StoryComponent({ data, storyIndex, onFinishStory }: Prop
 
                 </View>}
             </Pressable>
+
+            {/* BOTTOM RIGHT */}
             {currentStory.country &&
               <View className='flex-row items-center rounded-full mr-3 bg-zinc-900/60 px-2 py-1'>
                 <FontAwesome name="location-arrow" size={14} color="white" />

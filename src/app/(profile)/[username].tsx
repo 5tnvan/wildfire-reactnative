@@ -20,7 +20,6 @@ import { useIsFocused } from '@react-navigation/native';
 import StoryComponent from '@/src/components/StoryComponent';
 import { Ionicons } from '@expo/vector-icons';
 import { FollowsModal } from '@/src/components/modals/FollowsModal';
-import { InfoWithEmoji } from '@/src/components/InfoWithEmoji';
 import { useAuth } from '@/src/services/providers/AuthProvider';
 
 export default function ProfileUsernameScreen() {
@@ -35,7 +34,7 @@ export default function ProfileUsernameScreen() {
   //CONSUME PROVIDERS
   const { user: authUser } = useAuth();
   const { user } = useUser(username);
-  const { followed, followers, following, refetch: refetchFollows} = useUserFollows(username);
+  const { followed, followers, following, refetch: refetchFollows } = useUserFollows(username);
   const { isLoading: isLoadingFeed, feed } = useUserFeedByUsername(username);
 
 
@@ -71,18 +70,18 @@ export default function ProfileUsernameScreen() {
 
   //OPEN CLOSE STORY MODAL 
   const [insideModal, setInsideModal] = useState(false);
-  function openModal() { setInsideModal(true); }
-  function closeModal() { setInsideModal(false); }
+  function openModal() { }
+  function closeModal() { refetchFollows(); setInsideModal(false); setInsideStory(false); }
 
   const [insideStory, setInsideStory] = useState(false);
-  function openStory() { setInsideStory(true); openModal(); }
-  function closeStory() { refetchFollows(); setInsideStory(false); closeModal() }
+  function openStory() { setInsideStory(true); setInsideModal(true); }
+  function closeStory() { refetchFollows(); setInsideStory(false); setInsideModal(false); }
 
   if (!user) return <><Text>User not found</Text></>
 
   return (
     <>
-      {insideStory ?
+      {insideStory &&
         // STORY MODAL
         <Modal
           visible={insideModal}
@@ -92,115 +91,115 @@ export default function ProfileUsernameScreen() {
         >
           <StoryComponent data={{ authUser: authUser, user: user, feed: feed, followed: followed }} storyIndex={storyIndex} onFinishStory={closeStory} />
         </Modal>
-        :
-        <>
-          {/* HEADER */}
-          <Stack.Screen options={{
-            headerShown: true,
-            presentation: 'card',
-            headerBackTitle: 'Back',
-            title: '@' + username,
-            headerRight: () => (
-              <View>
-                {followed != null && followed &&
-                  <PressableAnimated className="py-1 px-3 flex-row items-center" onPress={() => setFollowsModalVisible(true)}>
-                    <Text className='mr-1'>Following </Text>
-                    <View><Ionicons name="checkmark-circle-outline" size={16} color={colorScheme == 'dark' ? 'white' : 'black'} /></View>
-                  </PressableAnimated>
-                }
-                {followed != null && !followed &&
-                  <PressableAnimated className="bg-accent py-1 px-3 flex-row justify-center" onPress={handleFollow}>
-                    <Text className='text-black font-medium'>Follow</Text>
-                  </PressableAnimated>
-                }
+      }
+      <>
+        {/* HEADER */}
+        <Stack.Screen options={{
+          headerShown: true,
+          presentation: 'card',
+          headerBackTitle: 'Back',
+          title: '@' + username,
+          headerRight: () => (
+            <View>
+              {followed != null && followed &&
+                <PressableAnimated className="py-1 px-3 flex-row items-center" onPress={() => setFollowsModalVisible(true)}>
+                  <Text className='mr-1'>Following </Text>
+                  <View><Ionicons name="checkmark-circle-outline" size={16} color={colorScheme == 'dark' ? 'white' : 'black'} /></View>
+                </PressableAnimated>
+              }
+              {followed != null && !followed &&
+                <PressableAnimated className="bg-accent py-1 px-3 flex-row justify-center" onPress={handleFollow}>
+                  <Text className='text-black font-medium'>Follow</Text>
+                </PressableAnimated>
+              }
+            </View>
+          )
+        }} />
+        {/* FOLLOWS MODAL */}
+        <FollowsModal visible={followsModalVisible} data={{ user: user, followers: followers }} onClose={() => { setFollowsModalVisible(false); refetchFollows() }} />
+        {/* CONTAINER FOR MAIN CONTENT*/}
+        <View className="flex-1 flex-col justify-between">
+
+          {/* LOADING FEED */}
+          {isLoadingFeed && <View className="flex-row justify-center items-center grow ">
+            <ActivityIndicator />
+          </View>}
+
+          {/* NO FEED */}
+          {!isLoadingFeed && feed && feed.length === 0 &&
+            <View className="flex-row justify-center items-center grow ">
+              <PressableAnimated onPress={() => console.log("clicked")}>🤫 User hasn't posted yet</PressableAnimated>
+            </View>}
+
+          {/* SPINNING CAROUSEL FEED */}
+          {!isLoadingFeed && feed && feed.length > 0 &&
+            <>
+              <View style={styles.container}>
+                <Animated.FlatList
+                  onScroll={onScroll}
+                  ListHeaderComponent={<View />}
+                  ListHeaderComponentStyle={{ width: SPACER }}
+                  ListFooterComponent={<View />}
+                  ListFooterComponentStyle={{ width: SPACER }}
+                  data={feed}
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={item => item.id + item.name}
+                  renderItem={({ item, index }) => {
+                    return (
+                      <Item
+                        item={item}
+                        index={index}
+                        x={x}
+                        width={ITEM_WIDTH}
+                        height={ITEM_HEIGHT}
+                        marginHorizontal={MARGin_HORIZONTAL}
+                        fullWidth={ITEM_FULL_WIDTH}
+                        onPress={handleStoryPress}
+                      />
+                    );
+                  }}
+                  horizontal
+                  scrollEventThrottle={16}
+                  decelerationRate="fast"
+                  snapToInterval={ITEM_FULL_WIDTH}
+                />
               </View>
-            )
-          }} />
-          {/* FOLLOWS MODAL */}
-          <FollowsModal visible={followsModalVisible} data={{ user: user, followers: followers }} onClose={() => {setFollowsModalVisible(false); refetchFollows()}} />
-          {/* CONTAINER FOR MAIN CONTENT*/}
-          <View className="flex-1 flex-col justify-between">
+            </>}
 
-            {/* LOADING FEED */}
-            {isLoadingFeed && <View className="flex-row justify-center items-center grow ">
-                <ActivityIndicator />
-              </View>}
-
-            {/* NO FEED */}
-            {!isLoadingFeed && feed && feed.length === 0 &&
-              <View className="flex-row justify-center items-center grow ">
-                <PressableAnimated onPress={() => console.log("clicked")}>🤫 User hasn't posted yet</PressableAnimated>
-              </View>}
-
-            {/* SPINNING CAROUSEL FEED */}
-            {!isLoadingFeed && feed && feed.length > 0 &&
-              <>
-                <View style={styles.container}>
-                  <Animated.FlatList
-                    onScroll={onScroll}
-                    ListHeaderComponent={<View />}
-                    ListHeaderComponentStyle={{ width: SPACER }}
-                    ListFooterComponent={<View />}
-                    ListFooterComponentStyle={{ width: SPACER }}
-                    data={feed}
-                    showsHorizontalScrollIndicator={false}
-                    keyExtractor={item => item.id + item.name}
-                    renderItem={({ item, index }) => {
-                      return (
-                        <Item
-                          item={item}
-                          index={index}
-                          x={x}
-                          width={ITEM_WIDTH}
-                          height={ITEM_HEIGHT}
-                          marginHorizontal={MARGin_HORIZONTAL}
-                          fullWidth={ITEM_FULL_WIDTH}
-                          onPress={handleStoryPress}
-                        />
-                      );
-                    }}
-                    horizontal
-                    scrollEventThrottle={16}
-                    decelerationRate="fast"
-                    snapToInterval={ITEM_FULL_WIDTH}
-                  />
-                </View>
-              </>}
-
-            {/* USER BOTTOM INFO */}
-            <View className={`${colorScheme == "dark" ? "bg-zinc-900" : "bg-white"} w-full items-center justify-center p-10`}>
-              <View className='absolute' style={{ top: -30 }}>
-                <Avatar
-                  avatar_url={user.avatar_url}
-                  username={user.username}
-                  size="lg"
-                  ring={true}
-                ></Avatar>
-              </View>
-              <Text className='font-medium text-lg text-accent'>@{user.username}</Text>
-              <Pressable className="flex-row gap-1 mb-3">
-                <Text className="font-semibold text-lg text-accent">
-                  {followers?.length}
-                </Text>
-                <Text className="text-lg">followers</Text>
-                {/* <Text className="font-semibold text-lg text-accent">
+          {/* USER BOTTOM INFO */}
+          <View className={`${colorScheme == "dark" ? "bg-zinc-900" : "bg-white"} w-full items-center justify-center p-10`}>
+            <View className='absolute' style={{ top: -30 }}>
+              <Avatar
+                avatar_url={user.avatar_url}
+                username={user.username}
+                size="lg"
+                ring={true}
+              ></Avatar>
+            </View>
+            <Text className='font-medium text-lg text-accent'>@{user.username}</Text>
+            <Pressable className="flex-row gap-1 mb-3">
+              <Text className="font-semibold text-lg text-accent">
+                {followers?.length}
+              </Text>
+              <Text className="text-lg">followers</Text>
+              {/* <Text className="font-semibold text-lg text-accent">
             {following?.length}
           </Text>
           <Text className="text-lg">following</Text> */}
-              </Pressable>
-              <PressableAnimated
-                onPress={() => alert("djhdjs")}>
-                <Text className="text-lg"> </Text>
-                <Text className="text-base">Tip Now</Text>
-                <MaterialCommunityIcons
-                  name="ethereum"
-                  size={17}
-                  color={colorScheme === "dark" ? "white" : "black"} // Adjust color based on colorScheme
-                />
-              </PressableAnimated>
-            </View>
+            </Pressable>
+            <PressableAnimated
+              onPress={() => alert("djhdjs")}>
+              <Text className="text-lg"> </Text>
+              <Text className="text-base">Tip Now</Text>
+              <MaterialCommunityIcons
+                name="ethereum"
+                size={17}
+                color={colorScheme === "dark" ? "white" : "black"} // Adjust color based on colorScheme
+              />
+            </PressableAnimated>
           </View>
-        </>}
+        </View>
+      </>
     </>
 
   );

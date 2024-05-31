@@ -158,7 +158,7 @@ function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
       </View>
 
       {/* VIDEO */}
-      <View className="w-full h-[500px] relative">
+      <View className="w-full h-[540px] relative">
         <Video
           ref={videoRef}
           source={{ uri: item.video_url }}

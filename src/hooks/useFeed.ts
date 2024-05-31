@@ -45,7 +45,7 @@ export const useFeed = () => {
 
     const { data, error } = await supabase
       .from('3sec_desc_view')
-      .select('id, thumbnail_url, video_url, created_at, views, country:country_id(id, name), profile:user_id(id, username, avatar_url), 3sec_fires(count), 3sec_comments(count)')
+      .select('id, thumbnail_url, video_url, created_at, country:country_id(id, name), profile:user_id(id, username, avatar_url), 3sec_fires(count), 3sec_comments(count)')
       .range(from, to)
 
       if (error) {

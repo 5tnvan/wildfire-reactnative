@@ -48,7 +48,7 @@ export default function ModalScreen() {
       </View>
 
       {/* Link */}
-      <Link href="https://www.wildpay.com/" className="mb-4"><Text className="text-base underline">{`Visit www.wildpay.com`}</Text></Link>
+      <Link href="https://www.wildpay.app" className="mb-4"><Text className="text-base underline">{`Visit www.wildpay.com`}</Text></Link>
       
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
