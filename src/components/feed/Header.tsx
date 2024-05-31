@@ -17,7 +17,7 @@ export default function Header() {
 
 const styles = StyleSheet.create({
   safeArea: {
-    height: 50,
+    height: 70,
     marginHorizontal: 10,
     marginBottom: 10,
   },

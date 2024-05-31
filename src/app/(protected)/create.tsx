@@ -88,7 +88,7 @@ const CameraScreen = () => {
 
       //if duration is more than 3100 and less than 2800 - your video needs to be 3 secs
 
-      if(result.assets[0].duration && (result.assets[0].duration > 3100 || result.assets[0].duration < 2800)){
+      if(result.assets[0].duration && (result.assets[0].duration > 3500 || result.assets[0].duration < 2500)){
         setIsDurationError(true)
         return;
       }
@@ -171,7 +171,7 @@ const CameraScreen = () => {
     try {
       const { uri } = await VideoThumbnails.getThumbnailAsync(
         videoUri,
-        { time: 1500, quality: 7 },
+        { time: 1500 },
       );
       return uri;
     } catch (e) {
@@ -360,7 +360,6 @@ const CameraScreen = () => {
           ref={cameraRef}
           style={styles.camera}
           facing={facingType}
-          videoQuality='2160p'
         >
         </CameraView>
 
