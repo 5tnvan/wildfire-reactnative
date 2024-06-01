@@ -35,7 +35,7 @@ export const useFeedFromTime = () => {
       .limit(3)
 
     if (error) {
-      console.error("Error fetching data:", error);
+      console.error("useFeedFromTime Error fetching data:", error);
     }
     return data || [];
   };

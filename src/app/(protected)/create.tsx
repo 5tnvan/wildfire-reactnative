@@ -20,6 +20,7 @@ import { useAuth } from '@/src/services/providers/AuthProvider';
 import { FFmpegKit, ReturnCode } from 'ffmpeg-kit-react-native';
 import * as FileSystem from 'expo-file-system';
 import Video from 'react-native-video';
+import { useAuthUser } from '@/src/services/providers/AuthUserProvider';
 
 const CameraScreen = () => {
 
@@ -29,6 +30,7 @@ const CameraScreen = () => {
 
   //CONSUME PROVIDERS
   const { user } = useAuth();
+  const { profile } = useAuthUser();
 
   // FETCH DIRECTLY
   const { limit } = useDailyPostLimit();
@@ -55,7 +57,7 @@ const CameraScreen = () => {
   const [cameraRollVideo, setCameraRollVideo] = useState<string>(); //video taken from camera roll
 
   //country modal
-  const [modalVisible, setModalVisible] = useState(false); //location modal
+  const [locationModalVisible, setLocationModalVisible] = useState(false); //location modal
   const [locationId, setLocationId] = useState<any>(null);
   const [locationName, setLocationName] = useState("Set location");
 
@@ -296,7 +298,7 @@ const CameraScreen = () => {
         console.log("uploaded!!");
         setRecordedVideo(undefined);
         setCameraRollVideo(undefined);
-        router.push("/(protected)/profile");
+        router.push("/(profile)/" + profile.username);
       }
     } catch (error) {
       console.error('Upload error:', error);
@@ -308,10 +310,9 @@ const CameraScreen = () => {
   // Reset
   useEffect(() => {
     if (isFocused) {
-      console.log(" focused")
+      console.log("IN FOCUS: create")
       setIsActive(true);
     } else {
-      console.log("not focused")
       setIsDurationError(false);
       setCameraRollVideo(undefined);
       setRecordedVideo(undefined);
@@ -449,7 +450,7 @@ const CameraScreen = () => {
             </View>
             
             <View className='absolute bottom-3 flex-row w-full items-center px-3'>
-              <Pressable className='flex-row justify-between grow py-3 px-3 items-center rounded-full bg-white mt-3 mr-3' onPress={() => setModalVisible(true)}>
+              <Pressable className='flex-row justify-between grow py-3 px-3 items-center rounded-full bg-white mt-3 mr-3' onPress={() => setLocationModalVisible(true)}>
                 <View><FontAwesome name="location-arrow" size={14} color="black" /></View>
                 <Text className='text-base font-semibold'>{locationName}</Text>
                 <View></View>
@@ -485,7 +486,7 @@ const CameraScreen = () => {
               />
             </View>
             <View className='absolute bottom-3 flex-row w-full items-center px-3'>
-              <Pressable className='flex-row justify-between grow py-3 px-3 items-center rounded-full bg-white mt-3 mr-3' onPress={() => setModalVisible(true)}>
+              <Pressable className='flex-row justify-between grow py-3 px-3 items-center rounded-full bg-white mt-3 mr-3' onPress={() => setLocationModalVisible(true)}>
                 <View><FontAwesome name="location-arrow" size={14} color="black" /></View>
                 <Text className='text-base font-semibold'>{locationName}</Text>
                 <View></View>
@@ -502,7 +503,8 @@ const CameraScreen = () => {
       )}
 
       {/* LOCATION MODAL */}
-      <SetCountryModal visible={modalVisible} onClose={() => setModalVisible(false)} passBack={handleCountrySelect}/>
+      {locationModalVisible && <SetCountryModal visible={locationModalVisible} onClose={() => setLocationModalVisible(false)} passBack={handleCountrySelect}/>}
+      
       
     </View>
   );

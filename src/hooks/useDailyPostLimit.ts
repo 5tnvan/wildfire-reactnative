@@ -52,7 +52,6 @@ export const useDailyPostLimit = () => {
     const now = new Date();
 
     if (!levelData) {
-      console.log("im here, level 0")
       if (posts && posts.length > 0) {
         const postDate = new Date(posts[0].created_at);
         const diff = (now.getTime() - postDate.getTime()) / (1000 * 60 * 60); // difference in hours
@@ -71,7 +70,6 @@ export const useDailyPostLimit = () => {
     }
 
     if (levelData) {
-      console.log("im here, level 1")
       if (posts && posts.length > 1) {
         
         const postDate1 = new Date(posts[0].created_at);

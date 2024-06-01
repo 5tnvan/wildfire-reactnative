@@ -49,7 +49,7 @@ export const useFeed = () => {
       .range(from, to)
 
       if (error) {
-        console.error("Error fetching data:", error);
+        console.error("useFeed Error fetching data:", error);
       } else {
         // console.log("data", JSON.stringify(data, null, 2));
 

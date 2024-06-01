@@ -13,6 +13,7 @@ type Props = {
 };
 
 export function SearchUserModal({ visible, onClose }: Props) {
+    console.log("rendering SearchUserModal")
     const colorScheme = useColorScheme();
     const router = useRouter();
     const [searchValue, setSearchValue] = useState("");

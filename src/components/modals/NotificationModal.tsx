@@ -31,8 +31,6 @@ export function NotificationModal({ visible, data, onClose }: Props) {
 
     //STATES
     const [readNotifications, setReadNotifications] = useState<any>(null);
-    console.log("followers unread notifications", JSON.stringify(followersNotifications, null, 2))
-    console.log("followers read notifications", JSON.stringify(readNotifications, null, 2))
 
     const handleReset = () => {
         setReadNotifications(null);
@@ -46,6 +44,7 @@ export function NotificationModal({ visible, data, onClose }: Props) {
     //REFETCH DATA WHEN SCREEN IS FOCUSED 
     useEffect(() => {
         if (isFocused) {
+            console.log("FOCUS: notification modal")
             setReadNotifications(null);
         }
     }, [isFocused]);

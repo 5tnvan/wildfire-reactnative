@@ -117,7 +117,8 @@ export default function ProfileUsernameScreen() {
           )
         }} />
         {/* FOLLOWS MODAL */}
-        <FollowsModal visible={followsModalVisible} data={{ user: user, followers: followers }} onClose={() => { setFollowsModalVisible(false); refetchFollows() }} />
+        {followsModalVisible && <FollowsModal visible={followsModalVisible} data={{ user: user, followers: followers }} onClose={() => { setFollowsModalVisible(false); refetchFollows() }} />}
+        
         {/* CONTAINER FOR MAIN CONTENT*/}
         <View className="flex-1 flex-col justify-between">
 

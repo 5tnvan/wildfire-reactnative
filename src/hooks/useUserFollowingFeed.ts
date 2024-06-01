@@ -56,7 +56,7 @@ export const useUserFollowingFeed = () => {
         .range(from, to);
 
       if (error) {
-        console.error("Error fetching data:", error);
+        console.error("useUserFollowingFeed Error fetching data:", error);
       } else {
         // Check if each post is liked by the user
         const likedPostsPromises = data.map(async (post: any) => {

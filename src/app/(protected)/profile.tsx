@@ -88,9 +88,9 @@ export default function ProfileScreen() {
   //REFETCH DATA WHEN SCREEN IS FOCUSED 
   useEffect(() => {
     if (isFocused) {
-      console.log("FOCUSED: profile")
-      x.value = 0;  // Reset x value
-      refetchFeed();
+      console.log("IN FOCUSED: profile")
+      //x.value = 0;  // Reset x value
+      //refetchFeed();
       refetchFollows();
     }
   }, [isFocused]);
@@ -125,10 +125,14 @@ export default function ProfileScreen() {
         }} />
 
         {/* SETTINGS MODAL */}
-        <SettingsModal visible={settingsModalVisible} onClose={() => setSettingsModalVisible(false)} />
+        {settingsModalVisible && 
+          <SettingsModal visible={settingsModalVisible} onClose={() => setSettingsModalVisible(false)} />
+        }
 
         {/* NOTIFICATION MODAL */}
-        <NotificationModal visible={notificationModalVisible} onClose={() => setNotificationModalVisible(false)} />
+        {notificationModalVisible && 
+          <NotificationModal visible={notificationModalVisible} onClose={() => setNotificationModalVisible(false)} />
+        }
 
         {/* CONTAINER FOR MAIN CONTENT*/}
         <View className="flex-1 flex-col justify-between">
