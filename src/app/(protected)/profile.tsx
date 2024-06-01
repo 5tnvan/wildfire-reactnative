@@ -27,6 +27,8 @@ import { FollowersModal } from "@/src/components/modals/FollowersModal";
 import { FollowingModal } from "@/src/components/modals/FolllowingModal";
 import Story from "@/src/components/story/Story";
 import WheelOfFortuneItem from "@/src/components/carousel/WheelOfFortuneItem";
+import { NotificationModal } from "@/src/components/modals/NotificationModal";
+import { useAuthUserNotifications } from "@/src/services/providers/AuthUserNotificationProvider";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -38,12 +40,17 @@ export default function ProfileScreen() {
   //CONSUME PROVIDERS
   const { isLoading: isLoadingUser, profile } = useAuthUser();
   const { isLoading: isLoadingFollows, followers, following, refetch: refetchFollows } = useAuthUserFollows();
+  const { isLoading: isLoadingNotifications, followersNotifications, refetch: refetchNotifications } = useAuthUserNotifications();
 
   //FETCH DIRECTLY 
   const { isLoading: isLoadingFeed, feed, refetch: refetchFeed } = useUserFeed(profile.id);
 
-  //HANDLE SETTINGS MODAL
+  //MODALS
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+  const [notificationModalVisible, setNotificationModalVisible] = useState(false);
+
+  //UNREAD NOTIFICATIONS
+  const unreadNotifications = followersNotifications?.filter((notification: any) => !notification.follower_read);
 
   //SPINNING CAROUSELL ANIMATION 
   const x = useSharedValue(0);
@@ -106,12 +113,22 @@ export default function ProfileScreen() {
         <Stack.Screen options={{
           headerShown: true, title: '@' + profile.username,
           headerRight: () => (
-            <PressableAnimated className="bg-transparent" onPress={() => setSettingsModalVisible(true)}><Ionicons name="settings" size={20} color={`${colorScheme == 'dark' ? 'white' : 'black'}`} /></PressableAnimated>
+            <>
+          <View className="flex-row items-center">
+            <TouchableOpacity className="mr-2" onPress={() => setNotificationModalVisible(true)}>
+              <Ionicons name="heart-outline" size={22} color={`${colorScheme == 'dark' ? 'white' : 'black'}`} />
+              {unreadNotifications && unreadNotifications.length > 0 && <View className="absolute right-0 top-0 w-2 h-2 rounded-full bg-red-600"></View>}
+            </TouchableOpacity>
+            <TouchableOpacity className="mr-3" onPress={() => setSettingsModalVisible(true)}><Ionicons name="settings" size={20} color={`${colorScheme == 'dark' ? 'white' : 'black'}`} /></TouchableOpacity>
+          </View></>
           )
         }} />
 
         {/* SETTINGS MODAL */}
         <SettingsModal visible={settingsModalVisible} onClose={() => setSettingsModalVisible(false)} />
+
+        {/* NOTIFICATION MODAL */}
+        <NotificationModal visible={notificationModalVisible} onClose={() => setNotificationModalVisible(false)} />
 
         {/* CONTAINER FOR MAIN CONTENT*/}
         <View className="flex-1 flex-col justify-between">

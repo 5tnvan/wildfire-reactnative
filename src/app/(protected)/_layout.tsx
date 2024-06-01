@@ -1,17 +1,18 @@
 import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Fontisto } from '@expo/vector-icons';
-import { Redirect, Stack, Tabs, useSegments } from 'expo-router';
 import Colors from '@/src/constants/Colors';
+import { MaterialIcons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
+import { Avatar } from '@/src/components/avatars/avatar';
+import { Redirect, Stack, Tabs, useSegments } from 'expo-router';
 import { useColorScheme } from '@/src/components/useColorScheme';
 import { useClientOnlyValue } from '@/src/components/useClientOnlyValue';
 import { useAuth } from '../../services/providers/AuthProvider';
 import AuthUserProvider, { useAuthUser } from '../../services/providers/AuthUserProvider';
 import AuthUserFollowsProvider from '@/src/services/providers/AuthUserFollowsProvider';
-import { AntDesign } from '@expo/vector-icons';
-import { Avatar } from '@/src/components/avatars/avatar';
+import AuthUserNotificationProvider, { useAuthUserNotifications } from '@/src/services/providers/AuthUserNotificationProvider';
+import { View } from 'react-native';
+
+
 
 /** 
  * TAB BAR ICON
@@ -30,7 +31,15 @@ function TabBarIcon(props: {
 function ProtectedLayoutNav() {
   const segment = useSegments();
   const colorScheme = useColorScheme();
+
+  //CONSUME PROVIDERS
   const { profile } = useAuthUser();
+  const { isLoading, followersNotifications, refetch } = useAuthUserNotifications();
+
+  //UNREAD NOTIFICATIONS
+  const unreadNotifications = followersNotifications?.filter((notification: any) => !notification.follower_read);
+
+  //console.log("unreadNotifications", unreadNotifications)
 
   return (
     <Tabs
@@ -80,7 +89,12 @@ function ProtectedLayoutNav() {
         options={{
           title: 'Profile',
           tabBarLabel: () => null,
-          tabBarIcon: ({ color }) => <Avatar avatar_url={profile?.avatar_url} username={profile?.username} size={'sm'} ring={true} />,
+          tabBarIcon: ({ color }) => 
+            <View>
+              <Avatar avatar_url={profile?.avatar_url} username={profile?.username} size={'sm'} ring={true} />
+              {unreadNotifications && unreadNotifications.length > 0 && <View className="absolute right-1 top-0 w-2 h-2 rounded-full bg-red-600"></View>}
+            </View>
+          ,
         }}
       />
       {/* <Tabs.Screen name="modals/follows-modal" options={{ href: null }} /> */}
@@ -102,10 +116,12 @@ export default function ProtectedLayout() {
 
   return (
     <>
-      <AuthUserProvider>
-      <AuthUserFollowsProvider>
-          <ProtectedLayoutNav />
-      </AuthUserFollowsProvider>
+    <AuthUserProvider>
+      <AuthUserNotificationProvider>
+        <AuthUserFollowsProvider>
+            <ProtectedLayoutNav />
+        </AuthUserFollowsProvider>
+      </AuthUserNotificationProvider>
     </AuthUserProvider>
     </>
     

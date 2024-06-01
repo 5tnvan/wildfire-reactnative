@@ -61,7 +61,7 @@ export function SearchUserModal({ visible, onClose }: Props) {
                 </View>
                 <ScrollView className="flex flex-col gap-2 h-full px-2">
                     {profiles && profiles.map((profile: any) => (
-                        <TouchableOpacity
+                        <Pressable
                             key={profile.id}
                             onPress={() =>{ 
                                 handleReset();
@@ -75,7 +75,7 @@ export function SearchUserModal({ visible, onClose }: Props) {
                             </View>
                             
                             <Entypo name="chevron-right" size={24} color={colorScheme == 'dark' ? 'white' : 'grey'} />
-                        </TouchableOpacity>
+                        </Pressable>
                     ))}
                 </ScrollView>
             </View>
