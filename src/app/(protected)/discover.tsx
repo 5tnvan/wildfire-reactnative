@@ -13,8 +13,6 @@ export default function DiscoverScreen() {
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [chosenTab, setChosenTab] = useState('time');
 
-  console.log("rendering discover")
-
   return (
     <>
       {/* HEADER: Discover & Search */}

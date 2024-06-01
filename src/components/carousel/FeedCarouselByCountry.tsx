@@ -15,11 +15,8 @@ const MARGIN_RIGHT = 4;
 
 function FeedCarouselByCountry() {
 
-    console.log("rendering FeedCarouselByCountry")
-
     // SET UP MASTER FEED
     const { feed: masterFeed, refetch: refetchFeed } = useFeedFromCountry(3);
-    //console.log("masterFeed by country", JSON.stringify(masterFeed, null, 2))
 
     // FIGURE OUT WHICH VIDEO IS PLAYING
     const [playingIndex, setPlayingIndex] = useState<any>(null);

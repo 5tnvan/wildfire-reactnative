@@ -24,8 +24,6 @@ export function FiresModal({ visible, data, onClose }: Props) {
     const router = useRouter();
     const [fires, setFires] = useState<any>();
 
-    console.log("FIRES MODAL")
-
     const handleReset = () => {
         onClose();
     }
@@ -41,7 +39,6 @@ export function FiresModal({ visible, data, onClose }: Props) {
         }
         if (isFocused) {
             fetchProfiles();
-            console.log("fetchProfiles")
         }
     }, [isFocused]);
 

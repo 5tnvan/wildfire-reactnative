@@ -39,9 +39,7 @@ export default function Posts({ setIsScrolling, following }: any) {
 
   // HANDLE END REACHED
   const handleEndReached = () => {
-    console.log("end reached");
     if (!isLoadingFeed) {
-      console.log("end reached: fetch more");
       fetchMore();
     }
   };
@@ -60,7 +58,6 @@ export default function Posts({ setIsScrolling, following }: any) {
     if (!isFocused) {
       setPlayingIndex(null);
     }
-    console.log("IN FOCUS: posts");
   }, [isFocused]);
 
   //OPTIMIZE FLATLIST

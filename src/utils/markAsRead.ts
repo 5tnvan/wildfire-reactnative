@@ -13,7 +13,5 @@ export const markAsRead = async (notification_id: any) => {
 
   if(error) {
     console.log("markAsRead error", error);
-  } else {
-    console.log("markAsRead success");
   }
 }

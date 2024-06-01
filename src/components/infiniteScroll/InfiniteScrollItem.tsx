@@ -21,8 +21,6 @@ import { increment_views, insert_views, watched } from '../../utils/views/increm
 
 function InfiniteScrollItem({ item, isPlaying }: any) {
 
-    console.log("rendering", item.id, isPlaying);
-
     const router = useRouter();
     const video = React.useRef<any>(null);
 

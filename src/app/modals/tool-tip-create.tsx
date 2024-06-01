@@ -34,9 +34,6 @@ export function ToolTip({ iconName, iconSize, text }: Props) {
 export default function ModalScreen() {
 
   const { limit, posts, postLeft, refetch } = useDailyPostLimit();
-  console.log("limit", limit);
-  console.log("posts", posts);
-  console.log("postLeft", postLeft);
 
   //HANDLE LEVELS MODAL
   const [levelsModalVisible, setLevelsModalVisible] = useState(false); //levels modal

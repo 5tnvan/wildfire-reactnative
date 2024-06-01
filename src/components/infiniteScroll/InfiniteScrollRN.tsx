@@ -25,11 +25,8 @@ export default function InfiniteScrollRN() {
   };
   const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
 
-  console.log("playingIndex", playingIndex);
-
   // HANDLE END REACHED
   const handleEndReached = () => {
-    console.log("end reached");
     if (!isLoading) {
       fetchMore();
     }

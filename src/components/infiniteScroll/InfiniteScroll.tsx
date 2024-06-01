@@ -70,14 +70,6 @@ export default function InfiniteScroll() {
     router.back();
   };
 
-  // HANDLE WHEN IN FOCUSED
-  // useEffect(() => {
-  //   if (isFocused) {
-  //     console.log("refetching 3secs")
-  //     refetch(); //refetch data
-  //   }
-  // }, [isFocused]);
-
   return (
     <View className='flex-1'>
       {/* VIDEO FEED */}

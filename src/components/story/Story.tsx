@@ -172,8 +172,6 @@ export default function Story({ data, storyIndex, onFinishStory }: Props) {
   };
 
   const handleFollow = async () => {
-    console.log("data.authUser", data.authUser.id);
-    console.log("data.user", data.user.id);
     setTemporaryFollowed(true);
     const { error } = await supabase
       .from("followers")

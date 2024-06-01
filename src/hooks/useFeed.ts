@@ -51,8 +51,6 @@ export const useFeed = () => {
       if (error) {
         console.error("useFeed Error fetching data:", error);
       } else {
-        // console.log("data", JSON.stringify(data, null, 2));
-
         // Check if each post is liked by the user
         const likedPostsPromises = data.map(async (post: any) => {
           const { data: liked, error } = await supabase

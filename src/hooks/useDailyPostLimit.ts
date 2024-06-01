@@ -16,7 +16,6 @@ export const useDailyPostLimit = () => {
   const [triggerRefetch, setTriggerRefetch] = useState(false);
 
   const refetch = () => {
-    console.log('refetchnggg')
     setTriggerRefetch(prev => !prev);
   };
 

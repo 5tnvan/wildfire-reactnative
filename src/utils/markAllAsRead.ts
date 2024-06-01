@@ -14,7 +14,5 @@ export const markAllAsRead = async (user_id: any) => {
 
   if(error) {
     console.log("markAllAsRead error", error);
-  } else {
-    console.log("markAllAsRead success");
   }
 }

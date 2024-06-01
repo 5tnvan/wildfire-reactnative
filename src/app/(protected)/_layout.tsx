@@ -39,8 +39,6 @@ function ProtectedLayoutNav() {
   //UNREAD NOTIFICATIONS
   const unreadNotifications = followersNotifications?.filter((notification: any) => !notification.follower_read);
 
-  //console.log("unreadNotifications", unreadNotifications)
-
   return (
     <Tabs
       screenOptions={{
@@ -92,7 +90,7 @@ function ProtectedLayoutNav() {
           tabBarIcon: ({ color }) => 
             <View>
               <Avatar avatar_url={profile?.avatar_url} username={profile?.username} size={'sm'} ring={true} />
-              {unreadNotifications && unreadNotifications.length > 0 && <View className="absolute right-1 top-0 w-2 h-2 rounded-full bg-red-600"></View>}
+              {unreadNotifications && unreadNotifications.length > 0 && <View className="absolute right-1 top-0 w-2 h-2 rounded-full bg-red-600 border border-white"></View>}
             </View>
           ,
         }}

@@ -88,12 +88,19 @@ export default function ProfileScreen() {
   //REFETCH DATA WHEN SCREEN IS FOCUSED 
   useEffect(() => {
     if (isFocused) {
-      console.log("IN FOCUSED: profile")
-      //x.value = 0;  // Reset x value
-      //refetchFeed();
       refetchFollows();
     }
   }, [isFocused]);
+
+  // HANDLE REFRESH
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    refetchFeed();
+    x.value = 0;
+    setRefreshing(false);
+  };
 
   return (
     <>
@@ -145,7 +152,7 @@ export default function ProfileScreen() {
           {/* LOADING FEED */}
           {!isLoadingFeed && !feed && <View className="flex-row justify-center items-center grow ">
           <View className="flex-row justify-center items-center grow ">
-              <PressableAnimated onPress={() => refetchFeed}>Something went wrong, reload</PressableAnimated>
+              <PressableAnimated onPress={() => refetchFeed}>Something went wrong. Try again later.</PressableAnimated>
             </View>
           </View>}
 
@@ -185,6 +192,8 @@ export default function ProfileScreen() {
                   scrollEventThrottle={16}
                   decelerationRate="fast"
                   snapToInterval={ITEM_FULL_WIDTH}
+                  refreshing={refreshing}
+                  onRefresh={handleRefresh}
                 />
               </View></>}
 

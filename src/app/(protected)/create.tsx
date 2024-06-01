@@ -218,10 +218,10 @@ const CameraScreen = () => {
 
     console.log("publishing");
 
-    // if(limit) {
-    //   alert("You've reached your 24hrs posting limit. Try again later.")
-    //   return;
-    // }
+    if(limit) {
+      alert("You've reached your 24hrs posting limit. Try again later.")
+      return;
+    }
 
     setIsUploading(true);
     const now = new Date().getTime();
@@ -310,7 +310,6 @@ const CameraScreen = () => {
   // Reset
   useEffect(() => {
     if (isFocused) {
-      console.log("IN FOCUS: create")
       setIsActive(true);
     } else {
       setIsDurationError(false);

@@ -9,13 +9,13 @@ import { supabase } from "@/src/lib/supabase";
  **/
 
 export const watched = async (video_id: any, user_id: any) => {
-  console.log("video_id", video_id);
-        console.log("user_id", user_id);
     const { data, error, count } = await supabase
       .from("3sec_views")
       .select('*', { count: 'exact' })
       .eq("video_id", video_id)
       .eq("user_id", user_id)
+
+      console.log("watched", count !== null && count > 0)
 
       return count !== null && count > 0;
   };
@@ -26,8 +26,6 @@ export const watched = async (video_id: any, user_id: any) => {
       .insert({ video_id: video_id, user_id: user_id})
 
       if(error) {
-        console.log("video_id", video_id);
-        console.log("user_id", user_id);
         console.log("error insert views", error);
       }
 

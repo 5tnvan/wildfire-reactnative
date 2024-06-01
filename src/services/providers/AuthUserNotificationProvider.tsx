@@ -22,7 +22,6 @@ export default function AuthUserNotificationProvider({ children }: PropsWithChil
     const [triggerRefetch, setTriggerRefetch] = useState(false);
 
     const refetch = () => {
-        console.log("refetch AuthUserNotificationProvider triggered")
         setTriggerRefetch((prev) => !prev);
     };
 
@@ -59,7 +58,7 @@ export default function AuthUserNotificationProvider({ children }: PropsWithChil
      * Refetch when 
      * **/
     const handleChange = (payload: any) => {
-        console.log("Change received!!", payload);
+        console.log("Notification change received!", payload);
         refetch();
     };
 

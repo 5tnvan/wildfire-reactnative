@@ -10,12 +10,9 @@ const MARGIN_LEFT = 0;
 const MARGIN_RIGHT = 4;
 
 function FeedCarouselByTime() {
-    console.log("rendering FeedCarouselByTime")
 
     // SET UP MASTER FEED
     const { isLoading, feed: masterFeed, refetch: refetchFeed } = useFeedFromTime();
-
-    //console.log("FeedCarouselByTime masterFeed", JSON.stringify(masterFeed, null, 2))
 
     // FIGURE OUT WHICH VIDEO IS PLAYING
     const [playingIndex, setPlayingIndex] = useState<any>(null);

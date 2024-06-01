@@ -27,7 +27,6 @@ export function CommentsModal({ visible, data, onClose }: Props) {
     const [comment, setComment] = useState('');
 
     const fetchComments = async () => {
-        console.log("fetch comments")
         const { data: res } = await supabase
             .from("3sec_comments")
             .select("id, comment, created_at, profile:user_id(id, username, avatar_url)")

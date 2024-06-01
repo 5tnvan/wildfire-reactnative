@@ -18,7 +18,6 @@ import { calculateTotalViews } from "@/src/utils/views/calculateTotalViews";
 import { getTotalViews } from "@/src/utils/views/getTotalViews";
 
 function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
-  //console.log("rendering", item.id, isPlaying);
 
   const router = useRouter();
   const colorScheme = useColorScheme();
