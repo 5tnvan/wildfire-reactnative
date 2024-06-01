@@ -454,11 +454,11 @@ const CameraScreen = () => {
                 <Text className='text-base font-semibold'>{locationName}</Text>
                 <View></View>
               </Pressable>
-              <TouchableOpacity className={`flex-row justify-center grow py-3 px-2 items-center rounded-full ${limit ? 'bg-primary' : 'bg-accent'}  mt-3`} onPress={handlePublishing}>
-                <View></View>
+              <TouchableOpacity className={`flex-row justify-between grow py-3 px-2 items-center rounded-full ${limit ? 'bg-primary' : 'bg-accent'}  mt-3`} onPress={handlePublishing}>
+                <View className='w-2'></View>
                 <Text className='text-base font-semibold'>Publish</Text>
-                {/* <Ionicons name="chevron-forward" size={22} color="black" /> */}
-                {isUploading && <ActivityIndicator size="small" color="#0000ff" className='ml-1' />}
+                {isUploading ? <ActivityIndicator size="small" color="#0000ff" className='' /> :
+                <Ionicons name="chevron-forward" size={15} color="black" />}
               </TouchableOpacity>
             </View>
           </View>
@@ -491,9 +491,10 @@ const CameraScreen = () => {
                 <View></View>
               </Pressable>
               <TouchableOpacity className={`flex-row justify-center grow py-3 px-2 items-center rounded-full ${limit ? 'bg-primary' : 'bg-accent'} mt-3`} onPress={handlePublishing}>
-                <View></View>
+                <View className='w-2'></View>
                 <Text className='text-base font-semibold'>Publish</Text>
-                {isUploading && <ActivityIndicator size="small" color="#0000ff" className='absolute right-2 m-auto' />}
+                {isUploading ? <ActivityIndicator size="small" color="#0000ff" className='' /> :
+                <Ionicons name="chevron-forward" size={15} color="black" />}
               </TouchableOpacity>
             </View>
           </View>

@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { supabase } from '@/src/lib/supabase';
 import { Input } from 'react-native-elements';
 import { Ionicons } from '@expo/vector-icons';
+import { PressableAnimated } from '@/src/components/pressables/PressableAnimated';
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
@@ -73,9 +74,9 @@ export default function LoginScreen() {
           />
         </View>
         <View>
-          <TouchableOpacity className={`items-center justify-center p-3 rounded-full ${colorScheme == 'dark' ? 'bg-secondary' : 'bg-neutral'}`} onPress={() => signInWithEmail()}>
+          <PressableAnimated className={`items-center justify-center p-3 rounded-full ${colorScheme == 'dark' ? 'bg-secondary' : 'bg-neutral'}`} onPress={() => signInWithEmail()}>
             <Text className={`text-lg font-semibold ${colorScheme == 'dark' ? 'text-white' : 'text-black'}`}>Log In</Text>
-          </TouchableOpacity>
+          </PressableAnimated>
         </View>
 
       </View>

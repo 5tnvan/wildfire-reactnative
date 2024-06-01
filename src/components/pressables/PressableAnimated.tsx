@@ -33,7 +33,7 @@ export function PressableAnimated({ onPress, children, style, className }: Anima
             onPress={onPress}
             className={`${className}`}
         >
-            <Animated.View className={`py-2 px-4 rounded-full ${colorScheme == 'dark' ? "bg-zinc-800" : "bg-zinc-100"}`} style={[{ transform: [{ scale: scaleValue }] }, style]}>
+            <Animated.View className={`py-2 px-4 rounded-full ${colorScheme == 'dark' ? "bg-zinc-800" : "bg-zinc-200"}`} style={[{ transform: [{ scale: scaleValue }] }, style]}>
                 <Text className={`text-base ${colorScheme == 'dark' ? "text-white" : "text-black"}`}>{children}</Text>
             </Animated.View>
         </Pressable>

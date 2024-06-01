@@ -6,11 +6,11 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import { TimeAgo } from './TimeAgo';
-import { Text } from "../components/Themed";
+import { TimeAgo } from '../TimeAgo';
+import { Text } from "../Themed";
 import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
-import { getTotalViews } from '../utils/views/getTotalViews';
-import FormatNumber from './FormatNumber';
+import { getTotalViews } from '../../utils/views/getTotalViews';
+import FormatNumber from '../FormatNumber';
 
 type Props = {
   item: any;
@@ -23,7 +23,7 @@ type Props = {
   onPress: (index: number) => void;
 };
 
-const Item = ({
+const WheelOfFortuneItem = ({
   item,
   width,
   height,
@@ -92,11 +92,11 @@ const Item = ({
             {item.country && <Text className={`text-black font-semibold`}>{item.country?.name}</Text>}
             <Text className='text-black'><TimeAgo timestamp={item.created_at}></TimeAgo> ago</Text>
           </View>
-          <View><Image source={require('../../assets/images/wildfire-logo-lit.png')} resizeMode="contain" className='w-12' /></View>
+          <View><Image source={require('../../../assets/images/wildfire-logo-lit.png')} resizeMode="contain" className='w-12' /></View>
         </View>
       </Animated.View>
     </Pressable>
   );
 };
 
-export default Item;
+export default WheelOfFortuneItem;

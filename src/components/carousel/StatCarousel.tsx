@@ -120,7 +120,7 @@ const Item = ({ id, title, stat, cta, icon, avatar, profile, onPress, colorSchem
                     <Avatar avatar_url={profile?.avatar_url} username={profile?.username} size={'md'} ring={true}></Avatar>
                 </View>
             }
-            <FontAwesome5 name={icon} size={30} color="black" />
+            <FontAwesome5 name={icon} size={30} color={colorScheme == 'dark' ? 'white' : 'black' } />
         </View>
     </Pressable>
 );

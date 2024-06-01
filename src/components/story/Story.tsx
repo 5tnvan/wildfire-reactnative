@@ -17,15 +17,15 @@ import {
   pause,
   play,
   unmute,
-} from '../utils/exportedFunction';
+} from '../../utils/exportedFunction';
 import Video from 'react-native-video';
-import { Avatar } from './avatars/avatar';
+import { Avatar } from '../avatars/avatar';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { TimeAgo } from './TimeAgo';
+import { TimeAgo } from '../TimeAgo';
 import { LinearGradient } from 'expo-linear-gradient';
-import { supabase } from '../lib/supabase';
-import { increment_views, insert_views, watched } from '../utils/views/incrementViews';
-import { useAuth } from '../services/providers/AuthProvider';
+import { supabase } from '../../lib/supabase';
+import { increment_views, insert_views, watched } from '../../utils/views/incrementViews';
+import { useAuth } from '../../services/providers/AuthProvider';
 import { router } from 'expo-router';
 import { FontAwesome5 } from '@expo/vector-icons';
 
@@ -37,7 +37,7 @@ type Props = {
 
 const { width } = Dimensions.get('window');
 
-export default function StoryComponent({ data, storyIndex, onFinishStory }: Props) {
+export default function Story({ data, storyIndex, onFinishStory }: Props) {
 
   //COSUME PROVIDERS
   const { user } = useAuth();

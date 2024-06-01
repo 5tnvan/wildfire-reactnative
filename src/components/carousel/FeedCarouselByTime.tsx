@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Text, FlatList, Dimensions, Pressable, Modal, Animated } from 'react-native';
 import { TimeAgo } from '../TimeAgo';
 import Video from 'react-native-video';
 import { useFeedFromTime } from '@/src/hooks/useFeedFromTime';
 import { useIsFocused } from '@react-navigation/native';
-import StoryComponent from '../StoryComponent';
 import { FontAwesome } from '@expo/vector-icons';
+import Story from '../story/Story';
 
 const CARD_WIDTH = Dimensions.get('window').width * 0.8;
 const CARD_HEIGHT = 600
@@ -52,6 +52,16 @@ export default function FeedCarouselByTime() {
         else { setPlayingIndex(null); } // stop playing when out of focus
     }, [isFocused]);
 
+    //OPTIMIZE FLATLIST
+    const renderItem = useCallback(({ item, index }: any) => (
+        <Item
+            video_url={item.first_video.video_url}
+            time={item.time}
+            onPress={() => openStory(item.data)}
+            isPlaying={index === playingIndex}
+        />
+    ), [playingIndex]);
+
     return (
         <>
             {insideStory && (
@@ -61,7 +71,7 @@ export default function FeedCarouselByTime() {
                     animationType="slide"
                     presentationStyle="pageSheet"
                 >
-                    <StoryComponent data={{ feed: storyFeed }} onFinishStory={closeStory} />
+                    <Story data={{ feed: storyFeed }} onFinishStory={closeStory} />
                 </Modal>
             )}
             {masterFeed && (
@@ -71,13 +81,7 @@ export default function FeedCarouselByTime() {
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={(item) => item.id}
-                    renderItem={({ item, index }) =>
-                        <Item
-                            video_url={item.first_video.video_url}
-                            time={item.time}
-                            onPress={() => openStory(item.data)}
-                            isPlaying={index === playingIndex}
-                        />}
+                    renderItem={renderItem}
                     snapToInterval={CARD_WIDTH + MARGIN_LEFT + MARGIN_RIGHT} // Calculate the size for a card including marginLeft and marginRight
                     decelerationRate="fast" // Make the scrolling feel snappier
                     contentContainerStyle={styles.container}
@@ -93,29 +97,28 @@ export default function FeedCarouselByTime() {
 * FLATLIST ITEM
 */
 
-const Item = ({ time, video_url, isPlaying, onPress }: any) => {
+const Item = memo(({ time, video_url, isPlaying, onPress }: any) => {
+
+    console.log("rendering", isPlaying, video_url );
 
     const videoRef = useRef<any>(null);
     
     //AFTER 3rd PLAY REPEAT, PAUSE VIDEO
     const [threePlayPaused, setThreePlayPaused] = useState(false);
-    const [repeatCount, setRepeatCount] = useState(0);
+    const repeatCountRef = useRef(0);
 
     const handleThreePlayRepeat = () => {
-        setRepeatCount(prevCount => {
-            if (prevCount < 2) {
-                return prevCount + 1;
-            } else {
-                // Pause the video after 3th repeat
-                if (videoRef.current) {
-                    videoRef.current.seek(0);
-                    videoRef.current.pause();
-                    setThreePlayPaused(true);
-                    fadeIn();
-                }
-                return prevCount;
+        if (repeatCountRef.current < 2) {
+            repeatCountRef.current += 1;
+        } else {
+            // Pause the video after 3rd repeat
+            if (videoRef.current) {
+                videoRef.current.seek(0);
+                videoRef.current.pause();
+                setThreePlayPaused(true);
+                fadeIn();
             }
-        });
+        }
     };
 
     //FADE IN 'WATCH NOW' ANIMATION
@@ -131,7 +134,7 @@ const Item = ({ time, video_url, isPlaying, onPress }: any) => {
     //WHEN VIDEO IS IN VIEW AGAIN, RESET
     useEffect(() => {
         if (isPlaying) {
-        setRepeatCount(0);
+        repeatCountRef.current = 0;
         setThreePlayPaused(false);
         fadeAnim.setValue(0); // Reset opacity to 0
         }
@@ -165,8 +168,7 @@ const Item = ({ time, video_url, isPlaying, onPress }: any) => {
         </View>
     </Pressable>
      );
-    
-    };
+}, (prevProps, nextProps) => { return prevProps.isPlaying === nextProps.isPlaying; })
 
 const styles = StyleSheet.create({
     container: {

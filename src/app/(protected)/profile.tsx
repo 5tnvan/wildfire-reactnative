@@ -19,14 +19,14 @@ import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
 } from 'react-native-reanimated';
-import Item from "@/src/components/Item";
-import StoryComponent from "@/src/components/StoryComponent";
 import { useIsFocused } from '@react-navigation/native';
 import { Stack, useRouter } from "expo-router";
 import { PressableAnimated } from "@/src/components/pressables/PressableAnimated";
 import { SettingsModal } from "@/src/components/modals/SettingsModal";
 import { FollowersModal } from "@/src/components/modals/FollowersModal";
 import { FollowingModal } from "@/src/components/modals/FolllowingModal";
+import Story from "@/src/components/story/Story";
+import WheelOfFortuneItem from "@/src/components/carousel/WheelOfFortuneItem";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -82,6 +82,7 @@ export default function ProfileScreen() {
   useEffect(() => {
     if (isFocused) {
       console.log("FOCUSED: profile")
+      x.value = 0;  // Reset x value
       refetchFeed();
       refetchFollows();
     }
@@ -97,7 +98,7 @@ export default function ProfileScreen() {
           animationType="slide"
           presentationStyle="pageSheet"
         >
-          <StoryComponent data={{ feed: feed, followed: null }} storyIndex={storyIndex} onFinishStory={closeStory} />
+          <Story data={{ feed: feed, followed: null }} storyIndex={storyIndex} onFinishStory={closeStory} />
         </Modal>
       }
       <>
@@ -120,6 +121,13 @@ export default function ProfileScreen() {
             <ActivityIndicator />
           </View>}
 
+          {/* LOADING FEED */}
+          {!isLoadingFeed && !feed && <View className="flex-row justify-center items-center grow ">
+          <View className="flex-row justify-center items-center grow ">
+              <PressableAnimated onPress={() => refetchFeed}>Something went wrong, reload</PressableAnimated>
+            </View>
+          </View>}
+
           {/* START YOUR FIRST POST */}
           {!isLoadingFeed && feed && feed.length === 0 &&
             <View className="flex-row justify-center items-center grow ">
@@ -140,7 +148,7 @@ export default function ProfileScreen() {
                   showsHorizontalScrollIndicator={false}
                   renderItem={({ item, index }) => {
                     return (
-                      <Item
+                      <WheelOfFortuneItem
                         item={item}
                         index={index}
                         x={x}

@@ -14,13 +14,14 @@ import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
 } from 'react-native-reanimated';
-import Item from '@/src/components/Item';
 import { PressableAnimated } from '@/src/components/pressables/PressableAnimated';
 import { useIsFocused } from '@react-navigation/native';
-import StoryComponent from '@/src/components/StoryComponent';
 import { Ionicons } from '@expo/vector-icons';
 import { FollowsModal } from '@/src/components/modals/FollowsModal';
 import { useAuth } from '@/src/services/providers/AuthProvider';
+import Story from '@/src/components/story/Story';
+import CarouselItem from '@/src/components/carousel/WheelOfFortuneItem';
+import WheelOfFortuneItem from '@/src/components/carousel/WheelOfFortuneItem';
 
 export default function ProfileUsernameScreen() {
 
@@ -89,7 +90,7 @@ export default function ProfileUsernameScreen() {
           animationType="slide"
           presentationStyle="pageSheet"
         >
-          <StoryComponent data={{ authUser: authUser, user: user, feed: feed, followed: followed }} storyIndex={storyIndex} onFinishStory={closeStory} />
+          <Story data={{ authUser: authUser, user: user, feed: feed, followed: followed }} storyIndex={storyIndex} onFinishStory={closeStory} />
         </Modal>
       }
       <>
@@ -146,7 +147,7 @@ export default function ProfileUsernameScreen() {
                   keyExtractor={item => item.id + item.name}
                   renderItem={({ item, index }) => {
                     return (
-                      <Item
+                      <WheelOfFortuneItem
                         item={item}
                         index={index}
                         x={x}
