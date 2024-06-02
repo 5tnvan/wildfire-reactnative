@@ -89,10 +89,10 @@ export function CommentsModal({ visible, data, onClose }: Props) {
                         />
                         <Pressable className="flex-row items-center mb-5">
                             <MaterialCommunityIcons name="message-reply-text-outline" size={28} color={`${colorScheme == 'dark' ? "white" : '#333'}`} />
-                            {comments?.length > 0 && 
+                            {comments?.length > 0 &&
                                 <Text className="ml-1 font-medium text-base"><FormatNumber number={comments.length} /></Text>
                             }
-                            {comments?.length == 0 && 
+                            {comments?.length == 0 &&
                                 <Text className="ml-1 font-medium text-base">Be first to comment</Text>
                             }
                         </Pressable>
@@ -125,31 +125,31 @@ export function CommentsModal({ visible, data, onClose }: Props) {
                         ))}
                     </ScrollView>
 
-                    
+
                 </View>
                 {/* COMMENT INPUT */}
-                <SafeAreaView className='fixed bottom-5 w-full px-4'>
-                        <View className='flex-row items-center bg-zinc-100 dark:bg-zinc-800 rounded-full px-4 py-2'>
-                            <Avatar avatar_url={profile.avatar_url} username={profile.username} size={'sm'} ring={true} />
-                            <TextInput
-                                style={{
-                                    flex: 1,
-                                    marginLeft: 10,
-                                    color: colorScheme === 'dark' ? 'white' : 'black',
-                                    maxHeight: 60,
-                                }}
-                                placeholder="Add a comment..."
-                                placeholderTextColor={colorScheme === 'dark' ? '#ccc' : '#999'}
-                                value={comment}
-                                onChangeText={setComment}
-                                multiline
-                                returnKeyType="default"
-                            />
-                            <Pressable onPress={handleCommentSubmit}>
-                                <MaterialCommunityIcons name="send-circle" size={32} color="grey" />
-                            </Pressable>
-                        </View>
-                    </SafeAreaView>
+                <SafeAreaView className='fixed bottom-5 w-full px-4 mb-10'>
+                    <View className='flex-row items-center bg-zinc-100 dark:bg-zinc-800 rounded-full px-4 py-2'>
+                        <Avatar avatar_url={profile.avatar_url} username={profile.username} size={'sm'} ring={true} />
+                        <TextInput
+                            style={{
+                                flex: 1,
+                                marginLeft: 10,
+                                color: colorScheme === 'dark' ? 'white' : 'black',
+                                maxHeight: 60,
+                            }}
+                            placeholder="Add a comment..."
+                            placeholderTextColor={colorScheme === 'dark' ? '#ccc' : '#999'}
+                            value={comment}
+                            onChangeText={setComment}
+                            multiline
+                            returnKeyType="default"
+                        />
+                        <Pressable onPress={handleCommentSubmit}>
+                            <MaterialCommunityIcons name="send-circle" size={32} color="grey" />
+                        </Pressable>
+                    </View>
+                </SafeAreaView>
             </KeyboardAvoidingView>
         </Modal>
     );

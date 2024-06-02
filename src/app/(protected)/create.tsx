@@ -261,32 +261,37 @@ const CameraScreen = () => {
 
     console.log("publishing");
 
-    // if(limit) {
-    //   alert("You've reached your 24hrs posting limit. Try again later.")
-    //   return;
-    // }
+    if(limit) {
+      alert("You've reached your 24hrs posting limit. Try again later.")
+      return;
+    }
 
     setIsUploading(true);
     const now = new Date().getTime();
 
-    // Set up video URI
-    let videoUri = '';
-    if (cameraRollVideo) videoUri = cameraRollVideo;
-    else if (recordedVideo) videoUri = recordedVideo;
-
-    // Read the thumbnail file as binary
-    if (!thumbnail) { 
-      console.warn("No thumbnail found."); 
-      return; 
+    // Determine the video URI
+    const videoUri = cameraRollVideo || recordedVideo;
+    if (!videoUri) {
+      console.warn("No video found.");
+      setIsUploading(false);
+      return;
     }
-    let thumbBinary = await RNFS.readFile(thumbnail, 'base64');
 
+    // Ensure thumbnail is available
+    if (!thumbnail) {
+      console.warn("No thumbnail found.");
+      setIsUploading(false);
+      return;
+    }
+    
+    //THUMBNAIL
     // Convert base64 encoded string to binary data
-    const thumbBinaryData = Buffer.from(thumbBinary, 'base64');
+    const thumbBase64 = await RNFS.readFile(thumbnail, 'base64');
+    const thumbBinaryData = Buffer.from(thumbBase64, 'base64');
     const thumbBunnyUrl = `https://${BunnyAPI.HOSTNAME}/${BunnyAPI.STORAGE_ZONE_NAME}/${user?.id}/${now}.jpg`;
     const pullZoneThumbUrl = `https://wildfire.b-cdn.net/${user?.id}/${now}.jpg`
 
-    // Define the upload options for the thumbnail
+    // Define thumbOptions
     const thumbOptions = {
       method: 'PUT',
       url: thumbBunnyUrl,
@@ -298,24 +303,24 @@ const CameraScreen = () => {
       responseType: 'arraybuffer' as const,
     };
 
-    // Perform the thumbnail upload
+    // Upload thumbOptions to BUNNY.NET
     try {
       await axios(thumbOptions);
     } catch (error) {
-      console.error('Thumbnail upload error:', error);
+      console.error('Thumbnail upload to BUNNY.NET error:', error);
+      setIsUploading(false);
       return;
     }
-  
-    // Read the video file as binary
-    let videoBinary = await RNFS.readFile(videoUri, 'base64');
-  
+
+    //THUMBNAIL
     // Convert base64 encoded string to binary data
-    const videoBinaryData = Buffer.from(videoBinary, 'base64');
+    const videoBase64 = await RNFS.readFile(videoUri, 'base64');
+    const videoBinaryData = Buffer.from(videoBase64, 'base64');
     const bunnyVideoUrl = `https://${BunnyAPI.HOSTNAME}/${BunnyAPI.STORAGE_ZONE_NAME}/${user?.id}/${now}.mp4`;
     const pullZoneVideoUrl = `https://wildfire.b-cdn.net/${user?.id}/${now}.mp4`
-    
-    // Define the upload options
-    const options = {
+
+    // Define vidOptions
+    const vidOptions = {
       method: 'PUT',
       url: bunnyVideoUrl,
       headers: {
@@ -325,28 +330,35 @@ const CameraScreen = () => {
       data: videoBinaryData, // Use binary data
       responseType: 'arraybuffer' as const, // Ensure the response is handled correctly and the type is compatible
     };
-  
-    // Perform the upload
-    
+
+    // Upload vidOptions to BUNNY.NET
     try {
-      const response = await axios(options);
-      console.log('Upload response:', response.data);
-      const { error } = await supabase.from("3sec").insert({ 
-        user_id: user?.id, 
+      await axios(vidOptions);
+    } catch (error) {
+      console.error('Video upload to BUNNY.NET error:', error);
+      setIsUploading(false);
+      return;
+    }
+
+    // INSERT to SUPABASE
+    try {
+      const { error } = await supabase.from("3sec").insert({
+        user_id: user?.id,
         video_url: pullZoneVideoUrl,
         thumbnail_url: pullZoneThumbUrl,
         country_id: locationId,
       });
-      if(!error) {
-        console.log("uploaded!!");
+      if (!error) {
+        console.log("VIDEO AND THUMBNAIL PUBLISHED SUCCESS!");
         setRecordedVideo(undefined);
         setCameraRollVideo(undefined);
+        setThumbnail(undefined)
         router.push("/(profile)/" + profile.username);
       } else {
         console.log(error);
       }
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error('Upload to 3sec error:', error);
     } finally {
       setIsUploading(false);
     }

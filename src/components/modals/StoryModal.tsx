@@ -188,7 +188,6 @@ export default function StoryModal({ visible, data, storyIndex, onClose }: Props
     }
   }, [currentStoryIndex, isPaused]);
 
-
   return (
     <Modal
       visible={visible}
@@ -244,7 +243,10 @@ export default function StoryModal({ visible, data, storyIndex, onClose }: Props
               <LinearGradient className='absolute bottom-0 p-20 w-full' colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 1)']}></LinearGradient>
 
               {/* BOTTOM LEFT */}
-              <Pressable className='flex-row items-center ml-3' onPress={() => router.push("/(profile/)" + currentStory.profile.username)}>
+              <Pressable className='flex-row items-center ml-3' onPress={() => {
+                  router.push("/(profile)/" + currentStory.profile.username);
+                  handleReset();
+                }}>
                 <Avatar avatar_url={currentStory.profile.avatar_url} username={currentStory.profile.username} size={'md'} ring={true} />
                 <Text className='ml-2 mr-1 font-bold text-white text-base' style={styles.shadow}>{currentStory.profile.username}</Text>
                 <Text className='text-white mr-1 text-base'><TimeAgo timestamp={currentStory.created_at}></TimeAgo></Text>
@@ -288,7 +290,6 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
     elevation: 5, // For Android
   },
-
   container: {
     flex: 1,
   },

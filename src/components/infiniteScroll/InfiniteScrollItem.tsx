@@ -208,7 +208,7 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
                         {item.country &&
                             <View className='flex-row items-center'>
                                 <FontAwesome name="location-arrow" size={14} color="white" />
-                                <Text className='text-white text-lg ml-1'>{item.country?.name}</Text>
+                                <Text className='text-white text-lg ml-1' style={styles.shadow}>{item.country?.name}</Text>
                             </View>
                         }
                     </View>
@@ -269,4 +269,11 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       alignItems: 'center',
     },
+    shadow: {
+        shadowColor: '#fff',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 1,
+        elevation: 5, // For Android
+      },
   });

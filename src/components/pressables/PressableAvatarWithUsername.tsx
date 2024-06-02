@@ -1,4 +1,4 @@
-import { Pressable } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import { Text, Image } from 'react-native';
 import { Avatar } from '../avatars/avatar';
 import { useRouter } from 'expo-router';
@@ -17,7 +17,17 @@ export function PressableAvatarWithUsername({ username, avatar_url }: Props) {
       onPress={() => router.push("/(profile)/" + username)}
     >
       <Avatar avatar_url={avatar_url} username={username} size={"md"} ring={true} />
-      <Text className='font-semibold text-lg text-white ml-1'>{username}</Text>
+      <Text className='font-semibold text-lg text-white ml-1' style={styles.shadow}>{username}</Text>
     </Pressable>
   );
 }
+
+const styles = StyleSheet.create({
+  shadow: {
+      shadowColor: '#fff',
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.8,
+      shadowRadius: 1,
+      elevation: 5, // For Android
+    },
+});
