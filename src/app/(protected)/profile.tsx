@@ -12,7 +12,7 @@ import {
 import { useAuthUser } from "../../services/providers/AuthUserProvider";
 import { Text } from "../../components/Themed";
 import { Avatar } from "../../components/avatars/avatar";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuthUserFollows } from "@/src/services/providers/AuthUserFollowsProvider";
 import { useUserFeed } from "@/src/hooks/useUserFeed";
 import Animated, {
@@ -25,7 +25,6 @@ import { PressableAnimated } from "@/src/components/pressables/PressableAnimated
 import { SettingsModal } from "@/src/components/modals/SettingsModal";
 import { FollowersModal } from "@/src/components/modals/FollowersModal";
 import { FollowingModal } from "@/src/components/modals/FolllowingModal";
-import Story from "@/src/components/story/Story";
 import WheelOfFortuneItem from "@/src/components/carousel/WheelOfFortuneItem";
 import { NotificationModal } from "@/src/components/modals/NotificationModal";
 import { useAuthUserNotifications } from "@/src/services/providers/AuthUserNotificationProvider";
@@ -108,10 +107,11 @@ export default function ProfileScreen() {
             <>
               <View className="flex-row items-center">
                 <TouchableOpacity className="mr-2" onPress={() => setNotificationModalVisible(true)}>
-                  <Ionicons name="heart-outline" size={22} color={`${colorScheme == 'dark' ? 'white' : 'black'}`} />
+                  <Ionicons name="heart-outline" size={26} color={`${colorScheme == 'dark' ? 'white' : 'black'}`} />
                   {unreadNotifications && unreadNotifications.length > 0 && <View className="absolute right-0 top-0 w-2 h-2 rounded-full bg-red-600"></View>}
                 </TouchableOpacity>
-                <TouchableOpacity className="mr-3" onPress={() => setSettingsModalVisible(true)}><Ionicons name="settings" size={20} color={`${colorScheme == 'dark' ? 'white' : 'black'}`} /></TouchableOpacity>
+                <TouchableOpacity className="mr-3" onPress={() => setSettingsModalVisible(true)}><Ionicons name="settings" size={22} color={`${colorScheme == 'dark' ? 'white' : 'black'}`} /></TouchableOpacity>
+                <TouchableOpacity className="mr-3" onPress={handleRefresh}><FontAwesome name="refresh" size={22} color={`${colorScheme == 'dark' ? 'white' : 'black'}`} /></TouchableOpacity>
               </View></>
           )
         }} />
@@ -177,8 +177,8 @@ export default function ProfileScreen() {
                   scrollEventThrottle={16}
                   decelerationRate="fast"
                   snapToInterval={ITEM_FULL_WIDTH}
-                  refreshing={refreshing}
-                  onRefresh={handleRefresh}
+                  // refreshing={refreshing}
+                  // onRefresh={handleRefresh}
                 />
               </View></>}
 

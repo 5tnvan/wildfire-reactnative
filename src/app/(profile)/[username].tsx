@@ -17,7 +17,6 @@ import { useIsFocused } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { FollowsModal } from '@/src/components/modals/FollowsModal';
 import { useAuth } from '@/src/services/providers/AuthProvider';
-import Story from '@/src/components/story/Story';
 import WheelOfFortuneItem from '@/src/components/carousel/WheelOfFortuneItem';
 import StoryModal from '@/src/components/modals/StoryModal';
 
