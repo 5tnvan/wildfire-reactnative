@@ -494,7 +494,7 @@ const CameraScreen = () => {
               />
             </View>
 
-            {thumbnail &&
+            {/* {thumbnail &&
               <View className='absolute top-2 right-2 rounded-full'>
                 <Image
                   source={{ uri: thumbnail }}
@@ -502,7 +502,7 @@ const CameraScreen = () => {
                   className='rounded-full bg-black/10'
                 />
               </View>
-            }
+            } */}
             
             <View className='absolute bottom-3 flex-row w-full items-center px-3'>
               <Pressable className='flex-row justify-between grow py-3 px-3 items-center rounded-full bg-white mt-3 mr-3' onPress={() => setLocationModalVisible(true)}>
@@ -541,7 +541,7 @@ const CameraScreen = () => {
               />
             </View>
             
-            {thumbnail &&
+            {/* {thumbnail &&
               <View className='absolute top-2 right-2 rounded-full'>
                 <Image
                   source={{ uri: thumbnail }}
@@ -549,7 +549,7 @@ const CameraScreen = () => {
                   className='rounded-full bg-black/10'
                 />
               </View>
-            }
+            } */}
             
             <View className='absolute bottom-3 flex-row w-full items-center px-3'>
               <Pressable className='flex-row justify-between grow py-3 px-3 items-center rounded-full bg-white mt-3 mr-3' onPress={() => setLocationModalVisible(true)}>

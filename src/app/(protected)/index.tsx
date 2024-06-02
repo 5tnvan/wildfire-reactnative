@@ -9,20 +9,17 @@ import Posts from '../../components/feed/Posts';
 
 export default function IndexScreen() {
   const isFocused = useIsFocused();
-  const { following, refetch: refetchFollows } = useAuthUserFollows();
-  const [isScrolling, setIsScrolling] = useState(false);
   const headerHeightAnim = useRef(new Animated.Value(150)).current; // Initial value for header height
 
-  // Re-fetch data when screen is focused 
-  useEffect(() => {
-    if (isFocused) {
-      refetchFollows();
-    }
-  }, [isFocused]);
+  //CONSUME PROVIDERS
+  const { following, refetch: refetchFollows } = useAuthUserFollows();
+  
+  //STATES
+  const [isScrolling, setIsScrolling] = useState(false);
 
-  // Animate the header height when isScrolling changes
+  // HIDE WHEN SCROLL ANIMATION
   useEffect(() => {
-    const targetHeight = isScrolling ? 0 : 150; // Collapsed and expanded header height
+    const targetHeight = isScrolling ? 0 : 150; // Collapsed and expanded height
     Animated.timing(headerHeightAnim, {
       toValue: targetHeight,
       duration: 300, // Duration of the animation
@@ -30,12 +27,19 @@ export default function IndexScreen() {
     }).start();
   }, [isScrolling]);
 
+  // IS FOCUSED
+  useEffect(() => {
+    if (isFocused) {
+      refetchFollows();
+    }
+  }, [isFocused]);
+
   return (
     <View className='flex-1'>
       {/* HEADER */}
       <Header />
 
-      {/* STAT */}
+      {/* STATS */}
       <View className=''>
         <FollowingCarousel data={following} />
         <Animated.View style={{ height: headerHeightAnim }}>

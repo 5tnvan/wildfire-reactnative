@@ -1,4 +1,4 @@
-import { Image, Pressable, StyleSheet, TouchableHighlight, TouchableOpacity, View, useColorScheme } from 'react-native';
+import { Image, Pressable, View, useColorScheme } from 'react-native';
 import React, { memo, useState } from 'react';
 import Animated, {
   Extrapolation,
@@ -8,9 +8,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { TimeAgo } from '../TimeAgo';
 import { Text } from "../Themed";
-import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import FormatNumber from '../FormatNumber';
-import { fetchViewCount } from '@/src/utils/fetch/fetchViewCount';
 
 type Props = {
   item: any;
@@ -53,8 +52,6 @@ const WheelOfFortuneItem = ({
 
   const colorScheme = useColorScheme();
 
-  console.log("item", item.id);
-
   return (
     <Pressable onPress={() => onPress(index)}>
       <Animated.View
@@ -63,6 +60,7 @@ const WheelOfFortuneItem = ({
           animatedStyle,
         ]}
         className={`${colorScheme == "dark" ? 'bg-zinc-900' : 'bg-neutral'} rounded-3xl overflow-hidden`}>
+
         {/* VIDEO THUMBNAIL */}
         <View className='flex-1'>
           <Image
@@ -72,8 +70,8 @@ const WheelOfFortuneItem = ({
             className='flex-1'
           />
         </View>
+
         {/* VIEWS */}
-        
         <View className='flex-row items-center absolute top-0 right-0 px-3 py-1 m-3 rounded-full bg-white/60'>
           <View className='mr-1'><FontAwesome name="eye" size={14} color="black" /></View>
           {/* <Text className='text-black'><FormatNumber number={item["3sec_views"].view_count}/></Text> */}
@@ -83,7 +81,6 @@ const WheelOfFortuneItem = ({
             <Text>0</Text>
           )}</Text>
         </View>
-        
         
         {/* BOTTOM */}
         <View className={`absolute bottom-0 w-full bg-white flex-row justify-between items-center px-4 py-2`}>

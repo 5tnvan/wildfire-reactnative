@@ -82,7 +82,6 @@ export default function ProfileScreen() {
   const handleRefresh = async () => {
     setRefreshing(true);
     refetchFeed();
-    console.log("set shared value to 0")
     x.value = 0;
     setRefreshing(false);
   };

@@ -53,13 +53,6 @@ export default function Posts({ setIsScrolling, following }: any) {
     setRefreshing(false);
   };
 
-  // PAUSE ALL VIDEOS WHEN NOT IN FOCUS
-  useEffect(() => {
-    if (!isFocused) {
-      setPlayingIndex(null);
-    }
-  }, [isFocused]);
-
   //OPTIMIZE FLATLIST
   const renderItem = useCallback(({ item , index } : any) => (
     <PostItem
@@ -70,6 +63,12 @@ export default function Posts({ setIsScrolling, following }: any) {
     />
   ), [playingIndex, isMuted, handleToggleMute]);
 
+  // PAUSE ALL VIDEOS WHEN NOT IN FOCUS
+  useEffect(() => {
+    if (!isFocused) {
+      setPlayingIndex(null);
+    }
+  }, [isFocused]);
 
   return (
     <>
@@ -98,7 +97,7 @@ export default function Posts({ setIsScrolling, following }: any) {
         onEndReachedThreshold={0.5} // Adjust the threshold as needed
         ListFooterComponent={() => (isLoadingFeed ? <ActivityIndicator size="large" color="#000" /> : null)}
         onScroll={handleScroll}
-        scrollEventThrottle={0}
+        scrollEventThrottle={100}
       />}
     </>
   );

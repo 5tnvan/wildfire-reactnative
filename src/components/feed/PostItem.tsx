@@ -21,6 +21,8 @@ function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
   const colorScheme = useColorScheme();
   const videoRef = useRef<any>(null);
 
+  console.log("post item", item.id, isPlaying);
+
   //COSUME PROVIDERS
   const { user } = useAuth();
 
@@ -34,13 +36,6 @@ function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
   //HANDLE INCREMENT VIEWS
   const handleIncrementViews = async () => {
     increment_views(item.id);
-    // const _watched = await watched(item.id, user?.id);
-    // if (_watched) {
-    //   increment_views(item.id, user?.id)
-    // } else {
-    //   const error = await insert_views(item.id, user?.id)
-    //   if (!error) increment_views(item.id, user?.id)
-    // }
   }
 
   //AFTER 3rd PLAY REPEAT, PAUSE VIDEO
@@ -81,7 +76,6 @@ function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
     }).start();
   };
 
-
   //HANDLE LIKE PRESS
   const [likeCount, setLikeCount] = useState(item["3sec_fires"][0].count);
   const [temporaryLiked, setTemporaryLiked] = useState(false);
@@ -115,8 +109,7 @@ function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
   //WHEN VIDEO IS PLAYING
   useEffect(() => {
     if (isPlaying) {
-      // increment views by +1
-      handleIncrementViews();
+      handleIncrementViews(); // increment views by +1
       // reset
       repeatCountRef.current = 0;
       setThreePlayPaused(false);
