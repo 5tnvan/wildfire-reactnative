@@ -12,10 +12,8 @@ import FormatNumber from "../FormatNumber";
 import { FiresModal } from "../modals/FiresModal";
 import { CommentsModal } from "../modals/CommentsModal";
 import { useRouter } from "expo-router";
-import { increment_views, insert_views, watched } from "@/src/utils/views/incrementViews";
+import { increment_views} from "@/src/utils/views/incrementViews";
 import { fetchViewCount } from "@/src/utils/fetch/fetchViewCount";
-import { calculateTotalViews } from "@/src/utils/views/calculateTotalViews";
-import { getTotalViews } from "@/src/utils/views/getTotalViews";
 
 function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
 
@@ -29,19 +27,20 @@ function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
   //GET VIDEO VIEWS
   const [totalViews, setTotalViews] = useState<any>(null);
   const handleGetViews = async () => {
-    const res = await getTotalViews(item.id);
-    setTotalViews(res);
+    const res = await fetchViewCount(item.id);
+    setTotalViews(res?.view_count);
   }
 
   //HANDLE INCREMENT VIEWS
   const handleIncrementViews = async () => {
-    const _watched = await watched(item.id, user?.id);
-    if (_watched) {
-      increment_views(item.id, user?.id)
-    } else {
-      const error = await insert_views(item.id, user?.id)
-      if (!error) increment_views(item.id, user?.id)
-    }
+    increment_views(item.id);
+    // const _watched = await watched(item.id, user?.id);
+    // if (_watched) {
+    //   increment_views(item.id, user?.id)
+    // } else {
+    //   const error = await insert_views(item.id, user?.id)
+    //   if (!error) increment_views(item.id, user?.id)
+    // }
   }
 
   //AFTER 3rd PLAY REPEAT, PAUSE VIDEO

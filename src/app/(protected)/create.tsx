@@ -299,6 +299,8 @@ const CameraScreen = () => {
         setRecordedVideo(undefined);
         setCameraRollVideo(undefined);
         router.push("/(profile)/" + profile.username);
+      } else {
+        console.log(error);
       }
     } catch (error) {
       console.error('Upload error:', error);

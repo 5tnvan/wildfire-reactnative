@@ -26,18 +26,18 @@ export default function DiscoverScreen() {
       </View>
 
       {/* TABs */}
-      <View className='flex-row px-2 mb-2 w-full'>
+      <View className='flex-row mb-1 w-full'>
         <Pressable
-          className={`${chosenTab == 'time' ? 'bg-accent' : colorScheme == 'dark' ? 'bg-zinc-900' : 'bg-white'} flex-row justify-center p-1 mr-2 rounded-full items-center grow`}
+          className={`${chosenTab == 'time' ? 'bg-accent' : colorScheme == 'dark' ? 'bg-zinc-900' : 'bg-white'} flex-col justify-center py-6 mr-1 rounded-lg items-center grow`}
           onPress={() => setChosenTab('time')}>
-          <Text className='text-base mr-1'>Time to remember</Text>
-          <FontAwesome6 name="clock" size={14} color={colorScheme == 'dark' ? 'white' : 'black'} />
+          <FontAwesome6 name="clock" size={26} color={colorScheme == 'dark' ? 'white' : 'black'} />
+          <Text className='text-lg mt-3'>Time to remember</Text>
         </Pressable>
         <Pressable
-          className={`${chosenTab == 'country' ? 'bg-accent' : colorScheme == 'dark' ? 'bg-zinc-900' : 'bg-white'} flex-row justify-center p-1 rounded-full items-center grow`}
+          className={`${chosenTab == 'country' ? 'bg-accent' : colorScheme == 'dark' ? 'bg-zinc-900' : 'bg-white'} flex-col justify-center items-center py-6 rounded-lg  grow`}
           onPress={() => setChosenTab('country')}>
-          <Text className='text-base mr-1'>A country to visit</Text>
-          <FontAwesome6 name="location-arrow" size={14} color={colorScheme == 'dark' ? 'white' : 'black'} />
+            <FontAwesome6 name="location-arrow" size={26} color={colorScheme == 'dark' ? 'white' : 'black'} />
+          <Text className='text-lg mt-3'>A location to visit</Text>
         </Pressable>
       </View>
 

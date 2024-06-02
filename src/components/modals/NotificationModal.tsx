@@ -2,8 +2,6 @@ import { Modal, Pressable, ScrollView, useColorScheme } from 'react-native';
 import { Text, View } from "@/src/components/Themed";
 import { Entypo, Ionicons } from '@expo/vector-icons';
 import { PressableAnimated } from '../pressables/PressableAnimated';
-import { supabase } from '@/src/lib/supabase';
-import { useFollowerNotifications } from '@/src/hooks/useFollowersNotification';
 import { useAuthUserNotifications } from '@/src/services/providers/AuthUserNotificationProvider';
 import { useRouter } from 'expo-router';
 import { Avatar } from '../avatars/avatar';
@@ -45,7 +43,7 @@ export function NotificationModal({ visible, data, onClose }: Props) {
     //REFETCH DATA WHEN SCREEN IS FOCUSED 
     useEffect(() => {
         if (isFocused) {
-            console.log("FOCUS: notification modal")
+            console.log("FOCUSED: notification modal")
             setReadNotifications(null);
         }
     }, [isFocused]);

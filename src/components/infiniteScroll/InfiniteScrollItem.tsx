@@ -16,8 +16,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import { FiresModal } from '../modals/FiresModal';
 import { CommentsModal } from '../modals/CommentsModal';
 import { useAuth } from '../../services/providers/AuthProvider';
-import { getTotalViews } from '../../utils/views/getTotalViews';
-import { increment_views, insert_views, watched } from '../../utils/views/incrementViews';
+import { increment_views } from '../../utils/views/incrementViews';
+import { fetchViewCount } from '@/src/utils/fetch/fetchViewCount';
 
 function InfiniteScrollItem({ item, isPlaying }: any) {
 
@@ -150,19 +150,13 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
     //GET VIDEO VIEWS
     const [totalViews, setTotalViews] = useState<any>(null);
     const handleGetViews = async () => {
-        const res = await getTotalViews(item.id);
-        setTotalViews(res);
+        const res = await fetchViewCount(item.id);
+        setTotalViews(res?.view_count);
     }
 
     //HANDLE INCREMENT VIEWS
     const handleIncrementViews = async () => {
-        const _watched = await watched(item.id, user?.id);
-        if (_watched) {
-            increment_views(item.id, user?.id)
-        } else {
-            const error = await insert_views(item.id, user?.id)
-            if (!error) increment_views(item.id, user?.id)
-        }
+        increment_views(item.id);
     }
 
     return (

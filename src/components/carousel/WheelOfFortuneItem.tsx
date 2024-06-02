@@ -1,5 +1,5 @@
 import { Image, Pressable, StyleSheet, TouchableHighlight, TouchableOpacity, View, useColorScheme } from 'react-native';
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import Animated, {
   Extrapolation,
   SharedValue,
@@ -9,8 +9,8 @@ import Animated, {
 import { TimeAgo } from '../TimeAgo';
 import { Text } from "../Themed";
 import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
-import { getTotalViews } from '../../utils/views/getTotalViews';
 import FormatNumber from '../FormatNumber';
+import { fetchViewCount } from '@/src/utils/fetch/fetchViewCount';
 
 type Props = {
   item: any;
@@ -53,13 +53,7 @@ const WheelOfFortuneItem = ({
 
   const colorScheme = useColorScheme();
 
-  //GET VIDEO VIEWS
-  const [totalViews, setTotalViews] = useState<any>(null);
-  const handleGetViews = async () => {
-    const res = await getTotalViews(item.id);
-    setTotalViews(res);
-  }
-  handleGetViews();
+  console.log("item", item.id);
 
   return (
     <Pressable onPress={() => onPress(index)}>
@@ -82,7 +76,12 @@ const WheelOfFortuneItem = ({
         
         <View className='flex-row items-center absolute top-0 right-0 px-3 py-1 m-3 rounded-full bg-white/60'>
           <View className='mr-1'><FontAwesome name="eye" size={14} color="black" /></View>
-          <Text className='text-black'>{totalViews && totalViews > 0 ?  <FormatNumber number={totalViews}/> : '0'}</Text>
+          {/* <Text className='text-black'><FormatNumber number={item["3sec_views"].view_count}/></Text> */}
+          <Text className='text-black'>{item["3sec_views"] ? (
+            <FormatNumber number={item["3sec_views"][0].view_count} />
+          ) : (
+            <Text>0</Text>
+          )}</Text>
         </View>
         
         
@@ -99,4 +98,6 @@ const WheelOfFortuneItem = ({
   );
 };
 
-export default WheelOfFortuneItem;
+export default memo(WheelOfFortuneItem, (prevProps, nextProps) => {
+  return (prevProps.item === nextProps.item);
+},);

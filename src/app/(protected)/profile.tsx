@@ -29,6 +29,7 @@ import Story from "@/src/components/story/Story";
 import WheelOfFortuneItem from "@/src/components/carousel/WheelOfFortuneItem";
 import { NotificationModal } from "@/src/components/modals/NotificationModal";
 import { useAuthUserNotifications } from "@/src/services/providers/AuthUserNotificationProvider";
+import StoryModal from "@/src/components/modals/StoryModal";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -36,6 +37,7 @@ export default function ProfileScreen() {
   const colorScheme = useColorScheme();
   const { width } = useWindowDimensions();
   const [storyIndex, setStoryIndex] = useState<any>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   //CONSUME PROVIDERS
   const { isLoading: isLoadingUser, profile } = useAuthUser();
@@ -48,6 +50,9 @@ export default function ProfileScreen() {
   //MODALS
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
   const [notificationModalVisible, setNotificationModalVisible] = useState(false);
+  const [followersModalVisible, setFollowersModalVisible] = useState(false);
+  const [followingModalVisible, setFollowingModalVisible] = useState(false);
+  const [storyModalVisible, setStoryModalVisible] = useState(false);
 
   //UNREAD NOTIFICATIONS
   const unreadNotifications = followersNotifications?.filter((notification: any) => !notification.follower_read);
@@ -66,24 +71,22 @@ export default function ProfileScreen() {
     },
   });
 
-  //HANDLE STORY PRESS
+  function openStory() { setStoryModalVisible(true); }
+  function closeStory() { setStoryModalVisible(false); }
+
   const handleStoryPress = (index: number) => {
     setStoryIndex(index);
     openStory();
   };
 
-  //OPEN CLOSE STORY MODAL 
-  const [insideModal, setInsideModal] = useState(false);
-  function openModal() { }
-  function closeModal() { setInsideModal(false); setInsideStory(false); }
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    refetchFeed();
+    console.log("set shared value to 0")
+    x.value = 0;
+    setRefreshing(false);
+  };
 
-  const [insideStory, setInsideStory] = useState(false);
-  function openStory() { setInsideStory(true); setInsideModal(true); }
-  function closeStory() { setInsideStory(false); setInsideModal(false); }
-
-  // HANDLE FOLLOWS MODAL
-  const [followersModalVisible, setFollowersModalVisible] = useState(false);
-  const [followingModalVisible, setFollowingModalVisible] = useState(false);
 
   //REFETCH DATA WHEN SCREEN IS FOCUSED 
   useEffect(() => {
@@ -92,28 +95,11 @@ export default function ProfileScreen() {
     }
   }, [isFocused]);
 
-  // HANDLE REFRESH
-  const [refreshing, setRefreshing] = useState(false);
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    refetchFeed();
-    x.value = 0;
-    setRefreshing(false);
-  };
-
   return (
     <>
-      {insideStory &&
+      {storyModalVisible &&
         // STORY MODAL
-        <Modal
-          visible={insideModal}
-          onRequestClose={() => closeModal()}
-          animationType="slide"
-          presentationStyle="pageSheet"
-        >
-          <Story data={{ feed: feed, followed: null }} storyIndex={storyIndex} onFinishStory={closeStory} />
-        </Modal>
+        <StoryModal visible={storyModalVisible} data={{ feed: feed, followed: null }} storyIndex={storyIndex} onClose={closeStory} />
       }
       <>
         {/* HEADER */}
@@ -121,23 +107,23 @@ export default function ProfileScreen() {
           headerShown: true, title: '@' + profile.username,
           headerRight: () => (
             <>
-          <View className="flex-row items-center">
-            <TouchableOpacity className="mr-2" onPress={() => setNotificationModalVisible(true)}>
-              <Ionicons name="heart-outline" size={22} color={`${colorScheme == 'dark' ? 'white' : 'black'}`} />
-              {unreadNotifications && unreadNotifications.length > 0 && <View className="absolute right-0 top-0 w-2 h-2 rounded-full bg-red-600"></View>}
-            </TouchableOpacity>
-            <TouchableOpacity className="mr-3" onPress={() => setSettingsModalVisible(true)}><Ionicons name="settings" size={20} color={`${colorScheme == 'dark' ? 'white' : 'black'}`} /></TouchableOpacity>
-          </View></>
+              <View className="flex-row items-center">
+                <TouchableOpacity className="mr-2" onPress={() => setNotificationModalVisible(true)}>
+                  <Ionicons name="heart-outline" size={22} color={`${colorScheme == 'dark' ? 'white' : 'black'}`} />
+                  {unreadNotifications && unreadNotifications.length > 0 && <View className="absolute right-0 top-0 w-2 h-2 rounded-full bg-red-600"></View>}
+                </TouchableOpacity>
+                <TouchableOpacity className="mr-3" onPress={() => setSettingsModalVisible(true)}><Ionicons name="settings" size={20} color={`${colorScheme == 'dark' ? 'white' : 'black'}`} /></TouchableOpacity>
+              </View></>
           )
         }} />
 
         {/* SETTINGS MODAL */}
-        {settingsModalVisible && 
+        {settingsModalVisible &&
           <SettingsModal visible={settingsModalVisible} onClose={() => setSettingsModalVisible(false)} />
         }
 
         {/* NOTIFICATION MODAL */}
-        {notificationModalVisible && 
+        {notificationModalVisible &&
           <NotificationModal visible={notificationModalVisible} onClose={() => setNotificationModalVisible(false)} />
         }
 
@@ -151,7 +137,7 @@ export default function ProfileScreen() {
 
           {/* LOADING FEED */}
           {!isLoadingFeed && !feed && <View className="flex-row justify-center items-center grow ">
-          <View className="flex-row justify-center items-center grow ">
+            <View className="flex-row justify-center items-center grow ">
               <PressableAnimated onPress={() => refetchFeed}>Something went wrong. Try again later.</PressableAnimated>
             </View>
           </View>}

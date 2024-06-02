@@ -10,8 +10,6 @@ const MARGIN_RIGHT = 4;
 
 const Item = ({ time, video_url, isPlaying, onPress }: any) => {
 
-    //console.log("rendering", isPlaying, video_url );
-
     const videoRef = useRef<any>(null);
     
     //AFTER 3rd PLAY REPEAT, PAUSE VIDEO

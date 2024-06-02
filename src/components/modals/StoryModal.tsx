@@ -24,7 +24,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { TimeAgo } from '../TimeAgo';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../../lib/supabase';
-import { increment_views, insert_views, watched } from '../../utils/views/incrementViews';
+import { increment_views } from '../../utils/views/incrementViews';
 import { useAuth } from '../../services/providers/AuthProvider';
 import { router } from 'expo-router';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -53,20 +53,14 @@ export default function StoryModal({ visible, data, storyIndex, onClose }: Props
   const [temporaryFollowed, setTemporaryFollowed] = useState(false);
 
   const handleIncrementViews = async (story: any) => {
-    const _watched = await watched(story.id, user?.id);
-    if (_watched) {
-      increment_views(story.id, user?.id)
-    } else {
-      const error = await insert_views(story.id, user?.id)
-      if (!error) increment_views(story.id, user?.id)
-    }
+    increment_views(story.id);
   }
 
   const renderStoryContent = (story: any) => {
 
     handleIncrementViews(story);
 
-    console.log("isPlaying", story.id) //last one always renders twice
+    //console.log("isPlaying", story.id) //last one always renders twice
 
     return (
       <Video

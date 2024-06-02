@@ -29,15 +29,6 @@ export const useUserFeed = (user_id: any) => {
       .eq("user_id", user_id)
       .order("created_at", { ascending: false });
 
-      //check if auth user follows this user
-    // const authUser = await fetchUser();
-    // if (authUser) {
-    //   const followed = fetchFollowed(authUser.user?.id, user_id);
-    // }
-
-    //add it to 
-    
-
     setFeed(data);
     setIsLoading(false);
   };
@@ -74,7 +65,7 @@ export const useUserFeedByUsername = (username: any) => {
       const { data: feed } = await supabase
         .from("3sec")
         .select(
-          "id, video_url, thumbnail_url, created_at, country:country_id(id, name), profile:user_id(id, username, avatar_url)"
+          "id, video_url, thumbnail_url, created_at, country:country_id(id, name), profile:user_id(id, username, avatar_url), 3sec_views(view_count)"
         )
         .eq("user_id", data.id)
         .order("created_at", { ascending: false });

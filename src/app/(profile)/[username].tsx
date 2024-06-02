@@ -1,15 +1,13 @@
-import { View, Image, Pressable, useColorScheme, StyleSheet, useWindowDimensions, Modal, ActivityIndicator } from 'react-native';
+import { View, Pressable, useColorScheme, StyleSheet, useWindowDimensions, Modal, ActivityIndicator } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from '../../components/Themed';
 import { useUser } from '@/src/hooks/useUser';
 import { Avatar } from '@/src/components/avatars/avatar';
 import { useUserFollows } from '@/src/hooks/useUserFollows';
-import { Entypo, FontAwesome, Fontisto, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useEffect, useState } from 'react';
-import { fetchUser } from '@/src/utils/fetch/fetchUser';
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useState } from 'react';
 import { supabase } from '@/src/lib/supabase';
-import { useUserFeed, useUserFeedByUsername } from '@/src/hooks/useUserFeed';
+import { useUserFeedByUsername } from '@/src/hooks/useUserFeed';
 import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
@@ -20,8 +18,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { FollowsModal } from '@/src/components/modals/FollowsModal';
 import { useAuth } from '@/src/services/providers/AuthProvider';
 import Story from '@/src/components/story/Story';
-import CarouselItem from '@/src/components/carousel/WheelOfFortuneItem';
 import WheelOfFortuneItem from '@/src/components/carousel/WheelOfFortuneItem';
+import StoryModal from '@/src/components/modals/StoryModal';
 
 export default function ProfileUsernameScreen() {
 
@@ -36,19 +34,14 @@ export default function ProfileUsernameScreen() {
   const { user: authUser } = useAuth();
   const { user } = useUser(username);
   const { followed, followers, following, refetch: refetchFollows } = useUserFollows(username);
+
+  //FETCH DIRECTLY
   const { isLoading: isLoadingFeed, feed } = useUserFeedByUsername(username);
 
-
-  //HANDLE FOLLOWS MODAL
+  //MODALS
+  const [storyModalVisible, setStoryModalVisible] = useState(false);
   const [followsModalVisible, setFollowsModalVisible] = useState(false); //follows modal
-
-  const handleFollow = async () => {
-    const { error } = await supabase
-      .from("followers")
-      .insert({ follower_id: authUser?.id, following_id: user.id });
-    if (!error) refetchFollows();
-  }
-
+  
   //SPINNING CAROUSELL ANIMATION 
   const x = useSharedValue(0);
   const ITEM_WIDTH = 250;
@@ -63,35 +56,27 @@ export default function ProfileUsernameScreen() {
     },
   });
 
-  //HANDLE PRESS STORY ITEM
+  function openStory() { setStoryModalVisible(true); }
+  function closeStory() { setStoryModalVisible(false); }
+
   const handleStoryPress = (index: number) => {
     setStoryIndex(index);
     openStory();
   };
 
-  //OPEN CLOSE STORY MODAL 
-  const [insideModal, setInsideModal] = useState(false);
-  function openModal() { }
-  function closeModal() { refetchFollows(); setInsideModal(false); setInsideStory(false); }
-
-  const [insideStory, setInsideStory] = useState(false);
-  function openStory() { setInsideStory(true); setInsideModal(true); }
-  function closeStory() { refetchFollows(); setInsideStory(false); setInsideModal(false); }
+  const handleFollow = async () => {
+    const { error } = await supabase
+      .from("followers")
+      .insert({ follower_id: authUser?.id, following_id: user.id });
+    if (!error) refetchFollows();
+  }  
 
   if (!user) return <><Text>User not found</Text></>
 
   return (
     <>
-      {insideStory &&
-        // STORY MODAL
-        <Modal
-          visible={insideModal}
-          onRequestClose={() => closeModal()}
-          animationType="slide"
-          presentationStyle="pageSheet"
-        >
-          <Story data={{ authUser: authUser, user: user, feed: feed, followed: followed }} storyIndex={storyIndex} onFinishStory={closeStory} />
-        </Modal>
+      {storyModalVisible &&
+        <StoryModal visible={storyModalVisible} data={{ authUser: authUser, user: user, feed: feed, followed: followed }} storyIndex={storyIndex} onClose={closeStory} />
       }
       <>
         {/* HEADER */}

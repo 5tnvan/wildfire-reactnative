@@ -6,7 +6,10 @@ import { calculateTotalViews } from "./calculateTotalViews";
  * fetch and calculate views
  * @returns views
  */
-export const getTotalViews = async (video_id: any) => {
+
+//archived
+
+export const getTotalViews_archived = async (video_id: any) => {
     const res = await fetchViewCount(video_id);
     if (res?.length) return calculateTotalViews(res);
     else return 0
