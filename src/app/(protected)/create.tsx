@@ -21,6 +21,7 @@ import { FFmpegKit, ReturnCode } from 'ffmpeg-kit-react-native';
 import * as FileSystem from 'expo-file-system';
 import Video from 'react-native-video';
 import { useAuthUser } from '@/src/services/providers/AuthUserProvider';
+import { Image } from 'react-native-elements';
 
 const CameraScreen = () => {
 
@@ -51,10 +52,12 @@ const CameraScreen = () => {
 
   //compression
   const [isCompressing, setIsCompressing] = useState(false);
+  const [isDurationError, setIsDurationError] = useState(false);
   
   //vid res
   const [recordedVideo, setRecordedVideo] = useState<any>(null); //video taken from camera
   const [cameraRollVideo, setCameraRollVideo] = useState<string>(); //video taken from camera roll
+  const [thumbnail, setThumbnail] = useState<string>();
 
   //country modal
   const [locationModalVisible, setLocationModalVisible] = useState(false); //location modal
@@ -73,8 +76,6 @@ const CameraScreen = () => {
     setFacingType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
   }
 
-  const [isDurationError, setIsDurationError] = useState(false);
-
   const handlePickCamRollVideo = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({ // No permissions request is necessary for launching the image library
       mediaTypes: ImagePicker.MediaTypeOptions.Videos,
@@ -88,18 +89,24 @@ const CameraScreen = () => {
 
     if (!result.canceled) {
 
-      //if duration is more than 3100 and less than 2800 - your video needs to be 3 secs
-
+      //check duration
       if(result.assets[0].duration && (result.assets[0].duration > 3500 || result.assets[0].duration < 2500)){
         setIsDurationError(true)
         return;
       }
+
+      const thumb = await generateThumbnail(result.assets[0].uri); //generate thumb
+      console.log("thumb", thumb)
       
-      const compressVidUri = await compressVideo(result.assets[0].uri)
-      
-      if (compressVidUri != null) {
-        setCameraRollVideo(compressVidUri);
+      if (thumb) { 
+        const compThumb = await compressThumbnail(thumb) //compress thumb
+        console.log("compThumb", compThumb)
+
+        if(compThumb != null) setThumbnail(compThumb) // set thum
       }
+
+      const compressVidUri = await compressVideo(result.assets[0].uri) //compress video
+      if (compressVidUri != null) { setCameraRollVideo(compressVidUri); } //set video
     }
   };
 
@@ -112,17 +119,25 @@ const CameraScreen = () => {
 
       const res = await cameraRef.current.recordAsync({
         maxDuration: 3,
-        mirror: true,
+        mirror: false,
       });
 
       if (res) {
         console.log("video recording res", res)
         setIsRecording(false);
-        const compressVidUri = await compressVideo(res.uri)
+        
+        const thumb = await generateThumbnail(res.uri); //generate thumb
+        console.log("thumb", thumb)
 
-        if (compressVidUri != null) {
-          setRecordedVideo(compressVidUri);
+        if (thumb) { 
+          const compThumb = await compressThumbnail(thumb) //compress thumb
+          console.log("compThumb", compThumb)
+  
+          if(compThumb != null) setThumbnail(compThumb) // set thum
         }
+
+        const compressVidUri = await compressVideo(res.uri)
+        if (compressVidUri != null) setRecordedVideo(compressVidUri); //compress video
       }
 
     }
@@ -182,6 +197,35 @@ const CameraScreen = () => {
     }
   };
 
+  const compressThumbnail = async (thumbUri:any) => {
+    setIsCompressing(true);
+  
+    const timestamp = Date.now();
+    const compressedThumbnailPath = `${FileSystem.cacheDirectory}comp_thumb_${timestamp}.jpg`;
+  
+    try {
+      // Execute FFmpeg command
+      const session = await FFmpegKit.execute(`-i "${thumbUri}" -vf "scale=iw*0.75:ih*0.75" -qscale:v 2 "${compressedThumbnailPath}"`);
+      const returnCode = await session.getReturnCode();
+  
+      if (ReturnCode.isSuccess(returnCode)) {
+        console.log("Thumbnail compression success", compressedThumbnailPath);
+        return compressedThumbnailPath;
+      } else if (ReturnCode.isCancel(returnCode)) {
+        console.log("Thumbnail compression canceled");
+        return null;
+      } else {
+        console.log("Thumbnail compression error");
+        return null;
+      }
+    } catch (error) {
+      console.error("FFmpeg execution error:", error);
+      return null;
+    } finally {
+      setIsCompressing(false);
+    }
+  };
+
   const compressVideo = async (videoUri: string) => {
     
     setIsCompressing(true);
@@ -213,15 +257,14 @@ const CameraScreen = () => {
     }
   };
   
-
   const handlePublishing = async () => {
 
     console.log("publishing");
 
-    if(limit) {
-      alert("You've reached your 24hrs posting limit. Try again later.")
-      return;
-    }
+    // if(limit) {
+    //   alert("You've reached your 24hrs posting limit. Try again later.")
+    //   return;
+    // }
 
     setIsUploading(true);
     const now = new Date().getTime();
@@ -231,12 +274,12 @@ const CameraScreen = () => {
     if (cameraRollVideo) videoUri = cameraRollVideo;
     else if (recordedVideo) videoUri = recordedVideo;
 
-     // Generate thumbnail
-    const thumbUri = await generateThumbnail(videoUri);
-    if (!thumbUri) return;
-
     // Read the thumbnail file as binary
-    let thumbBinary = await RNFS.readFile(thumbUri, 'base64');
+    if (!thumbnail) { 
+      console.warn("No thumbnail found."); 
+      return; 
+    }
+    let thumbBinary = await RNFS.readFile(thumbnail, 'base64');
 
     // Convert base64 encoded string to binary data
     const thumbBinaryData = Buffer.from(thumbBinary, 'base64');
@@ -317,6 +360,7 @@ const CameraScreen = () => {
       setIsDurationError(false);
       setCameraRollVideo(undefined);
       setRecordedVideo(undefined);
+      setThumbnail(undefined);
       setLocationId(null)
       setLocationName('Set location');
       setIsActive(false);
@@ -449,6 +493,16 @@ const CameraScreen = () => {
                 color="black"
               />
             </View>
+
+            {thumbnail &&
+              <View className='absolute top-2 right-2 rounded-full'>
+                <Image
+                  source={{ uri: thumbnail }}
+                  style={{ width: 90, height: 160, resizeMode: 'cover' }}
+                  className='rounded-full bg-black/10'
+                />
+              </View>
+            }
             
             <View className='absolute bottom-3 flex-row w-full items-center px-3'>
               <Pressable className='flex-row justify-between grow py-3 px-3 items-center rounded-full bg-white mt-3 mr-3' onPress={() => setLocationModalVisible(true)}>
@@ -486,13 +540,24 @@ const CameraScreen = () => {
                 color="black"
               />
             </View>
+            
+            {thumbnail &&
+              <View className='absolute top-2 right-2 rounded-full'>
+                <Image
+                  source={{ uri: thumbnail }}
+                  style={{ width: 90, height: 160, resizeMode: 'cover' }}
+                  className='rounded-full bg-black/10'
+                />
+              </View>
+            }
+            
             <View className='absolute bottom-3 flex-row w-full items-center px-3'>
               <Pressable className='flex-row justify-between grow py-3 px-3 items-center rounded-full bg-white mt-3 mr-3' onPress={() => setLocationModalVisible(true)}>
                 <View><FontAwesome name="location-arrow" size={14} color="black" /></View>
                 <Text className='text-base font-semibold'>{locationName}</Text>
                 <View></View>
               </Pressable>
-              <TouchableOpacity className={`flex-row justify-center grow py-3 px-2 items-center rounded-full ${limit ? 'bg-primary' : 'bg-accent'} mt-3`} onPress={handlePublishing}>
+              <TouchableOpacity className={`flex-row justify-between grow py-3 px-2 items-center rounded-full ${limit ? 'bg-primary' : 'bg-accent'} mt-3`} onPress={handlePublishing}>
                 <View className='w-2'></View>
                 <Text className='text-base font-semibold'>Publish</Text>
                 {isUploading ? <ActivityIndicator size="small" color="#0000ff" className='' /> :
