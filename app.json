@@ -22,7 +22,7 @@
         "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
         "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone."
       },
-      "bundleIdentifier": "com.anonymous.expoappnavts"
+      "bundleIdentifier": "com.anonymous.wildfireapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -33,7 +33,7 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.anonymous.expoappnavts"
+      "package": "com.anonymous.wildfireapp"
     },
     "web": {
       "bundler": "metro",
