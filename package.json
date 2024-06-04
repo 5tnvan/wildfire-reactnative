@@ -55,7 +55,8 @@
     "viem": "^2.10.5",
     "@shopify/flash-list": "1.6.4",
     "expo-auth-session": "~5.5.2",
-    "expo-build-properties": "~0.12.1"
+    "expo-build-properties": "~0.12.1",
+    "react-native-gesture-handler": "~2.16.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -10,6 +10,7 @@ export { ErrorBoundary, } from 'expo-router'; // Catch any errors thrown by the 
 export const unstable_settings = { initialRouteName: '(auth)', }; // Ensure that reloading on `/modal` keeps a back button present.
 SplashScreen.preventAutoHideAsync(); // Prevent the splash screen from auto-hiding before asset loading is complete.
 import 'react-native-reanimated';
+import 'react-native-gesture-handler';
 
 /** 
  * ROOT LAYOUT NAVIGATION

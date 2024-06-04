@@ -19,6 +19,7 @@ import { FollowsModal } from '@/src/components/modals/FollowsModal';
 import { useAuth } from '@/src/services/providers/AuthProvider';
 import WheelOfFortuneItem from '@/src/components/carousel/WheelOfFortuneItem';
 import StoryModal from '@/src/components/modals/StoryModal';
+import 'react-native-gesture-handler';
 
 export default function ProfileUsernameScreen() {
 

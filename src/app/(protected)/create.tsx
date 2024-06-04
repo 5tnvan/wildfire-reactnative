@@ -22,6 +22,7 @@ import * as FileSystem from 'expo-file-system';
 import Video from 'react-native-video';
 import { useAuthUser } from '@/src/services/providers/AuthUserProvider';
 import { Image } from 'react-native-elements';
+import 'react-native-gesture-handler';
 
 const CameraScreen = () => {
 

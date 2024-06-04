@@ -29,6 +29,7 @@ import WheelOfFortuneItem from "@/src/components/carousel/WheelOfFortuneItem";
 import { NotificationModal } from "@/src/components/modals/NotificationModal";
 import { useAuthUserNotifications } from "@/src/services/providers/AuthUserNotificationProvider";
 import StoryModal from "@/src/components/modals/StoryModal";
+import 'react-native-gesture-handler';
 
 export default function ProfileScreen() {
   const router = useRouter();

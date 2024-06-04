@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "wildfire",
-    "slug": "wildfire",
+    "name": "wildfire-app",
+    "slug": "wildfire-app",
     "description": "3 seconds a day keeps the doctor away. A new content sharing app based on extremely short content.",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -75,6 +75,21 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "3c396301-9e55-4ecc-890d-ef9ae7752a6a"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/3c396301-9e55-4ecc-890d-ef9ae7752a6a"
+    },
+    "owner": "vtasst"
   }
 }
