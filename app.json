@@ -22,7 +22,7 @@
         "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
         "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone."
       },
-      "bundleIdentifier": "app.3seconds.wildfireapp"
+      "bundleIdentifier": "app.threeseconds.wildfireapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -33,7 +33,7 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "app.3seconds.wildfireapp"
+      "package": "app.threeseconds.wildfireapp"
     },
     "web": {
       "bundler": "metro",
