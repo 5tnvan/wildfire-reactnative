@@ -22,7 +22,7 @@
         "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
         "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone."
       },
-      "bundleIdentifier": "app.threeseconds.wildfireapp"
+      "bundleIdentifier": "me.threeseconds.wildfireapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -33,7 +33,7 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "app.threeseconds.wildfireapp"
+      "package": "me.threeseconds.wildfireapp"
     },
     "web": {
       "bundler": "metro",
@@ -75,6 +75,20 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "1672d71d-a42d-4adc-a0ec-70e0f600c393"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1672d71d-a42d-4adc-a0ec-70e0f600c393"
     }
   }
 }
