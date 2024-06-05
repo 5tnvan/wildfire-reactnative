@@ -75,21 +75,6 @@
     ],
     "experiments": {
       "typedRoutes": true
-    },
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "3c396301-9e55-4ecc-890d-ef9ae7752a6a"
-      }
-    },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/3c396301-9e55-4ecc-890d-ef9ae7752a6a"
-    },
-    "owner": "vtasst"
+    }
   }
 }
