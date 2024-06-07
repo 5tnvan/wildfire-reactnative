@@ -1,4 +1,4 @@
-import { View, Pressable, useColorScheme, StyleSheet, useWindowDimensions, Modal, ActivityIndicator } from 'react-native';
+import { View, Pressable, useColorScheme, StyleSheet, useWindowDimensions, Modal, ActivityIndicator, Linking } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Text } from '../../components/Themed';
 import { useUser } from '@/src/hooks/useUser';
@@ -175,7 +175,7 @@ export default function ProfileUsernameScreen() {
           <Text className="text-lg">following</Text> */}
             </Pressable>
             <PressableAnimated
-              onPress={() => alert("djhdjs")}>
+              onPress={() => (Linking.openURL('https://www.wildpay.app/' + username))}>
               <Text className="text-lg"> </Text>
               <Text className="text-base">Tip Now</Text>
               <MaterialCommunityIcons
