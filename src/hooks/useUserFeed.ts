@@ -2,9 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
-import * as VideoThumbnails from "expo-video-thumbnails";
-import { fetchFollowed } from "../utils/fetch/fetchFollowed";
-import { fetchUser } from "../utils/fetch/fetchUser";
 
 /**
  * useUserFeed HOOK

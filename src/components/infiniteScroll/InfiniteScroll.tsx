@@ -311,8 +311,8 @@ const Item = ({ item, isPlaying }: any) => {
         }
       }} />}
 
-      {/* FIRES MODAL */}
-      {commentModalVisible && <CommentsModal visible={commentModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url }} onClose={() => {
+      {/* COMMENTS MODAL */}
+      {commentModalVisible && <CommentsModal visible={commentModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url, creator: item.profile.id }} onClose={() => {
         if (video.current && !threePlayPaused && !paused) {
           video.current.playAsync();
         }

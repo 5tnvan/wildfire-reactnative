@@ -1,8 +1,8 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Animated, TouchableOpacity, Linking, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Animated, TouchableOpacity, Linking, Dimensions, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Entypo, FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import Video from 'react-native-video';
 import { PressableComment } from '../pressables/PressableComment';
 import { PressableFire } from '../pressables/PressableFire';
@@ -18,10 +18,12 @@ import { CommentsModal } from '../modals/CommentsModal';
 import { useAuth } from '../../services/providers/AuthProvider';
 import { increment_views } from '../../utils/views/incrementViews';
 import { fetchViewCount } from '@/src/utils/fetch/fetchViewCount';
+import { ThreeDotsModal } from '../modals/ThreeDotsModal';
 
 function InfiniteScrollItem({ item, isPlaying }: any) {
 
     const router = useRouter();
+    const colorScheme = useColorScheme();
     const video = React.useRef<any>(null);
 
     //COSUME PROVIDERS
@@ -50,15 +52,15 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
     const handleThreePlayRepeat = () => {
         if (repeatCountRef.current < 2) {
             repeatCountRef.current += 1;
-          } else {
+        } else {
             // Pause the video after 3rd repeat
             if (video.current) {
-              video.current.seek(0);
-              video.current.pause();
-              setThreePlayPaused(true);
-              fadeIn();
+                video.current.seek(0);
+                video.current.pause();
+                setThreePlayPaused(true);
+                fadeIn();
             }
-          }
+        }
     };
 
     // HANDLE WATCH AGAIN
@@ -159,6 +161,16 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
         increment_views(item.id);
     }
 
+    //HANDLE THREE DOTS
+    const [threeDotsModalVisible, setThreeDotsModalVisible] = useState(false);
+    const handleThreeDotsPress = () => {
+        setThreeDotsModalVisible(true);
+        // Pause the video when three dots modal is opened
+        if (video.current) {
+            video.current.pause();
+        }
+    }
+
     return (
         <>
             <Pressable onPress={handleManualPause}>
@@ -190,11 +202,12 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
                     </View>
                 )}
                 {/* TOP */}
-                <SafeAreaView className='absolute right-3'>
+                <SafeAreaView className='absolute right-2 flex-row gap-1 items-center'>
                     <TouchableOpacity className={`flex-row items-center rounded-full bg-white/70`} onPress={() => handleGetViews()}>
                         <View className='px-2 py-1'><FontAwesome name="eye" size={18} color="black" /></View>
                         {totalViews && <Text className='text-lg mr-2'><FormatNumber number={totalViews} /></Text>}
                     </TouchableOpacity>
+                    <Pressable onPress={handleThreeDotsPress}><Entypo name="dots-three-vertical" size={18} color={colorScheme == 'dark' ? 'white' : 'black'} /></Pressable>
                 </SafeAreaView>
                 {/* BOTTOM */}
                 <LinearGradient className='absolute bottom-0 p-3 w-full' colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 1)']}>
@@ -233,11 +246,18 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
                 }
             }} />}
             {/* COMMENT MODAL */}
-            {commentModalVisible && <CommentsModal visible={commentModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url }} onClose={() => {
+            {commentModalVisible && <CommentsModal visible={commentModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url, creator: item.profile.id }} onClose={() => {
                 if (video.current && !threePlayPaused && !paused) {
                     video.current.resume();
                 }
                 setCommentModalVisible(false)
+            }} />}
+            {/* THREE DOT MODAL */}
+            {threeDotsModalVisible && <ThreeDotsModal visible={threeDotsModalVisible} report={true} block={false} data={{ content_id: item.id }} onClose={() => {
+                if (video.current && !threePlayPaused && !paused) {
+                    video.current.resume();
+                }
+                setThreeDotsModalVisible(false)
             }} />}
         </>
     );
@@ -247,27 +267,27 @@ export default memo(InfiniteScrollItem);
 
 const styles = StyleSheet.create({
     videoContainer: {
-      width: Dimensions.get('window').width,
-      height: Dimensions.get('window').height,
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
     },
     video: {
-      width: '100%',
-      height: '100%',
+        width: '100%',
+        height: '100%',
     },
     playIconContainer: {
-      ...StyleSheet.absoluteFillObject, // Position the play icon container absolutely within the video container
-      justifyContent: 'center',
-      alignItems: 'center',
+        ...StyleSheet.absoluteFillObject, // Position the play icon container absolutely within the video container
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     overlay: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      justifyContent: 'center',
-      alignItems: 'center',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     shadow: {
         shadowColor: '#fff',
@@ -275,5 +295,5 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.8,
         shadowRadius: 1,
         elevation: 5, // For Android
-      },
-  });
+    },
+});

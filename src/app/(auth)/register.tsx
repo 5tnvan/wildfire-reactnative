@@ -13,8 +13,10 @@ import {
   TouchableOpacity
 } from "react-native";
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { Checkbox } from "expo-checkbox";
 
 import { supabase } from "@/src/lib/supabase";
+import { Link } from "expo-router";
 
 export default function RegisterScreen() {
   const colorScheme = useColorScheme();
@@ -23,6 +25,7 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [available, setAvailable] = useState<boolean>();
+  const [eulaChecked, setEulaChecked] = useState(false);
 
   async function checkUsernameAvail(username: string) {
     const { data } = await supabase.from("profiles").select().eq("username", username);
@@ -93,7 +96,7 @@ export default function RegisterScreen() {
     })();
   }, [username]);
 
-  
+
   return (
     <View className="flex flex-col justify-content px-4 grow">
       {/* Create a wildpay account */}
@@ -170,7 +173,7 @@ export default function RegisterScreen() {
             value={email}
             placeholder="email@address.com"
             autoCapitalize={"none"}
-            className={colorScheme =="dark" ? 'text-white' : 'text-black'}
+            className={colorScheme == "dark" ? 'text-white' : 'text-black'}
           />
         </View>
 
@@ -183,15 +186,27 @@ export default function RegisterScreen() {
             secureTextEntry={true}
             placeholder="Password"
             autoCapitalize={"none"}
-            className={colorScheme =="dark" ? 'text-white' : 'text-black'}
+            className={colorScheme == "dark" ? 'text-white' : 'text-black'}
           />
+        </View>
+
+        {/* Checkbox for EULA */}
+        <View className="flex-row items-center mb-5">
+          <Checkbox
+            value={eulaChecked}
+            onValueChange={setEulaChecked}
+            color={eulaChecked ? '#FFAA00' : undefined}
+          />
+          <Text className="ml-2 text-black dark:text-white">
+            I agree with the <Link href="/modals/eula-terms-modal" className="text-accent">EULA terms</Link>
+          </Text>
         </View>
 
         <View className="items-center mb-5">
 
           <TouchableOpacity
-            className={`w-full items-center justify-center p-3 rounded-full ${loading ? "bg-slate-400" : "bg-accent"}`}
-            disabled={loading}
+            className={`w-full items-center justify-center p-3 rounded-full ${loading || !eulaChecked  ? "bg-zinc-400" : "bg-accent"}`}
+            disabled={loading || !eulaChecked}
             onPress={() => signUpWithEmail()}
           >
             <Text className="text-lg text-black font-semibold">Register</Text>

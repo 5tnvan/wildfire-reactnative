@@ -19,8 +19,8 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
-        "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone."
+        "NSCameraUsageDescription": "$(PRODUCT_NAME) uses your camera to record a 3-seconds video, to be shared with users of the app.",
+        "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) uses your microphone to record video sound, to be shared with users of the app."
       },
       "bundleIdentifier": "me.threeseconds.wildfireapp"
     },
@@ -32,6 +32,9 @@
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
+      ],
+      "blockedPermissions": [
+        "FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ],
       "package": "me.threeseconds.wildfireapp"
     },
@@ -46,15 +49,14 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
-          "recordAudioAndroid": true
+          "cameraPermission": "$(PRODUCT_NAME) uses your camera to record a 3-seconds video, to be shared with users of the app.",
+          "microphonePermission": "$(PRODUCT_NAME) uses your microphone to record video sound, to be shared with users of the app."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
+          "photosPermission": "The app accesses your photos to let you share them with users of the app."
         }
       ],
       "expo-video",

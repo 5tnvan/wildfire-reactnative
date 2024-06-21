@@ -11,6 +11,7 @@ import FormatNumber from '../FormatNumber';
 import { useAuthUser } from '@/src/services/providers/AuthUserProvider';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TimeAgo } from '../TimeAgo';
+import { checkIsBlocked } from '@/src/utils/check/checkIsBlocked';
 
 type Props = {
     visible: any,
@@ -25,6 +26,8 @@ export function CommentsModal({ visible, data, onClose }: Props) {
     const { profile } = useAuthUser();
     const [comments, setComments] = useState<any>();
     const [comment, setComment] = useState('');
+
+    console.log("comments data", data.id, data.thumbnail, data.creator);
 
     const fetchComments = async () => {
         const { data: res } = await supabase
@@ -45,7 +48,9 @@ export function CommentsModal({ visible, data, onClose }: Props) {
     }
 
     const handleCommentSubmit = async () => {
-        if (comment.trim()) {
+        //check if creator blocked auth user
+        const blocked = await checkIsBlocked(data.creator, profile.id);
+        if (comment.trim() && !blocked) {
             // Insert the comment to supabase
             const { data: res, error } = await supabase
                 .from('3sec_comments')
@@ -57,6 +62,8 @@ export function CommentsModal({ visible, data, onClose }: Props) {
                 setComment(''); // Clear the input after submission
                 fetchComments();
             }
+        } else if (blocked) {
+            alert("You cannot interact with this post.");
         }
     };
 

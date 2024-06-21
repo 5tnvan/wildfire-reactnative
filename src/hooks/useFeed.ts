@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
-import { fetchFollowing } from "../utils/fetch/fetchFollowing";
 import { fetchUser } from "../utils/fetch/fetchUser";
 
 const getRange = (page: number, range: number) => {

@@ -4,7 +4,7 @@ import { Text } from '../../components/Themed';
 import { useUser } from '@/src/hooks/useUser';
 import { Avatar } from '@/src/components/avatars/avatar';
 import { useUserFollows } from '@/src/hooks/useUserFollows';
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from 'react';
 import { supabase } from '@/src/lib/supabase';
 import { useUserFeedByUsername } from '@/src/hooks/useUserFeed';
@@ -20,6 +20,7 @@ import { useAuth } from '@/src/services/providers/AuthProvider';
 import WheelOfFortuneItem from '@/src/components/carousel/WheelOfFortuneItem';
 import StoryModal from '@/src/components/modals/StoryModal';
 import 'react-native-gesture-handler';
+import { ThreeDotsModal } from '@/src/components/modals/ThreeDotsModal';
 
 export default function ProfileUsernameScreen() {
 
@@ -32,8 +33,17 @@ export default function ProfileUsernameScreen() {
 
   //CONSUME PROVIDERS
   const { user: authUser } = useAuth();
-  const { user } = useUser(username);
+  const { user, isBlocked, refetch: refetchUser } = useUser(username);
   const { followed, followers, following, refetch: refetchFollows } = useUserFollows(username);
+
+  console.log("isBlocked", isBlocked);
+
+  //THREE DOTS
+  const [threeDotsModalVisible, setThreeDotsModalVisible] = useState(false);
+  const handleThreeDotsPress = () => {
+    refetchUser();
+    setThreeDotsModalVisible(true);
+  }
 
   //FETCH DIRECTLY
   const { isLoading: isLoadingFeed, feed } = useUserFeedByUsername(username);
@@ -86,7 +96,7 @@ export default function ProfileUsernameScreen() {
           headerBackTitle: 'Back',
           title: '@' + username,
           headerRight: () => (
-            <View>
+            <View className='flex-row items-center -m-3'>
               {followed != null && followed &&
                 <PressableAnimated className="py-1 px-3 flex-row items-center" onPress={() => setFollowsModalVisible(true)}>
                   <Text className='mr-1'>Following </Text>
@@ -98,11 +108,15 @@ export default function ProfileUsernameScreen() {
                   <Text className='text-black font-medium'>Follow</Text>
                 </PressableAnimated>
               }
+              <Pressable onPress={handleThreeDotsPress} className='ml-1'><Entypo name="dots-three-vertical" size={18} color={colorScheme == 'dark' ? 'white' : 'black'} /></Pressable>  
             </View>
           )
         }} />
         {/* FOLLOWS MODAL */}
         {followsModalVisible && <FollowsModal visible={followsModalVisible} data={{ user: user, followers: followers }} onClose={() => { setFollowsModalVisible(false); refetchFollows() }} />}
+        
+        {/* THREE DOT MODAL */}
+        {threeDotsModalVisible && <ThreeDotsModal visible={threeDotsModalVisible} data={{ blocking_id: user.id, isBlocked: isBlocked }} report={false} block={true} onClose={() => setThreeDotsModalVisible(false)} />}
         
         {/* CONTAINER FOR MAIN CONTENT*/}
         <View className="flex-1 flex-col justify-between">

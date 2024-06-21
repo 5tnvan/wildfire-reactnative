@@ -27,6 +27,7 @@ function RootLayoutNav() {
         <Stack.Screen name="modals/tool-tip-register-modal" options={{ title: 'Tooltip', presentation: 'card', headerBackTitle: 'Back' }} />
         <Stack.Screen name="modals/tool-tip-login-modal" options={{ title: 'Tooltip', presentation: 'card', headerBackTitle: 'Back' }} />
         <Stack.Screen name="modals/tool-tip-create" options={{ title: 'Tooltip', presentation: 'card', headerBackTitle: 'Back' }} />
+        <Stack.Screen name="modals/eula-terms-modal" options={{ title: 'Terms & Conditions', presentation: 'card', headerBackTitle: 'Back' }} />
       </Stack>
     </ThemeProvider>
   );

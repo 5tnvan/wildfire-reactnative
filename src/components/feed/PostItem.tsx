@@ -14,6 +14,8 @@ import { CommentsModal } from "../modals/CommentsModal";
 import { useRouter } from "expo-router";
 import { increment_views} from "@/src/utils/views/incrementViews";
 import { fetchViewCount } from "@/src/utils/fetch/fetchViewCount";
+import { PressableAnimated } from "../pressables/PressableAnimated";
+import { ThreeDotsModal } from "../modals/ThreeDotsModal";
 
 function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
 
@@ -25,6 +27,12 @@ function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
 
   //COSUME PROVIDERS
   const { user } = useAuth();
+
+  //THREE DOTS
+  const [threeDotsModalVisible, setThreeDotsModalVisible] = useState(false);
+  const handleThreeDotsPress = () => {
+    setThreeDotsModalVisible(true);
+  }
 
   //GET VIDEO VIEWS
   const [totalViews, setTotalViews] = useState<any>(null);
@@ -131,20 +139,21 @@ function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
   }, [firesModalVisible, commentModalVisible]);
 
   return (
-    <View className={`mb-1 rounded-2xl`}>
+    <View className={`mb-1 rounded-2xl relative`}>
       {/* HEADER */}
-      <View className="flex-row justify-between items-center p-4">
+      <View className="flex-row justify-between items-center p-4 pr-2">
         <Pressable className="flex-row items-center" onPress={() => router.push("/(profile)/" + item.profile.username)}>
           <Text className="font-semibold text-base">@{item.profile.username}</Text>
           <Text className="ml-1 text-base"><TimeAgo timestamp={item.created_at}></TimeAgo></Text>
         </Pressable>
-        <View>
+        <View className="flex-row gap-1 items-center">
           {item.country &&
             <View className={`${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-zinc-100'} flex-row items-center py-1 px-3 rounded-full`}>
               <FontAwesome name="location-arrow" size={14} color={colorScheme == 'dark' ? 'white' : 'black'} />
               <Text className='text-base ml-1'>{item.country.name}</Text>
             </View>
           }
+          <Pressable onPress={handleThreeDotsPress}><Entypo name="dots-three-vertical" size={18} color={colorScheme == 'dark' ? 'white' : 'black'} /></Pressable>  
         </View>
       </View>
 
@@ -214,8 +223,11 @@ function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
       {/* FIRES MODAL */}
       {firesModalVisible && <FiresModal visible={firesModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url }} onClose={() => setFiresModalVisible(false)} />}
 
-      {/* FIRES MODAL */}
-      {commentModalVisible && <CommentsModal visible={commentModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url }} onClose={() => setCommentModalVisible(false)} />}
+      {/* COMMENT MODAL */}
+      {commentModalVisible && <CommentsModal visible={commentModalVisible} data={{ id: item.id, thumbnail: item.thumbnail_url, creator: item.profile.id }} onClose={() => setCommentModalVisible(false)} />}
+
+      {/* THREE DOT MODAL */}
+      {threeDotsModalVisible && <ThreeDotsModal visible={threeDotsModalVisible} report={true} block={false} data={{ content_id: item.id }} onClose={() => setThreeDotsModalVisible(false)} />}
 
     </View>
   );
