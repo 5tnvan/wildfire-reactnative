@@ -189,7 +189,7 @@ export default function ProfileUsernameScreen() {
           <Text className="text-lg">following</Text> */}
             </Pressable>
             <PressableAnimated
-              onPress={() => (Linking.openURL('https://www.wildpay.app/' + username))}>
+              onPress={() => (Linking.openURL('https://www.3seconds.me/' + username))}>
               <Text className="text-lg"> </Text>
               <Text className="text-base">Tip Now</Text>
               <MaterialCommunityIcons

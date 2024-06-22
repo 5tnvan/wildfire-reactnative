@@ -219,7 +219,7 @@ export default function ProfileScreen() {
             {/* TIP NOW */}
             <PressableAnimated
               className={''}
-              onPress={() => (Linking.openURL('https://www.wildpay.app/' + profile.username))}>
+              onPress={() => (Linking.openURL('https://www.3seconds.me/' + profile.username))}>
               <Text className="text-lg"> </Text>
               <Text className="text-base">Tip Now</Text>
               <MaterialCommunityIcons
