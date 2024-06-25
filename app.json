@@ -20,7 +20,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "$(PRODUCT_NAME) uses your camera to record a 3-seconds video, to be shared with users of the app.",
-        "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) uses your microphone to record video sound, to be shared with users of the app."
+        "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) uses your microphone to record video sound, to be shared with users of the app.",
+        "UIBackgroundModes": []
       },
       "bundleIdentifier": "me.threeseconds.wildfireapp"
     },
