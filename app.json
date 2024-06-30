@@ -60,7 +60,6 @@
           "photosPermission": "The app accesses your photos to let you share them with users of the app."
         }
       ],
-      "expo-video",
       [
         "expo-build-properties",
         {
