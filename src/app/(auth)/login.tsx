@@ -7,6 +7,7 @@ import { supabase } from '@/src/lib/supabase';
 import { Input } from 'react-native-elements';
 import { Ionicons } from '@expo/vector-icons';
 import { PressableAnimated } from '@/src/components/pressables/PressableAnimated';
+import AuthGoogle from '@/src/components/auth/AuthGoogle';
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
@@ -78,7 +79,9 @@ export default function LoginScreen() {
             <Text className={`text-lg font-semibold ${colorScheme == 'dark' ? 'text-white' : 'text-black'}`}>Log In</Text>
           </PressableAnimated>
         </View>
-
+        <View className='my-5 self-center'>
+          <AuthGoogle />
+        </View>
       </View>
     </View>
   )
