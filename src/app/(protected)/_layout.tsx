@@ -11,8 +11,7 @@ import AuthUserProvider, { useAuthUser } from '../../services/providers/AuthUser
 import AuthUserFollowsProvider from '@/src/services/providers/AuthUserFollowsProvider';
 import AuthUserNotificationProvider, { useAuthUserNotifications } from '@/src/services/providers/AuthUserNotificationProvider';
 import { View } from 'react-native';
-
-
+import Push from '@/src/components/Push';
 
 /** 
  * TAB BAR ICON
@@ -118,6 +117,7 @@ export default function ProtectedLayout() {
       <AuthUserNotificationProvider>
         <AuthUserFollowsProvider>
             <ProtectedLayoutNav />
+            <Push />
         </AuthUserFollowsProvider>
       </AuthUserNotificationProvider>
     </AuthUserProvider>
