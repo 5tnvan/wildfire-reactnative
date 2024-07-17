@@ -33,10 +33,14 @@ function ProtectedLayoutNav() {
 
   //CONSUME PROVIDERS
   const { profile } = useAuthUser();
-  const { isLoading, followersNotifications, refetch } = useAuthUserNotifications();
+  const { isLoading, followersNotifications, firesNotifications, commentsNotifications, refetch } = useAuthUserNotifications();
 
-  //UNREAD NOTIFICATIONS
-  const unreadNotifications = followersNotifications?.filter((notification: any) => !notification.follower_read);
+  // Check each notification array before spreading and filtering
+const unreadNotifications = [
+  ...(followersNotifications || []),
+  ...(firesNotifications || []),
+  ...(commentsNotifications || []),
+].filter((notification) => notification && !notification.read);
 
   return (
     <Tabs

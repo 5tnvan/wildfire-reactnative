@@ -42,7 +42,7 @@ export default function ProfileScreen() {
   //CONSUME PROVIDERS
   const { isLoading: isLoadingUser, profile } = useAuthUser();
   const { isLoading: isLoadingFollows, followers, following, refetch: refetchFollows } = useAuthUserFollows();
-  const { isLoading: isLoadingNotifications, followersNotifications, refetch: refetchNotifications } = useAuthUserNotifications();
+  const { isLoading: isLoadingNotifications, followersNotifications, firesNotifications, commentsNotifications, refetch: refetchNotifications } = useAuthUserNotifications();
 
   //FETCH DIRECTLY 
   const { isLoading: isLoadingFeed, feed, refetch: refetchFeed } = useUserFeed(profile.id);
@@ -55,7 +55,12 @@ export default function ProfileScreen() {
   const [storyModalVisible, setStoryModalVisible] = useState(false);
 
   //UNREAD NOTIFICATIONS
-  const unreadNotifications = followersNotifications?.filter((notification: any) => !notification.follower_read);
+  // Check each notification array before spreading and filtering
+  const unreadNotifications = [
+    ...(followersNotifications || []),
+    ...(firesNotifications || []),
+    ...(commentsNotifications || []),
+  ].filter((notification) => notification && !notification.read);
 
   //SPINNING CAROUSELL ANIMATION 
   const x = useSharedValue(0);
@@ -178,8 +183,8 @@ export default function ProfileScreen() {
                   scrollEventThrottle={16}
                   decelerationRate="fast"
                   snapToInterval={ITEM_FULL_WIDTH}
-                  // refreshing={refreshing}
-                  // onRefresh={handleRefresh}
+                // refreshing={refreshing}
+                // onRefresh={handleRefresh}
                 />
               </View></>}
 

@@ -136,23 +136,25 @@ export default function Push() {
   }, []);
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-around' }}>
-      <Text className='text-white'>Your Expo push token: {expoPushToken}</Text>
-      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-        <Text className='text-white'>Title: {notification && notification.request.content.title} </Text>
-        <Text className='text-white'>Body: {notification && notification.request.content.body}</Text>
-        <Text className='text-white'>Data: {notification && JSON.stringify(notification.request.content.data)}</Text>
-      </View>
-      <Button
-        title="Press to Send Notification"
-        onPress={async () => {
-          await sendPushNotification(expoPushToken);
-        }}
-      />
-      <Button
-        title="Schedule test notifications"
-        onPress={schedulePushNotification}
-      />
-    </View>
+    <>
+      {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-around' }}>
+        <Text className='text-white'>Your Expo push token: {expoPushToken}</Text>
+        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+          <Text className='text-white'>Title: {notification && notification.request.content.title} </Text>
+          <Text className='text-white'>Body: {notification && notification.request.content.body}</Text>
+          <Text className='text-white'>Data: {notification && JSON.stringify(notification.request.content.data)}</Text>
+        </View>
+        <Button
+          title="Press to Send Notification"
+          onPress={async () => {
+            await sendPushNotification(expoPushToken);
+          }}
+        />
+        <Button
+          title="Schedule test notifications"
+          onPress={schedulePushNotification}
+        />
+      </View> */}
+    </>
   );
 }

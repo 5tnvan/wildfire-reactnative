@@ -12,6 +12,8 @@ import { fetchFollowersReadNotifications } from '@/src/utils/fetch/fetchFollower
 import { useEffect, useState } from 'react';
 import { useIsFocused } from '@react-navigation/native';
 import { TimeAgo } from '../TimeAgo';
+import { fetchFiresReadNotifications } from '@/src/utils/fetch/fetchFiresNotifications';
+import { fetchCommentsReadNotifications } from '@/src/utils/fetch/fetchCommentsNotifications';
 
 type Props = {
     visible: any,
@@ -26,7 +28,11 @@ export function NotificationModal({ visible, data, onClose }: Props) {
 
     //CONSUME PROVIDERS
     const { user } = useAuth();
-    const { isLoading, followersNotifications, refetch } = useAuthUserNotifications();
+    const { isLoading, followersNotifications, firesNotifications, commentsNotifications, refetch } = useAuthUserNotifications();
+
+    console.log("followersNotifications", followersNotifications);
+    console.log("firesNotifications", firesNotifications);
+    console.log("commentsNotifications", commentsNotifications);
 
     //STATES
     const [readNotifications, setReadNotifications] = useState<any>(null);
@@ -36,9 +42,18 @@ export function NotificationModal({ visible, data, onClose }: Props) {
         onClose();
     }
     const handleLoadPrevious = async () => {
-        const res = await fetchFollowersReadNotifications(user?.id);
-        setReadNotifications(res);
-    }
+        const followersRead = await fetchFollowersReadNotifications(user?.id) || [];
+        const firesRead = await fetchFiresReadNotifications(user?.id) || [];
+        const commentsRead = await fetchCommentsReadNotifications(user?.id) || [];
+
+        const mergedReadNotifications = mergeAndSortNotifications(
+            commentsRead.map((notification: any) => ({ ...notification, type: 'comment' })),
+            firesRead.map((notification: any) => ({ ...notification, type: 'like' })),
+            followersRead.map((notification: any) => ({ ...notification, type: 'follow' }))
+        );
+
+        setReadNotifications(mergedReadNotifications);
+    };
 
     //REFETCH DATA WHEN SCREEN IS FOCUSED 
     useEffect(() => {
@@ -47,6 +62,22 @@ export function NotificationModal({ visible, data, onClose }: Props) {
             setReadNotifications(null);
         }
     }, [isFocused]);
+
+    // Merge and sort notifications by created_at
+    const mergeAndSortNotifications = (comments: any[], fires: any[], followers: any[]) => {
+        const allNotifications = [
+            ...comments,
+            ...fires,
+            ...followers,
+        ];
+        return allNotifications.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    };
+
+    const allUnreadNotifications = mergeAndSortNotifications(
+        commentsNotifications.map((notification: any) => ({ ...notification, type: 'comment' })),
+        firesNotifications.map((notification: any) => ({ ...notification, type: 'like' })),
+        followersNotifications.map((notification: any) => ({ ...notification, type: 'follow' }))
+    );
 
     return (
         <Modal
@@ -74,23 +105,27 @@ export function NotificationModal({ visible, data, onClose }: Props) {
                 </View>
                 <ScrollView className="flex-1 flex-col h-full px-2">
                     {/* UNREAD NOTIFICATIONS */}
-                    {followersNotifications && followersNotifications.map((notification: any) => (
+                    {allUnreadNotifications.map((notification: any) => (
                         <Pressable
                             key={notification.id}
                             onPress={() => {
                                 markAsRead(notification.id)
                                 handleReset();
-                                router.push("/(profile)/" + notification.follower.username)
+                                router.push("/(profile)/" + notification.user.username)
                             }}
                             className={`flex-row items-center justify-between ${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-neutral'} rounded-full px-4 py-2 my-1`}
                         >
                             <View className={`flex-row items-center pl-1 ${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-neutral'}`}>
-                                <Avatar avatar_url={notification.follower.avatar_url} username={notification.follower.username} size={'sm'} ring={true} />
-                                <Text className="text-base ml-2 text-accent ont-medium">{notification.follower.username}</Text>
-                                <Text className='ml-1 text-base'>is following you</Text>
+                                <Avatar avatar_url={notification.user.avatar_url} username={notification.user.username} size={'sm'} ring={true} />
+                                <Text className="text-base ml-2 text-accent ont-medium">{notification.user.username}</Text>
+                                <Text className='ml-1 text-base'>
+                                    {notification.type === 'comment' && 'commented on your post'}
+                                    {notification.type === 'like' && 'liked your post'}
+                                    {notification.type === 'follow' && 'is following you'}
+                                </Text>
                             </View>
 
-                            {notification.follower_read == false && <View className='py-1 px-2 rounded-full' ><Text className='text-sm'>Check</Text></View>}
+                            {notification.read == false && <View className='py-1 px-2 rounded-full' ><Text className='text-sm'>Check</Text></View>}
                         </Pressable>
                     ))}
                     {/* READ NOTIFICATIONS */}
@@ -100,22 +135,25 @@ export function NotificationModal({ visible, data, onClose }: Props) {
                                 key={notif.id}
                                 onPress={() => {
                                     handleReset();
-                                    router.push("/(profile)/" + notif.follower.username)
+                                    router.push("/(profile)/" + notif.user.username);
                                 }}
                                 className={`flex-row items-center justify-between ${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-neutral'} rounded-full px-4 py-2 my-1`}
                             >
                                 <View className={`flex-row items-center pl-1 ${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-neutral'}`}>
-                                    <Avatar avatar_url={notif.follower.avatar_url} username={notif.follower.username} size={'sm'} ring={true} />
-                                    <Text className="text-base ml-2 text-accent ont-medium">{notif.follower.username}</Text>
-                                    <Text className='ml-2 text-base'>is following you</Text>
+                                    <Avatar avatar_url={notif.user.avatar_url} username={notif.user.username} size={'sm'} ring={true} />
+                                    <Text className="text-base ml-2 text-accent ont-medium">{notif.user.username}</Text>
+                                    <Text className='ml-1 text-base'>
+                                        {notif.type === 'comment' && 'commented on your post'}
+                                        {notif.type === 'like' && 'liked your post'}
+                                        {notif.type === 'follow' && 'is following you'}
+                                    </Text>
                                 </View>
-                                <Text className=''><TimeAgo timestamp={notif.follower_created_at}></TimeAgo></Text>
+                                <Text className=''><TimeAgo timestamp={notif.created_at}></TimeAgo></Text>
                             </Pressable>
                         ))
-
                     }
                     {/* BUTTON: Load Previous */}
-                    <PressableAnimated className="items-center self-center text-center my-1" onPress={handleLoadPrevious}><Text className=''>Load Previous</Text></PressableAnimated>
+                    <PressableAnimated className="items-center self-center text-center my-1" onPress={handleLoadPrevious}><Text className=''>Load Read</Text></PressableAnimated>
                 </ScrollView>
             </View>
         </Modal>
