@@ -23,6 +23,7 @@
         "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) uses your microphone to record video sound, to be shared with users of the app.",
         "UIBackgroundModes": []
       },
+      "usesAppleSignIn": true,
       "bundleIdentifier": "me.threeseconds.wildfireapp"
     },
     "android": {
@@ -79,7 +80,8 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.514020308684-p68k4vrf3icd59bs316o81lpeq3su2dv"
         }
-      ]
+      ],
+      ["expo-apple-authentication"]
     ],
     "experiments": {
       "typedRoutes": true

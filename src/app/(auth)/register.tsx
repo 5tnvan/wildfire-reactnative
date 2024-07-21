@@ -17,6 +17,7 @@ import { Checkbox } from "expo-checkbox";
 
 import { supabase } from "@/src/lib/supabase";
 import { Link } from "expo-router";
+import { AuthApple } from "@/src/components/auth/AuthApple";
 
 export default function RegisterScreen() {
   const colorScheme = useColorScheme();

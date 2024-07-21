@@ -8,6 +8,7 @@ import { Input } from 'react-native-elements';
 import { Ionicons } from '@expo/vector-icons';
 import { PressableAnimated } from '@/src/components/pressables/PressableAnimated';
 import AuthGoogle from '@/src/components/auth/AuthGoogle';
+import { AuthApple } from '@/src/components/auth/AuthApple';
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
@@ -81,6 +82,7 @@ export default function LoginScreen() {
         </View>
         <View className='my-5 self-center'>
           <AuthGoogle />
+          <AuthApple />
         </View>
       </View>
     </View>
