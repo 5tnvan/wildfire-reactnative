@@ -4,17 +4,20 @@ import {
     statusCodes,
   } from '@react-native-google-signin/google-signin'
   import { supabase } from "@/src/lib/supabase";
+import { View, StyleSheet, Pressable, useColorScheme, Text } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
   
   export default function AuthGoogle() {
+    const colorScheme = useColorScheme();
     GoogleSignin.configure({
       webClientId: '514020308684-149pm13ne6cuic0e2ugu229cl49k9sti.apps.googleusercontent.com',
       iosClientId: '514020308684-p68k4vrf3icd59bs316o81lpeq3su2dv.apps.googleusercontent.com'
     })
   
     return (
-      <GoogleSigninButton
-        size={GoogleSigninButton.Size.Wide}
-        color={GoogleSigninButton.Color.Dark}
+      <View className='flex items-center justify-center rounded-3xl mb-1 bg-white border'>
+      <Pressable
+      className='flex-row items-center justify-center gap-1 mt-2 mb-3'
         onPress={async () => {
           try {
             await GoogleSignin.hasPlayServices()
@@ -41,6 +44,7 @@ import {
             }
           }
         }}
-      />
+      ><AntDesign name="google" size={14} color={`${colorScheme == 'dark' ? 'black' : 'black'}`} /><Text className="font-medium color-black" style={{ fontSize: 19 }}>Sign in with Google</Text></Pressable>
+      </View>
     )
   }

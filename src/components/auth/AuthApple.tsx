@@ -1,15 +1,16 @@
-import { Platform } from 'react-native'
+import { Platform, View, StyleSheet } from 'react-native'
 import * as AppleAuthentication from 'expo-apple-authentication'
 import { supabase } from "@/src/lib/supabase";
 
 export function AuthApple() {
   if (Platform.OS === 'ios')
     return (
+      <View className='flex items-center justify-center mb-1'>
       <AppleAuthentication.AppleAuthenticationButton
         buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-        buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-        cornerRadius={5}
-        style={{ width: 200, height: 64 }}
+        buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE}
+        style={styles.signInButton}
+        cornerRadius={18}
         onPress={async () => {
           console.log("im here");
           try {
@@ -46,6 +47,18 @@ export function AuthApple() {
           }
         }}
       />
+      </View>
     )
   return <>{/* Implement Android Auth options. */}</>
 }
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  signInButton: {
+    width: 250,
+    height: 50,
+  },
+});

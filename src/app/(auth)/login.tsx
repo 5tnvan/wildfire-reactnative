@@ -80,11 +80,11 @@ export default function LoginScreen() {
             <Text className={`text-lg font-semibold ${colorScheme == 'dark' ? 'text-white' : 'text-black'}`}>Log In</Text>
           </PressableAnimated>
         </View>
-        <View className='my-5 self-center'>
-          <AuthGoogle />
-          <AuthApple />
-        </View>
       </View>
+      <View className='my-8 self-center grow justify-end'>
+          <AuthApple />
+          <AuthGoogle />
+        </View>
     </View>
   )
 }

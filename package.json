@@ -60,7 +60,8 @@
     "react-native-video": "^6.0.0",
     "react-native-web": "~0.19.6",
     "viem": "^2.10.5",
-    "expo-apple-authentication": "~6.4.1"
+    "expo-apple-authentication": "~6.4.1",
+    "expo-modules-core": "~1.12.19"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
