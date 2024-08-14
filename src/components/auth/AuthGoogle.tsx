@@ -17,7 +17,7 @@ import { AntDesign } from '@expo/vector-icons';
     return (
       <View className='flex items-center justify-center rounded-3xl mb-1 bg-white border'>
       <Pressable
-      className='flex-row items-center justify-center gap-1 mt-2 mb-3'
+      className='flex-row items-center justify-center gap-1 mt-2 mb-3 ml-2 mr-3'
         onPress={async () => {
           try {
             await GoogleSignin.hasPlayServices()

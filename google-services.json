@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "62873770908",
+    "project_id": "wildfire-app-dab70",
+    "storage_bucket": "wildfire-app-dab70.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:62873770908:android:ae5a3db8d58427e2118659",
+        "android_client_info": {
+          "package_name": "me.threeseconds.wildfireapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDh9ydQd2uHGPMSNAvon6u0Kun7XtD-Om0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

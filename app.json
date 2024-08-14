@@ -38,7 +38,8 @@
       "blockedPermissions": [
         "FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ],
-      "package": "me.threeseconds.wildfireapp"
+      "package": "me.threeseconds.wildfireapp",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
