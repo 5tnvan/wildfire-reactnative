@@ -29,10 +29,11 @@ export const useFeedFromTime = () => {
   const fetchFeed = async (startTime: Date, endTime: Date) => {
     const { data, error } = await supabase
       .from('3sec_random_view')
-      .select('id, video_url, thumbnail_url, created_at, country:country_id(name), profile:user_id(id, username, avatar_url)')
+      .select('id, video_url, thumbnail_url, created_at, suppressed, country:country_id(name), profile:user_id(id, username, avatar_url)')
       .gte('created_at', endTime.toISOString())
       .lt('created_at', startTime.toISOString())
       .limit(3)
+      .neq('suppressed', true)
 
     if (error) {
       console.error("useFeedFromTime Error fetching data:", error);
