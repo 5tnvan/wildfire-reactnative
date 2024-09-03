@@ -1,7 +1,7 @@
 import { Image, StyleSheet, useColorScheme, TouchableOpacity, Pressable, Animated } from "react-native";
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { Text, View } from "../Themed";
-import { SimpleLineIcons, MaterialCommunityIcons, Entypo, FontAwesome } from "@expo/vector-icons";
+import { SimpleLineIcons, MaterialCommunityIcons, Entypo, FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import Video from "react-native-video";
 import { TimeAgo } from "../TimeAgo";
 import { Avatar } from "../avatars/avatar";
@@ -35,11 +35,11 @@ function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
   }
 
   //GET VIDEO VIEWS
-  const [totalViews, setTotalViews] = useState<any>(null);
-  const handleGetViews = async () => {
-    const res = await fetchViewCount(item.id);
-    setTotalViews(res?.view_count);
-  }
+  // const [totalViews, setTotalViews] = useState<any>(null);
+  // const handleGetViews = async () => {
+  //   const res = await fetchViewCount(item.id);
+  //   setTotalViews(res?.view_count);
+  // }
 
   //HANDLE INCREMENT VIEWS
   const handleIncrementViews = async () => {
@@ -198,17 +198,18 @@ function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
 
       {/* ACTIONS */}
       <View className="flex-row justify-between p-4">
-        <TouchableOpacity className={`flex-row gap-1 items-center rounded-full px-2 ${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-zinc-100'}`} onPress={() => handleGetViews()}>
+        <TouchableOpacity className={`flex-row gap-1 items-center rounded-full px-2 ${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-zinc-100'}`}>
           <FontAwesome name="eye" size={18} color={colorScheme == 'dark' ? 'white' : 'black'} />
-          <Text className="text-base">{totalViews && <FormatNumber number={totalViews} />}</Text>
+          {/* <Text className="text-base">{totalViews && <FormatNumber number={totalViews} />}</Text> */}
+          <Text className="text-base"><FormatNumber number={item["3sec_views"][0].view_count} /></Text>
         </TouchableOpacity>
         <View className="flex-row gap-4 self-end">
           <Pressable onPress={handleLikePress} className="flex-row items-center">
-            <SimpleLineIcons name="fire" size={26} color={item.liked || temporaryLiked ? "red" : `${colorScheme == 'dark' ? "white" : 'black'}`} />
+            <FontAwesome5 name="fire" size={24} color={item.liked || temporaryLiked ? "red" : `${colorScheme == 'dark' ? "white" : 'black'}`} />
             {likeCount > 0 && <Text className="ml-1 font-medium text-lg"><FormatNumber number={likeCount} /></Text>}
           </Pressable>
           <Pressable onPress={handleCommentPress} className="flex-row items-center">
-            <MaterialCommunityIcons name="message-reply-text-outline" size={28} color={`${colorScheme == 'dark' ? "white" : '#333'}`} />
+            <MaterialCommunityIcons name="message-reply-text-outline" size={26} color={`${colorScheme == 'dark' ? "white" : '#333'}`} />
             {commentCount > 0 && <Text className="ml-1 font-medium text-lg"><FormatNumber number={commentCount} /></Text>}
           </Pressable>
 

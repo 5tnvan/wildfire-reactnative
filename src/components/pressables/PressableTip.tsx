@@ -10,8 +10,8 @@ export function PressableTip({ onPress } : any) {
         onPress()
       }}
     >
-      <FontAwesome5 name="bitcoin" size={18} color="white" />
-      <Text className='font-semibold ml-1 text-white'>Tip Now</Text>
+      <FontAwesome5 name="ethereum" size={18} color="white" />
+      <Text className='font-semibold ml-1 text-base text-white'>Tip Now</Text>
     </Pressable>
   );
 }

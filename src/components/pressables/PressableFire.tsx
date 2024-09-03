@@ -1,8 +1,7 @@
-import { Pressable, TouchableOpacity } from 'react-native';
-import { Text, Image } from 'react-native';
+import { TouchableOpacity } from 'react-native';
+import { Text } from 'react-native';
 import FormatNumber from '../FormatNumber';
-import { SimpleLineIcons } from '@expo/vector-icons';
-import { PressableAnimated } from './PressableAnimated';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 type Props = {
   amount: number;
@@ -18,7 +17,7 @@ export function PressableFire({ amount, liked, onPress } : Props) {
         onPress()
       }}
     >
-      <SimpleLineIcons name="fire" size={22} color={liked.liked || liked.temporaryLiked ? 'red' : 'white'} />
+      <FontAwesome5 name="fire" size={22} color={liked.liked || liked.temporaryLiked ? 'red' : 'white'} />
       {amount > 0 && <Text className='font-medium text-base text-white ml-1'><FormatNumber number={amount} /></Text>}
     </TouchableOpacity>
   );

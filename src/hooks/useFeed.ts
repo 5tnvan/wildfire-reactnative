@@ -43,8 +43,8 @@ export const useFeed = () => {
     const user = await fetchUser();
 
     const { data, error } = await supabase
-      .from('3sec_desc_view')
-      .select('id, thumbnail_url, video_url, created_at, suppressed, country:country_id(id, name), profile:user_id(id, username, avatar_url), 3sec_fires(count), 3sec_comments(count)')
+      .from('3sec_random_view')
+      .select('id, thumbnail_url, video_url, created_at, suppressed, country:country_id(id, name), profile:user_id(id, username, avatar_url), 3sec_views(view_count), 3sec_fires(count), 3sec_comments(count)')
       .range(from, to)
       .neq('suppressed', true)
 
@@ -70,7 +70,16 @@ export const useFeed = () => {
           setHasMore(false); // No more data to fetch
         }
 
-        setFeed((existingFeed) => [...existingFeed, ...masterData]);
+        // Ensure no duplicates in the feed
+        setFeed((existingFeed) => {
+          const newFeed = [...existingFeed];
+          masterData.forEach(item => {
+            if (!newFeed.some(feedItem => feedItem.id === item.id)) {
+              newFeed.push(item);
+            }
+          });
+          return newFeed;
+        });
       }
     setIsLoading(false);
   };

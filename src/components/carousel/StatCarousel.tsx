@@ -9,6 +9,7 @@ import { useAuthUser } from '@/src/services/providers/AuthUserProvider';
 import { useIncomingTransactions } from '@/src/hooks/useIncomingTransactions';
 import { useUserFeed } from '@/src/hooks/useUserFeed';
 import { LevelsModal } from '../modals/LevelsModal';
+import { convertEthToUsd } from '@/src/utils/convertEthToUsd';
 
 const CARD_WIDTH = Dimensions.get('window').width * 0.6;
 const CARD_HEIGHT = 145
@@ -25,6 +26,7 @@ export default function StatCarousel() {
     const router = useRouter();
     const isFocused = useIsFocused(); // Get focused state
     const colorScheme = useColorScheme();
+    
     
     //CONSUME PROVIDERS
     const { profile } = useAuthUser();
@@ -44,7 +46,8 @@ export default function StatCarousel() {
     const highestLevel = profile?.levels.reduce((max: number, item: any) => item.level > max ? item.level : max, 0);
     const levelNames = ["noob", "creator", "builder", "architect", "visionary", "god-mode"];
     const levelName = levelNames[highestLevel] || "unknown";
-    const balance = (calculateSum(incomingRes.ethereumData) + calculateSum(incomingRes.baseData)).toFixed(3);
+    const sum = calculateSum(incomingRes.ethereumData) + calculateSum(incomingRes.baseData);
+    const balance = sum === 0 ? sum.toFixed(2) : sum.toFixed(3);
 
     // cardData[0].stat = sumOfViews;
     cardData[0].title = 'Level ' + highestLevel;

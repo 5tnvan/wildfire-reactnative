@@ -150,11 +150,11 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
     };
 
     //GET VIDEO VIEWS
-    const [totalViews, setTotalViews] = useState<any>(null);
-    const handleGetViews = async () => {
-        const res = await fetchViewCount(item.id);
-        setTotalViews(res?.view_count);
-    }
+    // const [totalViews, setTotalViews] = useState<any>(null);
+    // const handleGetViews = async () => {
+    //     const res = await fetchViewCount(item.id);
+    //     setTotalViews(res?.view_count);
+    // }
 
     //HANDLE INCREMENT VIEWS
     const handleIncrementViews = async () => {
@@ -203,9 +203,10 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
                 )}
                 {/* TOP */}
                 <SafeAreaView className='absolute right-2 flex-row gap-1 items-center'>
-                    <TouchableOpacity className={`flex-row items-center rounded-full bg-white/70`} onPress={() => handleGetViews()}>
+                    <TouchableOpacity className={`flex-row items-center rounded-full bg-white/70`}>
                         <View className='px-2 py-1'><FontAwesome name="eye" size={18} color="black" /></View>
-                        {totalViews && <Text className='text-lg mr-2'><FormatNumber number={totalViews} /></Text>}
+                        {/* {totalViews && <Text className='text-lg mr-2'><FormatNumber number={totalViews} /></Text>} */}
+                        <Text className='text-lg mr-2'><FormatNumber number={item["3sec_views"][0].view_count} /></Text>
                     </TouchableOpacity>
                     <Pressable onPress={handleThreeDotsPress}><Entypo name="dots-three-vertical" size={18} color={colorScheme == 'dark' ? 'white' : 'black'} /></Pressable>
                 </SafeAreaView>
@@ -230,7 +231,7 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
                             <PressableComment amount={commentCount} onPress={handleCommentPress} />
                         </View>
                         <View className='bg-secondary/70 flew-row rounded-full px-4 py-2 grow mr-1'>
-                            <PressableTip onPress={() => Linking.openURL("https://www.wildpay.app/" + item.profile.username)} />
+                            <PressableTip onPress={() => Linking.openURL("https://www.3seconds.me/" + item.profile.username)} />
                         </View>
                         <View className='bg-secondary/70 flew-row rounded-full px-4 py-1 grow mr-0'>
                             <PressableFire liked={{ liked: item.liked, temporaryLiked: temporaryLiked }} amount={likeCount} onPress={handleLikePress} />
