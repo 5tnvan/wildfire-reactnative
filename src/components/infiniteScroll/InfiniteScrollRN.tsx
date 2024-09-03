@@ -59,6 +59,7 @@ export default function InfiniteScrollRN() {
       <FlatList
         data={feed}
         renderItem={renderItem}
+        keyExtractor={(item, index) => `${item.id}-${index}`}
         pagingEnabled
         horizontal={false}
         showsVerticalScrollIndicator={false}

@@ -13,13 +13,13 @@ type Props = {
 export function PressableComment({ amount, onPress } : Props) {
   return (
     <TouchableOpacity
-      className='flex-row items-center justify-evenly '
+      className='flex-row items-center justify-center '
       onPress={() => {
         onPress();
       }}
     >
       <MaterialCommunityIcons name="message-reply-text-outline" size={26} color="white" />
-      {amount > 0 && <Text className='font-medium text-base text-white ml-1'><FormatNumber number={amount} /></Text>}
+      {amount > 0 && <Text className='font-medium text-base text-white ml-2'><FormatNumber number={amount} /></Text>}
     </TouchableOpacity>
   );
 }

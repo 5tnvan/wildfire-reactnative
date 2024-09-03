@@ -4,12 +4,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { fetchUser } from "../utils/fetch/fetchUser";
 
-const getRange = (page: number, range: number) => {
-  const from = page * range;
-  const to = from + range - 1;
-  return { from, to };
-};
-
 /**
  * useFeed HOOK
  * Use this to get feed of videos
@@ -20,33 +14,28 @@ export const useFeed = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [feed, setFeed] = useState<any[]>([]);
   const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
   const [triggerRefetch, setTriggerRefetch] = useState(false);
 
   const refetch = () => {
     setPage(0); // Reset page
     setFeed([]); // Reset feed
-    setHasMore(true); // Reset hasMore to true
     setTriggerRefetch(prev => !prev); // Trigger refetch
   };
 
   const fetchMore = () => {
-    if (hasMore) {
-      setPage((prevPage) => prevPage + 1); // Increase page by 1
-    }
+    setPage((prevPage) => prevPage + 1); // Increase page by 1
   };
 
   const fetchFeed = async () => {
     setIsLoading(true);
-    const { from, to } = getRange(page, range);
 
     const user = await fetchUser();
 
     const { data, error } = await supabase
       .from('3sec_random_view')
-      .select('id, thumbnail_url, video_url, created_at, suppressed, country:country_id(id, name), profile:user_id(id, username, avatar_url), 3sec_views(view_count), 3sec_fires(count), 3sec_comments(count)')
-      .range(from, to)
+      .select('id, thumbnail_url, video_url, created_at, suppressed, country:country_id(id, name), profile:user_id(id, username, avatar_url), 3sec_tips(created_at, network, transaction_hash, amount, currency, comment, tipper:wallet_id(id, username, avatar_url)), 3sec_views(view_count), 3sec_fires(count), 3sec_comments(count)')
       .neq('suppressed', true)
+      .limit(range)
 
       if (error) {
         console.error("useFeed Error fetching data:", error);
@@ -66,20 +55,7 @@ export const useFeed = () => {
         // Wait for all promises to resolve
         const masterData = await Promise.all(likedPostsPromises);
 
-        if (data.length < range) {
-          setHasMore(false); // No more data to fetch
-        }
-
-        // Ensure no duplicates in the feed
-        setFeed((existingFeed) => {
-          const newFeed = [...existingFeed];
-          masterData.forEach(item => {
-            if (!newFeed.some(feedItem => feedItem.id === item.id)) {
-              newFeed.push(item);
-            }
-          });
-          return newFeed;
-        });
+        setFeed(existingFeed => [...existingFeed, ...masterData]);
       }
     setIsLoading(false);
   };

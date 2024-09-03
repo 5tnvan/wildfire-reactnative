@@ -203,11 +203,10 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
                 )}
                 {/* TOP */}
                 <SafeAreaView className='absolute right-2 flex-row gap-1 items-center'>
-                    <TouchableOpacity className={`flex-row items-center rounded-full bg-white/70`}>
+                    {/* <TouchableOpacity className={`flex-row items-center rounded-full bg-white/70`}>
                         <View className='px-2 py-1'><FontAwesome name="eye" size={18} color="black" /></View>
-                        {/* {totalViews && <Text className='text-lg mr-2'><FormatNumber number={totalViews} /></Text>} */}
                         <Text className='text-lg mr-2'><FormatNumber number={item["3sec_views"][0].view_count} /></Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                     <Pressable onPress={handleThreeDotsPress}><Entypo name="dots-three-vertical" size={18} color={colorScheme == 'dark' ? 'white' : 'black'} /></Pressable>
                 </SafeAreaView>
                 {/* BOTTOM */}
@@ -226,15 +225,24 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
                             </View>
                         }
                     </View>
-                    <View className='flex-row items-center mt-2 mb-5 grow justify-between'>
-                        <View className='bg-secondary/70 rounded-full px-4 py-1 grow mr-1'>
-                            <PressableComment amount={commentCount} onPress={handleCommentPress} />
-                        </View>
-                        <View className='bg-secondary/70 flew-row rounded-full px-4 py-2 grow mr-1'>
+                    <View className='flex-row items-center mt-2 mb-2 grow justify-between'>
+                        <View className='bg-accent/70 rounded-full py-2 grow mr-1'>
                             <PressableTip onPress={() => Linking.openURL("https://www.3seconds.me/" + item.profile.username)} />
                         </View>
-                        <View className='bg-secondary/70 flew-row rounded-full px-4 py-1 grow mr-0'>
+                        <View className='bg-base-100/70 rounded-full px-4 py-2 grow mr-1 items-center'>
+                            <Text className='text-base font-medium'>$35.5</Text>
+                        </View>
+                    </View>
+                    <View className='flex-row items-center mb-5 grow justify-between gap-1'>
+                        <TouchableOpacity className={`flex-row justify-center items-center rounded-full py-2 bg-secondary/70 grow`}>
+                            <View className='px-2 py-1'><FontAwesome name="eye" size={18} color="white" /></View>
+                            <Text className='text-base font-medium mr-2 text-white'><FormatNumber number={item["3sec_views"][0].view_count} /></Text>
+                        </TouchableOpacity>
+                        <View className='bg-secondary/70 rounded-full px-4 py-2 grow mr-0'>
                             <PressableFire liked={{ liked: item.liked, temporaryLiked: temporaryLiked }} amount={likeCount} onPress={handleLikePress} />
+                        </View>
+                        <View className='bg-secondary/70 rounded-full px-4 py-2 grow mr-1'>
+                            <PressableComment amount={commentCount} onPress={handleCommentPress} />
                         </View>
                     </View>
                 </LinearGradient>
