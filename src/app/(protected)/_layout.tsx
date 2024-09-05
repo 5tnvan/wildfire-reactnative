@@ -10,7 +10,7 @@ import { useAuth } from '../../services/providers/AuthProvider';
 import AuthUserProvider, { useAuthUser } from '../../services/providers/AuthUserProvider';
 import AuthUserFollowsProvider from '@/src/services/providers/AuthUserFollowsProvider';
 import AuthUserNotificationProvider, { useAuthUserNotifications } from '@/src/services/providers/AuthUserNotificationProvider';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import Push from '@/src/components/Push';
 
 /** 
@@ -93,7 +93,9 @@ const unreadNotifications = [
           tabBarIcon: ({ color }) => 
             <View>
               <Avatar avatar_url={profile?.avatar_url} username={profile?.username} size={'sm'} ring={true} />
-              {unreadNotifications && unreadNotifications.length > 0 && <View className="absolute right-1 top-0 w-2 h-2 rounded-full bg-red-600 border border-white"></View>}
+              {unreadNotifications && unreadNotifications.length > 0 && <View className="absolute right-0 top-0 w-5 h-5 rounded-full bg-red-600" style={{ right: -10, top: -2}}>
+                <Text className='text-xs text-white self-center font-bold'>{unreadNotifications.length}</Text>
+              </View>}
             </View>
           ,
         }}

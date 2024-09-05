@@ -2,7 +2,7 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Animated, TouchableOpacity, Linking, Dimensions, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Entypo, FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Entypo, FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import Video from 'react-native-video';
 import { PressableComment } from '../pressables/PressableComment';
 import { PressableFire } from '../pressables/PressableFire';
@@ -21,6 +21,8 @@ import { fetchViewCount } from '@/src/utils/fetch/fetchViewCount';
 import { ThreeDotsModal } from '../modals/ThreeDotsModal';
 
 function InfiniteScrollItem({ item, isPlaying }: any) {
+
+    console.log("item", item);
 
     const router = useRouter();
     const colorScheme = useColorScheme();
@@ -149,13 +151,6 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
         }
     };
 
-    //GET VIDEO VIEWS
-    // const [totalViews, setTotalViews] = useState<any>(null);
-    // const handleGetViews = async () => {
-    //     const res = await fetchViewCount(item.id);
-    //     setTotalViews(res?.view_count);
-    // }
-
     //HANDLE INCREMENT VIEWS
     const handleIncrementViews = async () => {
         increment_views(item.id);
@@ -225,13 +220,15 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
                             </View>
                         }
                     </View>
-                    <View className='flex-row items-center mt-2 mb-2 grow justify-between'>
+                    <View className='flex-row items-center mt-2 mb-2 grow'>
                         <View className='bg-accent/70 rounded-full py-2 grow mr-1'>
                             <PressableTip onPress={() => Linking.openURL("https://www.3seconds.me/" + item.profile.username)} />
                         </View>
-                        <View className='bg-base-100/70 rounded-full px-4 py-2 grow mr-1 items-center'>
-                            <Text className='text-base font-medium'>$35.5</Text>
-                        </View>
+                        {item['3sec_tips'].length > 0 && <View className='bg-base-100/70 rounded-full py-2 grow mr-1 justify-center items-center flex-row'>
+                            <MaterialCommunityIcons name="hand-heart-outline" size={18} color={colorScheme == 'dark' ? 'black' : 'black'} />
+                            <Text className='text-base font-medium ml-1'>{item['3sec_tips'].reduce((sum:any, tip:any) => sum + tip.amount, 0).toFixed(3)} ETH</Text>
+                        </View>}
+                        
                     </View>
                     <View className='flex-row items-center mb-5 grow justify-between gap-1'>
                         <TouchableOpacity className={`flex-row justify-center items-center rounded-full py-2 bg-secondary/70 grow`}>

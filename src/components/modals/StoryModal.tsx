@@ -201,7 +201,7 @@ export default function StoryModal({ visible, data, storyIndex, onClose }: Props
           onLongPress={handlePressIn}
           onPressOut={handlePressOut}
           style={styles.container}>
-          <View style={styles.container} className='bg-white flex-1'>
+          <View style={styles.container} className='bg-black/50 flex-1'>
 
             {/* STORY VIDEO */}
             {renderStoryContent(currentStory)}

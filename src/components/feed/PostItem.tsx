@@ -198,14 +198,21 @@ function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
 
       {/* ACTIONS */}
       <View className="flex-row justify-between p-4">
-        <TouchableOpacity className={`flex-row gap-1 items-center rounded-full px-2 ${colorScheme == 'dark' ? 'bg-zinc-800' : 'bg-zinc-100'}`}>
-          <FontAwesome name="eye" size={18} color={colorScheme == 'dark' ? 'white' : 'black'} />
+        <View className="flex-row">
+        {item['3sec_tips']?.length > 0 &&
+        <TouchableOpacity className={`flex-row gap-1 rounded-full px-2 bg-accent`}>
+          <MaterialCommunityIcons name="hand-heart-outline" size={18} color={colorScheme == 'dark' ? 'black' : 'black'} />
+        <Text className='text-base text-black font-medium'>{item['3sec_tips'].reduce((sum:any, tip:any) => sum + tip.amount, 0).toFixed(3)} ETH</Text>
+      </TouchableOpacity>
+        }</View>
+        <View className="flex-row gap-4 items-center self-end">
+        <View className={`flex-row items-center`}>
+          <FontAwesome name="eye" size={20} color={colorScheme == 'dark' ? 'white' : 'black'} />
           {/* <Text className="text-base">{totalViews && <FormatNumber number={totalViews} />}</Text> */}
-          <Text className="text-base"><FormatNumber number={item["3sec_views"][0].view_count} /></Text>
-        </TouchableOpacity>
-        <View className="flex-row gap-4 self-end">
+          <Text className="text-lg font-medium ml-1"><FormatNumber number={item["3sec_views"][0].view_count} /></Text>
+        </View>
           <Pressable onPress={handleLikePress} className="flex-row items-center">
-            <FontAwesome5 name="fire" size={24} color={item.liked || temporaryLiked ? "red" : `${colorScheme == 'dark' ? "white" : 'black'}`} />
+            <FontAwesome5 name="fire" size={22} color={item.liked || temporaryLiked ? "red" : `${colorScheme == 'dark' ? "white" : 'black'}`} />
             {likeCount > 0 && <Text className="ml-1 font-medium text-lg"><FormatNumber number={likeCount} /></Text>}
           </Pressable>
           <Pressable onPress={handleCommentPress} className="flex-row items-center">
