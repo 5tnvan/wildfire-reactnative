@@ -22,7 +22,7 @@ export const useDailyPostLimit = () => {
   const init = async () => {
     setIsLoading(true);
 
-    // Fetch user
+    const now = new Date(); // Get current date and time
     const user = await fetchUser();
 
     // Fetch level (if data returns, setLevel to 1, otherwise leave level as 0)
@@ -38,7 +38,7 @@ export const useDailyPostLimit = () => {
       .select('id, created_at')
       .eq('user_id', user.user?.id)
       .order('created_at', { ascending: false })
-      .limit(2);
+      .limit(6);
 
     if (postsError) {
       console.error(postsError);
@@ -48,62 +48,24 @@ export const useDailyPostLimit = () => {
 
     setPosts(posts);
 
-    const now = new Date();
+    // Determine the allowed number of posts based on user classification
+    const maxPosts = levelData ? 6 : 3; // 'Creator' allows 6 posts, 'Noob' allows 3 posts
 
-    if (!levelData) {
-      if (posts && posts.length > 0) {
-        const postDate = new Date(posts[0].created_at);
-        const diff = (now.getTime() - postDate.getTime()) / (1000 * 60 * 60); // difference in hours
+    // Filter posts made within the last 24 hours, default to empty array if posts is undefined
+    const postsInLast24Hours = (posts || []).filter(post => {
+      const postDate = new Date(post.created_at);
+      const diff = (now.getTime() - postDate.getTime()) / (1000 * 60 * 60); // Difference in hours
+      return diff < 24;
+    });
 
-        if (diff < 24) {
-          setLimit(true);
-          setPostLeft(0);
-        } else {
-          setLimit(false);
-          setPostLeft(1);
-        }
-      } else {
-        setLimit(false);
-        setPostLeft(1);
-      }
-    }
+    // Calculate the number of posts left
+    const postsLeft = Math.max(0, maxPosts - postsInLast24Hours.length);
+    setPostLeft(postsLeft);
 
-    if (levelData) {
-      if (posts && posts.length > 1) {
-        
-        const postDate1 = new Date(posts[0].created_at);
-        const postDate2 = new Date(posts[1].created_at);
-        const diff1 = (now.getTime() - postDate1.getTime()) / (1000 * 60 * 60); // difference in hours
-        const diff2 = (now.getTime() - postDate2.getTime()) / (1000 * 60 * 60); // difference in hours
+    // Determine if the user has reached their limit
+    setLimit(postsLeft === 0);
 
-        if (diff1 < 24 && diff2 < 24) {
-          setLimit(true);
-          setPostLeft(0);
-        } else if (diff1 < 24) {
-          setLimit(false);
-          setPostLeft(1);
-        } else {
-          setLimit(false);
-          setPostLeft(2);
-        }
-      } else if (posts && posts?.length === 1) {
-        const postDate = new Date(posts[0].created_at);
-        const diff = (now.getTime() - postDate.getTime()) / (1000 * 60 * 60); // difference in hours
-
-        if (diff < 24) {
-          setLimit(false);
-          setPostLeft(1);
-        } else {
-          setLimit(false);
-          setPostLeft(2);
-        }
-      } else {
-        setLimit(false);
-        setPostLeft(2);
-      }
-    }
-
-    setIsLoading(false);
+    setIsLoading(false); // Stop loading
   };
 
   useEffect(() => {
