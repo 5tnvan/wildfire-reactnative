@@ -12,6 +12,7 @@ import AuthUserFollowsProvider from '@/src/services/providers/AuthUserFollowsPro
 import AuthUserNotificationProvider, { useAuthUserNotifications } from '@/src/services/providers/AuthUserNotificationProvider';
 import { View, Text } from 'react-native';
 import Push from '@/src/components/Push';
+import FormatNumber from '@/src/components/FormatNumber';
 
 /** 
  * TAB BAR ICON
@@ -93,8 +94,15 @@ const unreadNotifications = [
           tabBarIcon: ({ color }) => 
             <View>
               <Avatar avatar_url={profile?.avatar_url} username={profile?.username} size={'sm'} ring={true} />
-              {unreadNotifications && unreadNotifications.length > 0 && <View className="absolute right-0 top-0 w-6 h-6 rounded-full bg-red-600 items-center justify-center" style={{ right: -10, top: -2}}>
-                <Text className='text-xs text-white font-bold'>{unreadNotifications.length}</Text>
+              {unreadNotifications && unreadNotifications.length > 0 && 
+              <View
+              className={`absolute right-0 top-0 rounded-full ${unreadNotifications.length > 10 ? 'px-1 py-1' : 'px-1 py-1'} bg-red-600 items-center justify-center`}
+              style={{
+                right: unreadNotifications.length > 100 ? -15 : -10,
+                top: -3,
+              }}
+            >
+                <Text className='text-xs text-white font-bold'><FormatNumber number={unreadNotifications.length} /></Text>
               </View>}
             </View>
           ,

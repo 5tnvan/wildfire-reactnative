@@ -17,7 +17,6 @@ import { FiresModal } from '../modals/FiresModal';
 import { CommentsModal } from '../modals/CommentsModal';
 import { useAuth } from '../../services/providers/AuthProvider';
 import { increment_views } from '../../utils/views/incrementViews';
-import { fetchViewCount } from '@/src/utils/fetch/fetchViewCount';
 import { ThreeDotsModal } from '../modals/ThreeDotsModal';
 
 function InfiniteScrollItem({ item, isPlaying }: any) {
@@ -166,6 +165,17 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
         }
     }
 
+    //HANLDE FOLLOW
+    const [temporaryFollowed, setTemporaryFollowed] = useState(false);
+    const handleFollow = async () => {
+        console.log("follower_id", user?.id);
+        console.log("following_id", item.profile.id);
+        const { error } = await supabase
+          .from("followers")
+          .insert({ follower_id: user?.id, following_id: item.profile.id });
+        if (!error) setTemporaryFollowed(true);
+      }
+
     return (
         <>
             <Pressable onPress={handleManualPause}>
@@ -209,16 +219,31 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
                     <View className='flex-col items-center justify-between'>
                         <View className='flex-row items-center'>
                             <PressableAvatarWithUsername avatar_url={item.profile.avatar_url} username={item.profile.username} />
+                            {item.followed != null &&
+                  <View className='ml-1'>
+                    {
+                      item.followed || temporaryFollowed ?
+                        <View className='flex-row items-center bg-zinc-900/10 border rounded-lg border-white px-2 py-0 ml-1'>
+                          <Text className='text-white mr-1 text-base' style={styles.shadow}>Following</Text>
+                          <FontAwesome5 name="check" size={10} color="white" />
+                        </View>
+                        :
+                        <TouchableOpacity className='bg-zinc-900/10 border rounded-lg border-white px-2 py-0 ml-1' onPress={handleFollow}><Text className='text-white text-base' style={styles.shadow}>Follow +</Text></TouchableOpacity>
+                    }
+
+                  </View>}
+                        </View>
+                        <View className='flex flex-row'>
+                            {item.country &&
+                                <View className='flex-row items-center'>
+                                    <FontAwesome name="location-arrow" size={14} color="white" />
+                                    <Text className='text-white text-lg ml-1' style={styles.shadow}>{item.country?.name}</Text>
+                                </View>
+                            }
                             <Text className='ml-1 text-lg text-white mr-2'>
                                 <TimeAgo timestamp={item.created_at}></TimeAgo>
                             </Text>
                         </View>
-                        {item.country &&
-                            <View className='flex-row items-center'>
-                                <FontAwesome name="location-arrow" size={14} color="white" />
-                                <Text className='text-white text-lg ml-1' style={styles.shadow}>{item.country?.name}</Text>
-                            </View>
-                        }
                     </View>
                     <View className='flex-row items-center mt-2 mb-2 grow'>
                         <View className='bg-accent/70 rounded-full py-2 grow mr-1'>
@@ -228,7 +253,6 @@ function InfiniteScrollItem({ item, isPlaying }: any) {
                             <MaterialCommunityIcons name="hand-heart-outline" size={18} color={colorScheme == 'dark' ? 'black' : 'black'} />
                             <Text className='text-base font-medium ml-1'>{item['3sec_tips'].reduce((sum:any, tip:any) => sum + tip.amount, 0).toFixed(3)} ETH</Text>
                         </View>}
-                        
                     </View>
                     <View className='flex-row items-center mb-5 grow justify-between gap-1'>
                         <TouchableOpacity className={`flex-row justify-center items-center rounded-full py-2 bg-secondary/70 grow`}>

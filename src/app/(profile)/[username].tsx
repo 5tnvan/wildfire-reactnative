@@ -1,4 +1,4 @@
-import { View, Pressable, useColorScheme, StyleSheet, useWindowDimensions, Modal, ActivityIndicator, Linking } from 'react-native';
+import { View, Pressable, useColorScheme, StyleSheet, useWindowDimensions, Modal, ActivityIndicator, Linking, TouchableOpacity } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Text } from '../../components/Themed';
 import { useUser } from '@/src/hooks/useUser';
@@ -21,6 +21,10 @@ import WheelOfFortuneItem from '@/src/components/carousel/WheelOfFortuneItem';
 import StoryModal from '@/src/components/modals/StoryModal';
 import 'react-native-gesture-handler';
 import { ThreeDotsModal } from '@/src/components/modals/ThreeDotsModal';
+import { FollowersModal } from '@/src/components/modals/FollowersModal';
+import { FollowingModal } from '@/src/components/modals/FolllowingModal';
+import { calculateSum } from '@/src/utils/calculateSum';
+import { useIncomingTransactions } from '@/src/hooks/useIncomingTransactions';
 
 export default function ProfileUsernameScreen() {
 
@@ -35,8 +39,12 @@ export default function ProfileUsernameScreen() {
   const { user: authUser } = useAuth();
   const { user, isBlocked, refetch: refetchUser } = useUser(username);
   const { followed, followers, following, refetch: refetchFollows } = useUserFollows(username);
+  
+  //FETCH DIRECTLY
+  const incomingRes = useIncomingTransactions(user?.wallet_id);
 
-  console.log("isBlocked", isBlocked);
+  //CALCULATE BALANCE
+  const sum = calculateSum(incomingRes.ethereumData) + calculateSum(incomingRes.baseData);
 
   //THREE DOTS
   const [threeDotsModalVisible, setThreeDotsModalVisible] = useState(false);
@@ -51,7 +59,9 @@ export default function ProfileUsernameScreen() {
   //MODALS
   const [storyModalVisible, setStoryModalVisible] = useState(false);
   const [followsModalVisible, setFollowsModalVisible] = useState(false); //follows modal
-  
+  const [followersModalVisible, setFollowersModalVisible] = useState(false);
+  const [followingModalVisible, setFollowingModalVisible] = useState(false);
+
   //SPINNING CAROUSELL ANIMATION 
   const x = useSharedValue(0);
   const ITEM_WIDTH = 250;
@@ -79,7 +89,7 @@ export default function ProfileUsernameScreen() {
       .from("followers")
       .insert({ follower_id: authUser?.id, following_id: user.id });
     if (!error) refetchFollows();
-  }  
+  }
 
   if (!user) return <><Text>User not found</Text></>
 
@@ -108,16 +118,16 @@ export default function ProfileUsernameScreen() {
                   <Text className='text-black font-medium'>Follow</Text>
                 </PressableAnimated>
               }
-              <Pressable onPress={handleThreeDotsPress} className='ml-1'><Entypo name="dots-three-vertical" size={18} color={colorScheme == 'dark' ? 'white' : 'black'} /></Pressable>  
+              <Pressable onPress={handleThreeDotsPress} className='ml-1'><Entypo name="dots-three-vertical" size={18} color={colorScheme == 'dark' ? 'white' : 'black'} /></Pressable>
             </View>
           )
         }} />
         {/* FOLLOWS MODAL */}
         {followsModalVisible && <FollowsModal visible={followsModalVisible} data={{ user: user, followers: followers }} onClose={() => { setFollowsModalVisible(false); refetchFollows() }} />}
-        
+
         {/* THREE DOT MODAL */}
         {threeDotsModalVisible && <ThreeDotsModal visible={threeDotsModalVisible} data={{ blocking_id: user.id, isBlocked: isBlocked }} report={false} block={true} onClose={() => setThreeDotsModalVisible(false)} />}
-        
+
         {/* CONTAINER FOR MAIN CONTENT*/}
         <View className="flex-1 flex-col justify-between">
 
@@ -168,7 +178,7 @@ export default function ProfileUsernameScreen() {
             </>}
 
           {/* USER BOTTOM INFO */}
-          <View className={`${colorScheme == "dark" ? "bg-zinc-900" : "bg-white"} w-full items-center justify-center p-10`}>
+          <View className={`${colorScheme == "dark" ? "bg-zinc-900" : "bg-white"} w-full items-center justify-center pb-10 pt-8`}>
             <View className='absolute' style={{ top: -30 }}>
               <Avatar
                 avatar_url={user.avatar_url}
@@ -178,26 +188,42 @@ export default function ProfileUsernameScreen() {
               ></Avatar>
             </View>
             <Text className='font-medium text-lg text-accent'>@{user.username}</Text>
-            <Pressable className="flex-row gap-1 mb-3">
-              <Text className="font-semibold text-lg text-accent">
-                {followers?.length}
-              </Text>
-              <Text className="text-lg">followers</Text>
-              {/* <Text className="font-semibold text-lg text-accent">
-            {following?.length}
-          </Text>
-          <Text className="text-lg">following</Text> */}
-            </Pressable>
-            <PressableAnimated
-              onPress={() => (Linking.openURL('https://www.3seconds.me/' + username))}>
-              <Text className="text-lg"> </Text>
-              <Text className="text-base">Tip Now</Text>
-              <MaterialCommunityIcons
-                name="ethereum"
-                size={17}
-                color={colorScheme === "dark" ? "white" : "black"} // Adjust color based on colorScheme
-              />
-            </PressableAnimated>
+            <View className="flex-row items-center mb-1">
+              <TouchableOpacity className="flex-row gap-1 mb-3" onPress={() => setFollowersModalVisible(true)}>
+                <Text className="font-semibold text-lg text-accent">
+                  {followers?.length}
+                </Text>
+                <Text className="text-lg">followers</Text>
+              </TouchableOpacity>
+              <TouchableOpacity className="flex-row gap-1 mb-3 ml-1" onPress={() => setFollowingModalVisible(true)}>
+                <Text className="font-semibold text-lg text-accent">
+                  {following?.length}
+                </Text>
+                <Text className="text-lg">following</Text>
+              </TouchableOpacity>
+            </View>
+            {/* FOLLOWERS MODAL */}
+            <FollowersModal visible={followersModalVisible} data={{ user: user, followers: followers }} onClose={() => setFollowersModalVisible(false)} />
+            {/* FOLLOWING MODAL */}
+            <FollowingModal visible={followingModalVisible} data={{ user: user, following: following }} onClose={() => setFollowingModalVisible(false)} />
+            {/* TIP NOW */}
+            <View className="flex flex-row w-full justify-center">
+              <PressableAnimated
+                className="bg-accent px-9"
+                onPress={() => (Linking.openURL('https://www.3seconds.me/' + username))}>
+                <Text className="text-lg"> </Text>
+                <Text className="text-base">Tip Now</Text>
+                {/* <MaterialCommunityIcons
+                  name="ethereum"
+                  size={14}
+                  color={colorScheme === "dark" ? "white" : "black"} // Adjust color based on colorScheme
+                /> */}
+              </PressableAnimated>
+              {sum > 0 && <View className='bg-neutral rounded-full py-2 px-4 mr-2 justify-center items-center flex-row ml-1'>
+                <MaterialCommunityIcons name="hand-heart-outline" size={18} color={colorScheme == 'dark' ? 'black' : 'black'} />
+                <Text className='text-base font-medium ml-1'>{sum.toFixed(3)} ETH</Text>
+              </View>}
+            </View>
           </View>
         </View>
       </>

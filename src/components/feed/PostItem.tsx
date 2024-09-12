@@ -205,13 +205,13 @@ function PostItem({ item, isPlaying, isMuted, toggleMute }: any) {
         <Text className='text-base text-black font-medium'>{item['3sec_tips'].reduce((sum:any, tip:any) => sum + tip.amount, 0).toFixed(3)} ETH</Text>
       </TouchableOpacity>
         }</View>
-        <View className="flex-row gap-4 items-center self-end">
-        <View className={`flex-row items-center`}>
-          <FontAwesome name="eye" size={20} color={colorScheme == 'dark' ? 'white' : 'black'} />
-          {/* <Text className="text-base">{totalViews && <FormatNumber number={totalViews} />}</Text> */}
-          <Text className="text-lg font-medium ml-1"><FormatNumber number={item["3sec_views"][0].view_count} /></Text>
-        </View>
-          <Pressable onPress={handleLikePress} className="flex-row items-center">
+        <View className="flex-row items-center self-end">
+          <View className={`flex-row items-center`}>
+            <FontAwesome name="eye" size={20} color={colorScheme == 'dark' ? 'white' : 'black'} />
+            {/* <Text className="text-base">{totalViews && <FormatNumber number={totalViews} />}</Text> */}
+            <Text className="text-lg font-medium ml-1"><FormatNumber number={item["3sec_views"][0].view_count} /></Text>
+          </View>
+          <Pressable onPress={handleLikePress} className="flex-row items-center px-2.5">
             <FontAwesome5 name="fire" size={22} color={item.liked || temporaryLiked ? "red" : `${colorScheme == 'dark' ? "white" : 'black'}`} />
             {likeCount > 0 && <Text className="ml-1 font-medium text-lg"><FormatNumber number={likeCount} /></Text>}
           </Pressable>

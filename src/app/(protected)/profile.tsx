@@ -30,6 +30,8 @@ import { NotificationModal } from "@/src/components/modals/NotificationModal";
 import { useAuthUserNotifications } from "@/src/services/providers/AuthUserNotificationProvider";
 import StoryModal from "@/src/components/modals/StoryModal";
 import 'react-native-gesture-handler';
+import { useIncomingTransactions } from "@/src/hooks/useIncomingTransactions";
+import { calculateSum } from "@/src/utils/calculateSum";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -46,6 +48,10 @@ export default function ProfileScreen() {
 
   //FETCH DIRECTLY 
   const { isLoading: isLoadingFeed, feed, refetch: refetchFeed } = useUserFeed(profile.id);
+  const incomingRes = useIncomingTransactions(profile?.wallet_id);
+
+  //CALCULATE BALANCE
+  const sum = calculateSum(incomingRes.ethereumData) + calculateSum(incomingRes.baseData);
 
   //MODALS
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
@@ -222,17 +228,24 @@ export default function ProfileScreen() {
             {/* FOLLOWING MODAL */}
             <FollowingModal visible={followingModalVisible} data={{ user: profile, following: following }} onClose={() => setFollowingModalVisible(false)} />
             {/* TIP NOW */}
-            <PressableAnimated
-              className={''}
-              onPress={() => (Linking.openURL('https://www.3seconds.me/' + profile.username))}>
-              <Text className="text-lg"> </Text>
-              <Text className="text-base">Tip Now</Text>
-              <MaterialCommunityIcons
-                name="ethereum"
-                size={14}
-                color={colorScheme === "dark" ? "white" : "black"} // Adjust color based on colorScheme
-              />
-            </PressableAnimated>
+            <View className="flex flex-row w-full justify-center">
+              <PressableAnimated
+                className="bg-accent px-9"
+                onPress={() => (Linking.openURL('https://www.3seconds.me/' + profile.username))}>
+                <Text className="text-lg"> </Text>
+                <Text className="text-base">Tip Now</Text>
+                {/* <MaterialCommunityIcons
+                  name="ethereum"
+                  size={14}
+                  color={colorScheme === "dark" ? "white" : "black"} // Adjust color based on colorScheme
+                /> */}
+              </PressableAnimated>
+              {sum > 0 && <View className='bg-neutral rounded-full py-2 px-4 mr-2 justify-center items-center flex-row ml-1'>
+                <MaterialCommunityIcons name="hand-heart-outline" size={18} color={colorScheme == 'dark' ? 'black' : 'black'} />
+                <Text className='text-base font-medium ml-1'>{sum.toFixed(3)} ETH</Text>
+              </View>}
+            </View>
+
           </View>
         </View>
       </>

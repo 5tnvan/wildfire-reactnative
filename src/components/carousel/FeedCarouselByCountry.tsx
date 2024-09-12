@@ -1,10 +1,6 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Text, FlatList, Dimensions, Pressable, Modal, Animated } from 'react-native';
-import Video from 'react-native-video';
 import { useFeedFromCountry } from '@/src/hooks/useFeedFromCountry';
-import { FontAwesome } from '@expo/vector-icons';
-import { useIsFocused } from '@react-navigation/native';
-import Story from '../story/Story';
 import StoryModal from '../modals/StoryModal';
 import FeedCarouselItem from './FeedCarouselItem';
 
