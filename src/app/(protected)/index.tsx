@@ -6,6 +6,7 @@ import StatCarousel from '@/src/components/carousel/StatCarousel';
 import FollowingCarousel from '@/src/components/carousel/FollowingCarousel';
 import Header from '../../components/feed/Header';
 import Posts from '../../components/feed/Posts';
+import { Settings } from 'react-native-fbsdk-next';
 
 export default function IndexScreen() {
   const isFocused = useIsFocused();
@@ -16,6 +17,13 @@ export default function IndexScreen() {
   
   //STATES
   const [isScrolling, setIsScrolling] = useState(false);
+
+  // HIDE WHEN SCROLL ANIMATION
+  useEffect(() => {
+    Settings.initializeSDK();
+    Settings.setAdvertiserTrackingEnabled(true);
+    console.log("done")
+  }, []);
 
   // HIDE WHEN SCROLL ANIMATION
   useEffect(() => {
